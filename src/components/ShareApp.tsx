@@ -10,9 +10,13 @@ const MESSAGES: Record<Lang, { label: string; title: string; text: string }> = {
     title: "Haya Al-Salat — a peaceful Fajr companion",
     text: `Assalamu Alaikum! 🌙
 
-I wanted to share Haya Al-Salat — a peaceful Fajr companion that gently wakes you before dawn with the beautiful recitation of Surat Al-Mu'minun by Mukhtar Al-Hajj, so you begin your day with remembrance of Allah.
+I made a peaceful Fajr companion called Haya Al-Salat. It gently wakes you before dawn with Surat Al-Mu'minun by Mukhtar Al-Hajj and shows local prayer times.
 
-Try it here: ${APP_URL}`,
+Try it here: ${APP_URL}
+
+If it blesses your morning, please share it with others. 🤲
+
+Jazakum Allahu Khairan!`,
   },
   sv: {
     label: "Svenska",
