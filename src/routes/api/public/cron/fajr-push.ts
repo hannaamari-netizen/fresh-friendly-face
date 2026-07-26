@@ -73,7 +73,7 @@ function concat(...arrs: Uint8Array[]): Uint8Array {
 async function hkdf(salt: Uint8Array, ikm: Uint8Array, info: Uint8Array, length: number): Promise<Uint8Array> {
   const key = await crypto.subtle.importKey("raw", ikm as BufferSource, { name: "HKDF" }, false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits(
-    { name: "HKDF", hash: "SHA-256", salt, info },
+    { name: "HKDF", hash: "SHA-256", salt: salt as BufferSource, info: info as BufferSource },
     key,
     length * 8,
   );
@@ -121,7 +121,7 @@ async function encryptPayload(
   const ephPubRaw = new Uint8Array(await crypto.subtle.exportKey("raw", eph.publicKey)); // 65 bytes
 
   const clientPubKey = await crypto.subtle.importKey(
-    "raw", clientPub, { name: "ECDH", namedCurve: "P-256" }, false, [],
+    "raw", clientPub as BufferSource, { name: "ECDH", namedCurve: "P-256" }, false, [],
   );
   const sharedBits = await crypto.subtle.deriveBits(
     { name: "ECDH", public: clientPubKey }, eph.privateKey, 256,
@@ -275,7 +275,7 @@ export const Route = createFileRoute("/api/public/cron/fajr-push")({
           }
         }
 
-        return Response.json({ ok: true, sent, failed, advanced, checked: rows?.length ?? 0 });
+        return Response.json({ ok: true, sent, failed, advanced, checked: (rows as any[] | null)?.length ?? 0 });
       },
       GET: async () => Response.json({ ok: true, hint: "POST to trigger" }),
     },
