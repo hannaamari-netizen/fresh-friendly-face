@@ -59,9 +59,6 @@ export function FajrReminder({ fajrDate }: Props) {
           });
         } catch {}
       }, delay);
-          });
-        } catch {}
-      }, delay);
     };
 
     schedule();
