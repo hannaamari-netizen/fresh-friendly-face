@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as LicensesRouteImport } from './routes/licenses'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicCronFajrPushRouteImport } from './routes/api/public/cron/fajr-push'
 
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LicensesRoute = LicensesRouteImport.update({
+  id: '/licenses',
+  path: '/licenses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,30 +37,34 @@ const ApiPublicCronFajrPushRoute = ApiPublicCronFajrPushRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/privacy' | '/api/public/cron/fajr-push'
+  fullPaths: '/' | '/licenses' | '/privacy' | '/api/public/cron/fajr-push'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/privacy' | '/api/public/cron/fajr-push'
-  id: '__root__' | '/' | '/privacy' | '/api/public/cron/fajr-push'
+  to: '/' | '/licenses' | '/privacy' | '/api/public/cron/fajr-push'
+  id: '__root__' | '/' | '/licenses' | '/privacy' | '/api/public/cron/fajr-push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LicensesRoute: typeof LicensesRoute
   PrivacyRoute: typeof PrivacyRoute
   ApiPublicCronFajrPushRoute: typeof ApiPublicCronFajrPushRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/licenses': {
+      id: '/licenses'
+      path: '/licenses'
+      fullPath: '/licenses'
+      preLoaderRoute: typeof LicensesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LicensesRoute: LicensesRoute,
   PrivacyRoute: PrivacyRoute,
   ApiPublicCronFajrPushRoute: ApiPublicCronFajrPushRoute,
 }
