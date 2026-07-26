@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicCronFajrPushRouteImport } from './routes/api/public/cron/fajr-push'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCronFajrPushRoute = ApiPublicCronFajrPushRouteImport.update({
+  id: '/api/public/cron/fajr-push',
+  path: '/api/public/cron/fajr-push',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/public/cron/fajr-push'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/public/cron/fajr-push'
+  id: '__root__' | '/' | '/api/public/cron/fajr-push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicCronFajrPushRoute: typeof ApiPublicCronFajrPushRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/fajr-push': {
+      id: '/api/public/cron/fajr-push'
+      path: '/api/public/cron/fajr-push'
+      fullPath: '/api/public/cron/fajr-push'
+      preLoaderRoute: typeof ApiPublicCronFajrPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicCronFajrPushRoute: ApiPublicCronFajrPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
