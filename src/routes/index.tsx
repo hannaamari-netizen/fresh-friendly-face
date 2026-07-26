@@ -812,22 +812,86 @@ function HayaAlSalat() {
             )}
 
 
-            {/* Progress */}
+            {/* Progress + seek */}
             <div className="mt-4">
-              <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="absolute inset-y-0 left-0 rounded-full"
-                  style={{
-                    width: duration ? `${(progress / duration) * 100}%` : "0%",
-                    background: "linear-gradient(90deg, var(--gold), var(--dawn))",
+              <div className="relative h-6 w-full">
+                {/* Track */}
+                <div className="pointer-events-none absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="absolute inset-y-0 left-0 rounded-full"
+                    style={{
+                      width: duration ? `${(progress / duration) * 100}%` : "0%",
+                      background: "linear-gradient(90deg, var(--gold), var(--dawn))",
+                    }}
+                  />
+                </div>
+                {/* Thumb */}
+                {duration ? (
+                  <div
+                    className="pointer-events-none absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full shadow"
+                    style={{
+                      left: `${(progress / duration) * 100}%`,
+                      background: "var(--gold)",
+                      boxShadow: "0 0 0 3px oklch(0.82 0.13 85 / 0.25)",
+                    }}
+                  />
+                ) : null}
+                {/* Seek input (transparent, overlays track) */}
+                <input
+                  type="range"
+                  min={0}
+                  max={duration || 0}
+                  step={0.1}
+                  value={Math.min(progress, duration || 0)}
+                  disabled={!duration}
+                  onChange={(e) => {
+                    const t = Number(e.currentTarget.value);
+                    const el = audioRef.current;
+                    if (el && Number.isFinite(t)) {
+                      try { el.currentTime = t; } catch {}
+                      setProgress(t);
+                    }
                   }}
+                  aria-label="Seek within recitation"
+                  className="haya-seek absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
                 />
               </div>
-              <div className="mt-1.5 flex justify-between text-[10px] tabular-nums text-muted-foreground">
+              <div className="mt-1.5 flex items-center justify-between gap-3 text-[10px] tabular-nums text-muted-foreground">
                 <span>{fmtTime(progress)}</span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const el = audioRef.current;
+                      if (!el) return;
+                      const t = Math.max(0, (el.currentTime || 0) - 10);
+                      try { el.currentTime = t; } catch {}
+                      setProgress(t);
+                    }}
+                    disabled={!duration}
+                    className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-foreground/80 transition hover:bg-white/10 disabled:opacity-40"
+                  >
+                    −10s
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const el = audioRef.current;
+                      if (!el) return;
+                      const t = Math.min(el.duration || 0, (el.currentTime || 0) + 10);
+                      try { el.currentTime = t; } catch {}
+                      setProgress(t);
+                    }}
+                    disabled={!duration}
+                    className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-foreground/80 transition hover:bg-white/10 disabled:opacity-40"
+                  >
+                    +10s
+                  </button>
+                </div>
                 <span>{duration ? fmtTime(duration) : "--:--"}</span>
               </div>
             </div>
+
 
             {/* Auto-start lead time before Fajr */}
             <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 px-3 py-3">
