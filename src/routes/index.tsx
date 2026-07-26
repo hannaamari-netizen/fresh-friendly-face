@@ -384,13 +384,16 @@ function HayaAlSalat() {
   }, [timings, now, loc?.tz, resolvePrayerInstant]);
 
   const [snoozeUntil, setSnoozeUntil] = useState<number | null>(null);
+  const [stopConfirmOpen, setStopConfirmOpen] = useState(false);
+
 
   function togglePlay() {
     const el = audioRef.current;
     if (!el) return;
     if (el.paused) {
-      // Manual play cancels any pending snooze.
+      // Manual play cancels any pending snooze and any stop confirmation.
       setSnoozeUntil(null);
+      setStopConfirmOpen(false);
       // Stop adhan if it's playing so the two audios don't overlap.
       if (adhanRef.current && !adhanRef.current.paused) {
         try { adhanRef.current.pause(); } catch {}
@@ -401,16 +404,19 @@ function HayaAlSalat() {
     else { el.pause(); setPlaying(false); }
   }
 
+
   function snoozeRecitation() {
     const el = audioRef.current;
     if (!el) return;
     try { el.pause(); } catch {}
     setPlaying(false);
+    setStopConfirmOpen(false);
     setSnoozeUntil(Date.now() + snoozeDuration * 60 * 1000);
   }
   function cancelSnooze() {
     setSnoozeUntil(null);
   }
+
 
   // Fully stop the recitation: pause, reset position, cancel any pending
   // snooze, and mark today's auto-start slot as consumed so it won't
@@ -828,24 +834,49 @@ function HayaAlSalat() {
                     );
                   })}
                 </div>
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  <button
-                    onClick={snoozeRecitation}
-                    disabled={!playing}
-                    className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    Snooze {snoozeDuration} min
-                  </button>
-                  <button
-                    onClick={stopRecitation}
-                    disabled={!playing && (audioRef.current?.currentTime ?? 0) === 0}
-                    className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-rose-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    <Square className="h-3 w-3" fill="currentColor" /> Stop
-                  </button>
-                </div>
+                {stopConfirmOpen ? (
+                  <div className="mt-2 rounded-2xl border border-rose-200/20 bg-rose-200/5 px-3 py-2.5">
+                    <p className="text-xs font-medium text-rose-50">Stop recitation?</p>
+                    <p className="text-[10px] text-rose-100/70">This will reset Surat Al-Mu'minun to the beginning.</p>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => setStopConfirmOpen(false)}
+                        className="rounded-xl border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-white/10"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          setStopConfirmOpen(false);
+                          stopRecitation();
+                        }}
+                        className="flex items-center justify-center gap-1.5 rounded-xl border border-rose-200/30 bg-rose-200/10 px-3 py-1.5 text-xs font-medium text-rose-100 transition hover:bg-rose-200/20"
+                      >
+                        <Square className="h-3 w-3" fill="currentColor" /> Stop
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={snoozeRecitation}
+                      disabled={!playing}
+                      className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Snooze {snoozeDuration} min
+                    </button>
+                    <button
+                      onClick={() => setStopConfirmOpen(true)}
+                      disabled={!playing && (audioRef.current?.currentTime ?? 0) === 0}
+                      className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-rose-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <Square className="h-3 w-3" fill="currentColor" /> Stop
+                    </button>
+                  </div>
+                )}
               </div>
             )}
+
 
 
             {/* Progress + seek */}
