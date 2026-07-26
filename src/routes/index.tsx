@@ -292,7 +292,7 @@ function HayaAlSalat() {
     el.play().then(() => setAdhanPlaying(prayerKey)).catch(() => setAdhanPlaying(null));
   }
 
-  // Auto-start Surat Al-Mu'minun 10 minutes before Fajr, once per Fajr instant.
+  // Auto-start Surat Al-Mu'minun `recitationLead` minutes before Fajr, once per Fajr instant.
   // Browsers may block autoplay without a prior user gesture; the app is
   // typically opened at least once, which grants permission for this tab.
   const autoStartedForRef = useRef<number | null>(null);
@@ -302,8 +302,8 @@ function HayaAlSalat() {
     if (!el) return;
     const target = fajrInfo.fajr.getTime();
     const msBefore = target - now.getTime();
-    // Window: from 10 min before Fajr up to Fajr itself.
-    if (msBefore <= 10 * 60 * 1000 && msBefore > 0) {
+    // Window: from `recitationLead` min before Fajr up to Fajr itself.
+    if (msBefore <= recitationLead * 60 * 1000 && msBefore > 0) {
       if (autoStartedForRef.current === target) return;
       if (!el.paused) return; // already playing
       // Stop any adhan first.
