@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Moon } from "lucide-react";
+import { isReducedMotionInitial } from "@/hooks/useReducedMotion";
 
 const SEEN_KEY = "haya-splash-seen-session";
 
@@ -7,10 +8,15 @@ export function SplashScreen() {
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
+  const [reduced] = useState(() => isReducedMotionInitial());
 
   useEffect(() => {
     setMounted(true);
-    // Show splash on every fresh load (installed PWA re-launch or browser reload)
+    if (reduced) {
+      setVisible(false);
+      try { sessionStorage.setItem(SEEN_KEY, "1"); } catch {}
+      return;
+    }
     const hideTimer = setTimeout(() => setFadeOut(true), 2200);
     const removeTimer = setTimeout(() => {
       setVisible(false);
@@ -22,7 +28,7 @@ export function SplashScreen() {
       clearTimeout(hideTimer);
       clearTimeout(removeTimer);
     };
-  }, []);
+  }, [reduced]);
 
   if (!mounted || !visible) return null;
 
