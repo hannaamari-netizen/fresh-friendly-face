@@ -1429,6 +1429,14 @@ function HayaAlSalat() {
           <p className="mt-2 normal-case tracking-normal">
             ✍️ Created with care by Inoxin HA
           </p>
+          <p className="mt-3 normal-case tracking-normal">
+            <Link
+              to="/privacy"
+              className="underline underline-offset-4 transition hover:text-foreground"
+            >
+              Privacy Policy
+            </Link>
+          </p>
         </footer>
 
       </div>
