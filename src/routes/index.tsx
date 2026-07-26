@@ -91,10 +91,11 @@ function HayaAlSalat() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const adhanRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [adhanPlaying, setAdhanPlaying] = useState<string | null>(null);
+
+  // Adhan volume + mute
   const [adhanVolume, setAdhanVolume] = useState<number>(() => {
     if (typeof window === "undefined") return 0.8;
     const raw = localStorage.getItem("haya-adhan-volume");
@@ -105,6 +106,29 @@ function HayaAlSalat() {
     try { localStorage.setItem("haya-adhan-volume", String(adhanVolume)); } catch {}
     if (adhanRef.current) adhanRef.current.volume = adhanVolume;
   }, [adhanVolume]);
+
+  // Recitation volume + mute
+  const [recitationVolume, setRecitationVolume] = useState<number>(() => {
+    if (typeof window === "undefined") return 0.8;
+    const raw = localStorage.getItem("haya-recitation-volume");
+    const v = raw ? Number(raw) : NaN;
+    return Number.isFinite(v) && v >= 0 && v <= 1 ? v : 0.8;
+  });
+  const [recitationMuted, setRecitationMuted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("haya-recitation-muted") === "1";
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("haya-recitation-volume", String(recitationVolume));
+      localStorage.setItem("haya-recitation-muted", recitationMuted ? "1" : "0");
+    } catch {}
+    const el = audioRef.current;
+    if (el) {
+      el.muted = recitationMuted;
+      el.volume = recitationVolume;
+    }
+  }, [recitationVolume, recitationMuted]);
   const [recitationLead, setRecitationLead] = useState<number>(() => {
     if (typeof window === "undefined") return 10;
     const raw = localStorage.getItem("haya-recitation-lead");
