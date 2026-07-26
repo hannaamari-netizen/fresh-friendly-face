@@ -384,6 +384,22 @@ function HayaAlSalat() {
     setSnoozeUntil(null);
   }
 
+  // Fully stop the recitation: pause, reset position, cancel any pending
+  // snooze, and mark today's auto-start slot as consumed so it won't
+  // restart on its own until the next Fajr window.
+  function stopRecitation() {
+    const el = audioRef.current;
+    if (el) {
+      try { el.pause(); } catch {}
+      try { el.currentTime = 0; } catch {}
+    }
+    setPlaying(false);
+    setSnoozeUntil(null);
+    const target = fajrInfo?.fajr ? fajrInfo.fajr.getTime() : null;
+    if (target !== null) autoStartedForRef.current = target;
+  }
+
+
   function toggleAdhan(prayerKey: string) {
     const el = adhanRef.current;
     if (!el) return;
