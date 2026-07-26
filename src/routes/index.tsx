@@ -828,6 +828,7 @@ function HayaAlSalat() {
                 onChange={(e) => setAdhanVolume(Number(e.target.value))}
                 aria-label="Adhan volume"
                 className="haya-slider flex-1"
+                style={{ ["--val" as any]: `${adhanVolume * 100}%` }}
               />
             </div>
           </div>
