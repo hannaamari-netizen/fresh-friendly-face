@@ -88,3 +88,12 @@
   border: 2px solid var(--gold);
   animation: pulse-ring 2.4s cubic-bezier(0.4,0,0.6,1) infinite;
 }
+
+html[data-reduced-motion="true"] *,
+html[data-reduced-motion="true"] *::before,
+html[data-reduced-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
