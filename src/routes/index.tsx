@@ -85,6 +85,9 @@ function HayaAlSalat() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const offline = useOfflineAudio(SURAH_URL);
+  // Streaming-first: start with the network URL, swap to the offline blob only
+  // when playback is idle so an in-flight stream is never interrupted.
+  const [activeSrc, setActiveSrc] = useState<string>(SURAH_URL);
 
   // Fetch location + prayer times (timezone-aware, refetches on day rollover / focus)
   const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
@@ -226,6 +229,32 @@ function HayaAlSalat() {
     if (el.paused) { el.play(); setPlaying(true); }
     else { el.pause(); setPlaying(false); }
   }
+
+  // Prefer the offline blob, but only swap when playback is idle so a stream
+  // in progress plays through uninterrupted. On next play, the local copy is used.
+  useEffect(() => {
+    if (!offline.localUrl) return;
+    if (activeSrc === offline.localUrl) return;
+    if (playing) return; // don't yank an active stream
+    const el = audioRef.current;
+    const currentTime = el?.currentTime ?? 0;
+    setActiveSrc(offline.localUrl);
+    // Preserve position if the user paused mid-stream.
+    if (el && currentTime > 0) {
+      const restore = () => {
+        try { el.currentTime = currentTime; } catch {}
+        el.removeEventListener("loadedmetadata", restore);
+      };
+      el.addEventListener("loadedmetadata", restore);
+    }
+  }, [offline.localUrl, playing, activeSrc]);
+
+  // If the cache is cleared while paused, revert to the network URL.
+  useEffect(() => {
+    if (!offline.localUrl && activeSrc !== SURAH_URL && !playing) {
+      setActiveSrc(SURAH_URL);
+    }
+  }, [offline.localUrl, activeSrc, playing]);
 
   return (
     <main className="relative min-h-dvh w-full overflow-x-hidden safe-px">
@@ -430,10 +459,11 @@ function HayaAlSalat() {
 
             <audio
               ref={audioRef}
-              src={offline.localUrl ?? SURAH_URL}
+              src={activeSrc}
               preload="metadata"
               onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
               onTimeUpdate={(e) => setProgress(e.currentTarget.currentTime)}
+              onPause={() => setPlaying(false)}
               onEnded={() => setPlaying(false)}
             />
           </div>
