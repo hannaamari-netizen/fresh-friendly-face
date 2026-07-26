@@ -28,6 +28,11 @@ export const Route = createFileRoute("/")({
 const SURAH_URL =
   "https://server16.mp3quran.net/mukhtar_haj/Rewayat-Hafs-A-n-Assem/023.mp3";
 
+// Adhan (call to prayer) audio. Fajr uses the special Fajr adhan which includes
+// "As-salatu khayrun min an-nawm" (prayer is better than sleep).
+const ADHAN_FAJR_URL = "https://www.islamcan.com/audio/adhan/azan2.mp3";
+const ADHAN_URL = "https://www.islamcan.com/audio/adhan/azan1.mp3";
+
 type Timings = {
   Fajr: string; Sunrise: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string;
 };
