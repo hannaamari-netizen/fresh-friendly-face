@@ -805,15 +805,11 @@ function HayaAlSalat() {
                 </p>
               </div>
               <button
-                onClick={() => {
-                  if (!audioRef.current) return;
-                  audioRef.current.muted = !audioRef.current.muted;
-                  setMuted(audioRef.current.muted);
-                }}
-                aria-label={muted ? "Unmute" : "Mute"}
+                onClick={() => setRecitationMuted((m) => !m)}
+                aria-label={recitationMuted ? "Unmute recitation" : "Mute recitation"}
                 className="rounded-full p-2 text-muted-foreground transition hover:text-foreground"
               >
-                {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                {recitationMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </button>
             </div>
 
