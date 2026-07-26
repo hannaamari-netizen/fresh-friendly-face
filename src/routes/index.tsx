@@ -532,7 +532,7 @@ function HayaAlSalat() {
         notifyRecitationStart();
       }).catch(() => {
         // Autoplay blocked — user can tap play.
-        el.volume = 1;
+        el.volume = recitationMuted ? 0 : recitationVolume;
       });
     }
   }, [now, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
