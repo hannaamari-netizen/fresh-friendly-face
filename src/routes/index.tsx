@@ -784,6 +784,39 @@ function HayaAlSalat() {
               </p>
             </div>
 
+            {/* Desktop notification when Surat starts */}
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-medium text-amber-50">Notify me when it starts</p>
+                <p className="text-[10px] text-muted-foreground/80">
+                  {!notifSupported
+                    ? "Notifications aren't supported on this device."
+                    : Notification.permission === "denied"
+                    ? "Notifications blocked in browser settings."
+                    : notifyOnStart
+                    ? "You'll get a desktop alert when Surat Al-Mu'minun starts."
+                    : "Get a desktop alert the moment Surat Al-Mu'minun begins."}
+                </p>
+              </div>
+              {notifyOnStart ? (
+                <button
+                  onClick={() => setNotifyOnStart(false)}
+                  className="rounded-full border border-amber-200/30 px-3 py-1 text-[11px] text-amber-100 transition hover:bg-amber-200/10"
+                >
+                  On
+                </button>
+              ) : (
+                <button
+                  onClick={enableStartNotifications}
+                  disabled={!notifSupported || (notifSupported && Notification.permission === "denied")}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Enable
+                </button>
+              )}
+            </div>
+
+
 
             {/* Offline caching */}
             <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-2">
