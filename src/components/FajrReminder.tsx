@@ -82,6 +82,26 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
   const supported = typeof window !== "undefined" && "Notification" in window;
   const canBackground = pushSupported();
 
+  const activeTz =
+    timezone ||
+    (typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC");
+  const activeTemplate = messageFor(settings, activeTz);
+
+  function setTemplateForActiveTz(value: string) {
+    setSettings((s) => ({
+      ...s,
+      messages: { ...s.messages, [tzKey(activeTz)]: value },
+    }));
+  }
+
+  function resetTemplateForActiveTz() {
+    setSettings((s) => {
+      const next = { ...s.messages };
+      delete next[tzKey(activeTz)];
+      return { ...s, messages: next };
+    });
+  }
+
   const savePush = useServerFn(savePushSubscription);
   const removePush = useServerFn(deletePushSubscription);
 
