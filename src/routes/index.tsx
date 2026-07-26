@@ -863,6 +863,49 @@ function HayaAlSalat() {
               </p>
             </div>
 
+            {/* Fade-in duration */}
+            <div className="mt-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Fade-in
+                </p>
+                <span className="text-[10px] tabular-nums" style={{ color: "var(--gold)" }}>
+                  {fadeInMs === 0 ? "Off" : `${(fadeInMs / 1000).toFixed(fadeInMs % 1000 === 0 ? 0 : 1)}s`}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                {[
+                  { label: "Off", ms: 0 },
+                  { label: "1s", ms: 1000 },
+                  { label: "2s", ms: 2000 },
+                  { label: "4s", ms: 4000 },
+                  { label: "6s", ms: 6000 },
+                ].map((opt) => {
+                  const sel = fadeInMs === opt.ms;
+                  return (
+                    <button
+                      key={opt.ms}
+                      onClick={() => setFadeInMs(opt.ms)}
+                      className="flex-1 rounded-full border px-2 py-1.5 text-[11px] font-medium transition"
+                      style={{
+                        borderColor: sel ? "var(--gold)" : "oklch(1 0 0 / 0.12)",
+                        background: sel ? "oklch(0.82 0.13 85 / 0.15)" : "transparent",
+                        color: sel ? "var(--gold)" : "var(--foreground)",
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-[10px] text-muted-foreground/80">
+                {fadeInMs === 0
+                  ? "Recitation starts at full volume."
+                  : `Volume rises gently over ${(fadeInMs / 1000).toFixed(fadeInMs % 1000 === 0 ? 0 : 1)} seconds when it auto-starts.`}
+              </p>
+            </div>
+
+
             {/* Desktop notification when Surat starts */}
             <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
               <div className="min-w-0 flex-1">
