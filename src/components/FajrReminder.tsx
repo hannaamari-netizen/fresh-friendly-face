@@ -21,12 +21,27 @@ const STORAGE_KEY = "haya-fajr-reminder";
 const OFFSETS = [5, 15, 30, 60];
 const DEFAULT_MESSAGE = "Fajr is in {minutes} minutes. Wake gently for the prayer of the dawn.";
 const MAX_MESSAGE_LEN = 140;
+const GLOBAL_TZ_KEY = "__global__";
 
-type Settings = { enabled: boolean; offset: number; message: string; background: boolean };
+type Settings = {
+  enabled: boolean;
+  offset: number;
+  /** Legacy single template; kept as fallback for any timezone without an override. */
+  message: string;
+  /** Per-IANA-timezone reminder templates. */
+  messages: Record<string, string>;
+  background: boolean;
+};
 
 function loadSettings(): Settings {
-  if (typeof window === "undefined")
-    return { enabled: false, offset: 15, message: DEFAULT_MESSAGE, background: false };
+  const base: Settings = {
+    enabled: false,
+    offset: 15,
+    message: DEFAULT_MESSAGE,
+    messages: {},
+    background: false,
+  };
+  if (typeof window === "undefined") return base;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -35,11 +50,21 @@ function loadSettings(): Settings {
         enabled: !!p.enabled,
         offset: p.offset ?? 15,
         message: p.message ?? DEFAULT_MESSAGE,
+        messages: p.messages && typeof p.messages === "object" ? p.messages : {},
         background: !!p.background,
       };
     }
   } catch {}
-  return { enabled: false, offset: 15, message: DEFAULT_MESSAGE, background: false };
+  return base;
+}
+
+function tzKey(tz: string | null | undefined) {
+  return (tz && tz.trim()) || GLOBAL_TZ_KEY;
+}
+
+function messageFor(settings: Settings, tz: string | null | undefined) {
+  const key = tzKey(tz);
+  return settings.messages[key] ?? settings.message ?? DEFAULT_MESSAGE;
 }
 
 function renderMessage(template: string, minutes: number) {
