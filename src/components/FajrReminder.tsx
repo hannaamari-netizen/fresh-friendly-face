@@ -5,16 +5,26 @@ type Props = { fajrDate: Date | null };
 
 const STORAGE_KEY = "haya-fajr-reminder";
 const OFFSETS = [5, 15, 30, 60];
+const DEFAULT_MESSAGE = "Fajr is in {minutes} minutes. Wake gently for the prayer of the dawn.";
+const MAX_MESSAGE_LEN = 140;
 
-type Settings = { enabled: boolean; offset: number };
+type Settings = { enabled: boolean; offset: number; message: string };
 
 function loadSettings(): Settings {
-  if (typeof window === "undefined") return { enabled: false, offset: 15 };
+  if (typeof window === "undefined") return { enabled: false, offset: 15, message: DEFAULT_MESSAGE };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const p = JSON.parse(raw);
+      return { enabled: !!p.enabled, offset: p.offset ?? 15, message: p.message ?? DEFAULT_MESSAGE };
+    }
   } catch {}
-  return { enabled: false, offset: 15 };
+  return { enabled: false, offset: 15, message: DEFAULT_MESSAGE };
+}
+
+function renderMessage(template: string, minutes: number) {
+  const t = (template || DEFAULT_MESSAGE).trim() || DEFAULT_MESSAGE;
+  return t.replace(/\{minutes\}/gi, String(minutes));
 }
 
 export function FajrReminder({ fajrDate }: Props) {
