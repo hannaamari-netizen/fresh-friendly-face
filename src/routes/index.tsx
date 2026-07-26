@@ -406,7 +406,7 @@ function HayaAlSalat() {
     if (!el) return;
     try { el.pause(); } catch {}
     setPlaying(false);
-    setSnoozeUntil(Date.now() + 5 * 60 * 1000);
+    setSnoozeUntil(Date.now() + snoozeDuration * 60 * 1000);
   }
   function cancelSnooze() {
     setSnoozeUntil(null);
