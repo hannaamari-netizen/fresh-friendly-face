@@ -450,14 +450,17 @@ function HayaAlSalat() {
     }
     const el = audioRef.current;
     if (el && el.paused) {
+      el.volume = 0;
       el.play().then(() => {
         setPlaying(true);
+        fadeInRecitation();
         notifyRecitationStart();
       }).catch(() => {
         // Autoplay blocked — user can tap play.
+        el.volume = 1;
       });
     }
-  }, [now, snoozeUntil, notifyRecitationStart]);
+  }, [now, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
 
   // Prefer the offline blob, but only swap when playback is idle so a stream
   // in progress plays through uninterrupted. On next play, the local copy is used.
