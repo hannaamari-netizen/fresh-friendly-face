@@ -105,6 +105,15 @@ function HayaAlSalat() {
     try { localStorage.setItem("haya-adhan-volume", String(adhanVolume)); } catch {}
     if (adhanRef.current) adhanRef.current.volume = adhanVolume;
   }, [adhanVolume]);
+  const [recitationLead, setRecitationLead] = useState<number>(() => {
+    if (typeof window === "undefined") return 10;
+    const raw = localStorage.getItem("haya-recitation-lead");
+    const v = raw ? Number(raw) : NaN;
+    return Number.isFinite(v) && v >= 1 && v <= 60 ? Math.round(v) : 10;
+  });
+  useEffect(() => {
+    try { localStorage.setItem("haya-recitation-lead", String(recitationLead)); } catch {}
+  }, [recitationLead]);
   const offline = useOfflineAudio(SURAH_URL);
   const auto = useAutoDownload({
     isCached: offline.status === "cached",
@@ -283,7 +292,7 @@ function HayaAlSalat() {
     el.play().then(() => setAdhanPlaying(prayerKey)).catch(() => setAdhanPlaying(null));
   }
 
-  // Auto-start Surat Al-Mu'minun 10 minutes before Fajr, once per Fajr instant.
+  // Auto-start Surat Al-Mu'minun `recitationLead` minutes before Fajr, once per Fajr instant.
   // Browsers may block autoplay without a prior user gesture; the app is
   // typically opened at least once, which grants permission for this tab.
   const autoStartedForRef = useRef<number | null>(null);
@@ -293,8 +302,8 @@ function HayaAlSalat() {
     if (!el) return;
     const target = fajrInfo.fajr.getTime();
     const msBefore = target - now.getTime();
-    // Window: from 10 min before Fajr up to Fajr itself.
-    if (msBefore <= 10 * 60 * 1000 && msBefore > 0) {
+    // Window: from `recitationLead` min before Fajr up to Fajr itself.
+    if (msBefore <= recitationLead * 60 * 1000 && msBefore > 0) {
       if (autoStartedForRef.current === target) return;
       if (!el.paused) return; // already playing
       // Stop any adhan first.
@@ -307,7 +316,7 @@ function HayaAlSalat() {
         // Autoplay blocked — leave state as-is; user can tap play.
       });
     }
-  }, [fajrInfo, now]);
+  }, [fajrInfo, now, recitationLead]);
 
   // Prefer the offline blob, but only swap when playback is idle so a stream
   // in progress plays through uninterrupted. On next play, the local copy is used.
@@ -484,7 +493,7 @@ function HayaAlSalat() {
                 <TimeUnit value={pad(fajrInfo.s)} label="sec" />
               </div>
               {(() => {
-                const recMs = fajrInfo.diff - 10 * 60 * 1000;
+                const recMs = fajrInfo.diff - recitationLead * 60 * 1000;
                 if (recMs > 0) {
                   const rh = Math.floor(recMs / 3600000);
                   const rm = Math.floor((recMs % 3600000) / 60000);
@@ -578,6 +587,41 @@ function HayaAlSalat() {
                 <span>{duration ? fmtTime(duration) : "--:--"}</span>
               </div>
             </div>
+
+            {/* Auto-start lead time before Fajr */}
+            <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 px-3 py-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Start reciting before Fajr
+                </p>
+                <span className="text-[10px] tabular-nums" style={{ color: "var(--gold)" }}>
+                  {recitationLead} min
+                </span>
+              </div>
+              <div className="flex gap-2">
+                {[5, 10, 15, 20, 30].map((m) => {
+                  const sel = recitationLead === m;
+                  return (
+                    <button
+                      key={m}
+                      onClick={() => setRecitationLead(m)}
+                      className="flex-1 rounded-full border px-2 py-1.5 text-[11px] font-medium transition"
+                      style={{
+                        borderColor: sel ? "var(--gold)" : "oklch(1 0 0 / 0.12)",
+                        background: sel ? "oklch(0.82 0.13 85 / 0.15)" : "transparent",
+                        color: sel ? "var(--gold)" : "var(--foreground)",
+                      }}
+                    >
+                      {m}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-[10px] text-muted-foreground/80">
+                Surat Al-Mu'minun begins {recitationLead} minutes before the Fajr adhan.
+              </p>
+            </div>
+
 
             {/* Offline caching */}
             <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-2">
