@@ -2,7 +2,7 @@ import { useState } from "react";
 
 const APP_URL = "https://fresh-friendly-face.lovable.app";
 
-type Lang = "en" | "sv" | "ar" | "tr";
+type Lang = "en" | "sv" | "ar";
 
 const MESSAGES: Record<Lang, { label: string; title: string; text: string }> = {
   en: {
@@ -31,15 +31,6 @@ Prova här: ${APP_URL}`,
 أشارككم تطبيق حيّ على الصلاة — رفيق هادئ يوقظك برفق قبل الفجر بتلاوة عذبة لسورة المؤمنون بصوت الشيخ مختار الحاج، لتبدأ يومك بذكر الله.
 
 جرّبه هنا: ${APP_URL}`,
-  },
-  tr: {
-    label: "Türkçe",
-    title: "Haya Al-Salat — huzurlu bir Fajr yoldaşı",
-    text: `Esselamu Aleykum! 🌙
-
-Haya Al-Salat'ı paylaşmak istedim — Muhtar El-Hac'ın güzel sesiyle Mü'minûn Sûresi tilavetiyle sizi Fajr'dan önce nazikçe uyandıran huzurlu bir yoldaş. Güne Allah'ı zikrederek başlarsınız.
-
-Buradan deneyin: ${APP_URL}`,
   },
 };
 
