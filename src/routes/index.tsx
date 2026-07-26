@@ -279,6 +279,7 @@ function HayaAlSalat() {
     const src = prayerKey === "Fajr" ? ADHAN_FAJR_URL : ADHAN_URL;
     el.src = src;
     el.currentTime = 0;
+    el.volume = adhanVolume;
     el.play().then(() => setAdhanPlaying(prayerKey)).catch(() => setAdhanPlaying(null));
   }
 
