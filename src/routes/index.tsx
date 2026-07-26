@@ -410,11 +410,13 @@ function HayaAlSalat() {
     if (!el) return;
     try { el.pause(); } catch {}
     setPlaying(false);
+    setStopConfirmOpen(false);
     setSnoozeUntil(Date.now() + snoozeDuration * 60 * 1000);
   }
   function cancelSnooze() {
     setSnoozeUntil(null);
   }
+
 
   // Fully stop the recitation: pause, reset position, cancel any pending
   // snooze, and mark today's auto-start slot as consumed so it won't
