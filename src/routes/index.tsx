@@ -4,9 +4,11 @@ import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCi
 import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
+import { InstallSteps } from "@/components/InstallSteps";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -688,12 +690,17 @@ function HayaAlSalat() {
           <MotionToggle />
         </section>
 
+        <section className="mt-6">
+          <InstallSteps />
+        </section>
+
         <footer className="mt-10 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground/70">
           Prayer of the dawn · صلاة الفجر
           <p className="mt-2 normal-case tracking-normal">
             ✍️ Created with care by Hanna Amari
           </p>
         </footer>
+
       </div>
     </main>
   );
