@@ -121,7 +121,7 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
       id = window.setTimeout(() => {
         try {
           new Notification("Haya Al-Salat", {
-            body: renderMessage(settings.message, settings.offset),
+            body: renderMessage(activeTemplate, settings.offset),
             icon: "/icon-192.png",
             badge: "/icon-192.png",
             tag: "fajr-reminder",
