@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      push_subscriptions: {
+        Row: {
+          auth: string
+          calc_method: number
+          created_at: string
+          device_token: string
+          endpoint: string
+          failure_count: number
+          id: string
+          last_sent_at: string | null
+          latitude: number | null
+          longitude: number | null
+          message_template: string
+          next_fajr_utc: string | null
+          offset_minutes: number
+          p256dh: string
+          timezone: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          auth: string
+          calc_method?: number
+          created_at?: string
+          device_token: string
+          endpoint: string
+          failure_count?: number
+          id?: string
+          last_sent_at?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          message_template?: string
+          next_fajr_utc?: string | null
+          offset_minutes?: number
+          p256dh: string
+          timezone?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          auth?: string
+          calc_method?: number
+          created_at?: string
+          device_token?: string
+          endpoint?: string
+          failure_count?: number
+          id?: string
+          last_sent_at?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          message_template?: string
+          next_fajr_utc?: string | null
+          offset_minutes?: number
+          p256dh?: string
+          timezone?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
