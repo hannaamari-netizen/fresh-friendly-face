@@ -154,7 +154,7 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
             latitude,
             longitude,
             offsetMinutes: settings.offset,
-            messageTemplate: settings.message,
+            messageTemplate: activeTemplate,
             title: "Haya Al-Salat",
             calcMethod: 2,
           }),
@@ -166,7 +166,7 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
     })();
     return () => { cancelled = true; };
   }, [
-    settings.enabled, settings.background, settings.offset, settings.message,
+    settings.enabled, settings.background, settings.offset, activeTemplate,
     permission, timezone, latitude, longitude, canBackground, savePush,
   ]);
 
