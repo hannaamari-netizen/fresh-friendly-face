@@ -52,10 +52,13 @@ export function FajrReminder({ fajrDate }: Props) {
       id = window.setTimeout(() => {
         try {
           new Notification("Haya Al-Salat", {
-            body: `Fajr is in ${settings.offset} minutes. Wake gently for the prayer of the dawn.`,
+            body: renderMessage(settings.message, settings.offset),
             icon: "/icon-192.png",
             badge: "/icon-192.png",
             tag: "fajr-reminder",
+          });
+        } catch {}
+      }, delay);
           });
         } catch {}
       }, delay);
