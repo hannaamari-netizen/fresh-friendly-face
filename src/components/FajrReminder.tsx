@@ -5,16 +5,26 @@ type Props = { fajrDate: Date | null };
 
 const STORAGE_KEY = "haya-fajr-reminder";
 const OFFSETS = [5, 15, 30, 60];
+const DEFAULT_MESSAGE = "Fajr is in {minutes} minutes. Wake gently for the prayer of the dawn.";
+const MAX_MESSAGE_LEN = 140;
 
-type Settings = { enabled: boolean; offset: number };
+type Settings = { enabled: boolean; offset: number; message: string };
 
 function loadSettings(): Settings {
-  if (typeof window === "undefined") return { enabled: false, offset: 15 };
+  if (typeof window === "undefined") return { enabled: false, offset: 15, message: DEFAULT_MESSAGE };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const p = JSON.parse(raw);
+      return { enabled: !!p.enabled, offset: p.offset ?? 15, message: p.message ?? DEFAULT_MESSAGE };
+    }
   } catch {}
-  return { enabled: false, offset: 15 };
+  return { enabled: false, offset: 15, message: DEFAULT_MESSAGE };
+}
+
+function renderMessage(template: string, minutes: number) {
+  const t = (template || DEFAULT_MESSAGE).trim() || DEFAULT_MESSAGE;
+  return t.replace(/\{minutes\}/gi, String(minutes));
 }
 
 export function FajrReminder({ fajrDate }: Props) {
@@ -42,7 +52,7 @@ export function FajrReminder({ fajrDate }: Props) {
       id = window.setTimeout(() => {
         try {
           new Notification("Haya Al-Salat", {
-            body: `Fajr is in ${settings.offset} minutes. Wake gently for the prayer of the dawn.`,
+            body: renderMessage(settings.message, settings.offset),
             icon: "/icon-192.png",
             badge: "/icon-192.png",
             tag: "fajr-reminder",
@@ -130,6 +140,40 @@ export function FajrReminder({ fajrDate }: Props) {
                 </button>
               );
             })}
+          </div>
+
+          <div className="mt-5">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                Reminder message
+              </p>
+              <button
+                type="button"
+                onClick={() => setSettings((s) => ({ ...s, message: DEFAULT_MESSAGE }))}
+                className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition hover:text-[var(--gold)]"
+              >
+                Reset
+              </button>
+            </div>
+            <textarea
+              value={settings.message}
+              onChange={(e) =>
+                setSettings((s) => ({ ...s, message: e.target.value.slice(0, MAX_MESSAGE_LEN) }))
+              }
+              rows={2}
+              maxLength={MAX_MESSAGE_LEN}
+              placeholder={DEFAULT_MESSAGE}
+              className="w-full resize-none rounded-2xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs leading-relaxed text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-[var(--gold)]/60"
+            />
+            <div className="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground">
+              <span>
+                Use <span className="text-[var(--gold)]">{"{minutes}"}</span> for the countdown.
+              </span>
+              <span>{settings.message.length}/{MAX_MESSAGE_LEN}</span>
+            </div>
+            <p className="mt-2 text-[10px] italic text-muted-foreground/80">
+              Preview: “{renderMessage(settings.message, settings.offset)}”
+            </p>
           </div>
         </div>
       )}
