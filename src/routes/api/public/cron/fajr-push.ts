@@ -71,7 +71,7 @@ function concat(...arrs: Uint8Array[]): Uint8Array {
   return out;
 }
 async function hkdf(salt: Uint8Array, ikm: Uint8Array, info: Uint8Array, length: number): Promise<Uint8Array> {
-  const key = await crypto.subtle.importKey("raw", ikm, { name: "HKDF" }, false, ["deriveBits"]);
+  const key = await crypto.subtle.importKey("raw", ikm as BufferSource, { name: "HKDF" }, false, ["deriveBits"]);
   const bits = await crypto.subtle.deriveBits(
     { name: "HKDF", hash: "SHA-256", salt, info },
     key,
@@ -154,8 +154,8 @@ async function encryptPayload(
   // Pad byte 0x02 (last record delimiter)
   const plaintext = concat(payload, new Uint8Array([0x02]));
 
-  const cekKey = await crypto.subtle.importKey("raw", cek, { name: "AES-GCM" }, false, ["encrypt"]);
-  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce }, cekKey, plaintext));
+  const cekKey = await crypto.subtle.importKey("raw", cek as BufferSource, { name: "AES-GCM" }, false, ["encrypt"]);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce as BufferSource }, cekKey, plaintext as BufferSource));
 
   // Header: salt(16) | rs(4 BE) | idlen(1) | keyid (65)
   const rs = 4096;
@@ -188,7 +188,7 @@ async function sendPush(
       "Urgency": "high",
       "Authorization": `vapid t=${jwt}, k=${vapid.publicKeyB64}`,
     },
-    body: encrypted,
+    body: encrypted as BodyInit,
   });
   return { ok: res.ok, status: res.status };
 }
