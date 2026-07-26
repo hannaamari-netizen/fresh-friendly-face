@@ -5,7 +5,7 @@ import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
-import { formatInZone, todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
+import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
 
 export const Route = createFileRoute("/")({
   head: () => ({
