@@ -980,6 +980,42 @@ function HayaAlSalat() {
               </div>
             </div>
 
+            {/* Recitation volume */}
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Recitation volume
+                </p>
+                <span className="text-[10px] tabular-nums text-muted-foreground">
+                  {recitationMuted ? "Muted" : `${Math.round(recitationVolume * 100)}%`}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRecitationMuted((m) => !m)}
+                  aria-label={recitationMuted ? "Unmute recitation" : "Mute recitation"}
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-muted-foreground transition hover:text-[var(--gold)]"
+                >
+                  {recitationMuted ? (
+                    <VolumeX className="h-3.5 w-3.5" />
+                  ) : (
+                    <Volume2 className="h-3.5 w-3.5" />
+                  )}
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={recitationVolume}
+                  onChange={(e) => setRecitationVolume(Number(e.target.value))}
+                  aria-label="Recitation volume"
+                  className="haya-slider flex-1"
+                  style={{ ["--val" as any]: `${recitationVolume * 100}%` }}
+                />
+              </div>
+            </div>
 
             {/* Auto-start lead time before Fajr */}
             <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 px-3 py-3">
