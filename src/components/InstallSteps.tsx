@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { Download, Share, Plus, Home, Smartphone, ChevronDown, ChevronUp } from "lucide-react";
 
+type BeforeInstallPrompt = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
+
 export function InstallSteps() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPrompt | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
