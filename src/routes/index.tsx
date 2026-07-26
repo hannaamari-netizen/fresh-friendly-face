@@ -403,7 +403,7 @@ function HayaAlSalat() {
         // Autoplay blocked — leave state as-is; user can tap play.
       });
     }
-  }, [fajrInfo, now, recitationLead, snoozeUntil]);
+  }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart]);
 
   // Auto-resume Surat when the 5-minute snooze elapses.
   useEffect(() => {
