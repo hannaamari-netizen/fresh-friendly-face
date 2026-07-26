@@ -114,6 +114,35 @@ function HayaAlSalat() {
   useEffect(() => {
     try { localStorage.setItem("haya-recitation-lead", String(recitationLead)); } catch {}
   }, [recitationLead]);
+
+  // Audio auto-play unlock. Browsers block programmatic play() without a
+  // prior user gesture, so show a prompt until the user taps once. On tap,
+  // we call play()+pause() on both audio elements to "unlock" the tab.
+  const [audioUnlocked, setAudioUnlocked] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return sessionStorage.getItem("haya-audio-unlocked") === "1";
+  });
+  const unlockAudio = useCallback(async () => {
+    const els = [audioRef.current, adhanRef.current].filter(Boolean) as HTMLAudioElement[];
+    for (const el of els) {
+      const prevMuted = el.muted;
+      const prevSrc = el.src;
+      try {
+        el.muted = true;
+        if (!el.src) el.src = SURAH_URL; // needs a src to play
+        await el.play();
+        el.pause();
+        el.currentTime = 0;
+      } catch {
+        // ignore — user gesture still lets subsequent play() work
+      } finally {
+        el.muted = prevMuted;
+        if (!prevSrc && el === adhanRef.current) el.removeAttribute("src");
+      }
+    }
+    try { sessionStorage.setItem("haya-audio-unlocked", "1"); } catch {}
+    setAudioUnlocked(true);
+  }, []);
   const offline = useOfflineAudio(SURAH_URL);
   const auto = useAutoDownload({
     isCached: offline.status === "cached",
@@ -425,6 +454,34 @@ function HayaAlSalat() {
     <main className="relative min-h-dvh w-full overflow-x-hidden safe-px">
       <SplashScreen />
       <Stars />
+
+      {!audioUnlocked && (
+        <div
+          className="fixed inset-x-0 z-50 flex justify-center px-4"
+          style={{ bottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+          role="dialog"
+          aria-live="polite"
+        >
+          <button
+            type="button"
+            onClick={unlockAudio}
+            className="group flex w-full max-w-sm items-center gap-3 rounded-2xl border border-amber-200/30 bg-[#0b0a1a]/90 px-4 py-3 text-left shadow-2xl backdrop-blur transition hover:border-amber-200/60"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-200/15 text-amber-100 text-lg">
+              🔔
+            </span>
+            <span className="flex-1">
+              <span className="block text-sm font-medium text-amber-50">Tap to enable audio</span>
+              <span className="block text-xs text-amber-100/70">
+                Required so the Adhan and Surat Al-Mu'minun can auto-play before Fajr.
+              </span>
+            </span>
+            <span className="text-xs font-semibold text-amber-200 group-hover:text-amber-100">Enable</span>
+          </button>
+        </div>
+      )}
+
+
 
       {/* Moon glow */}
       <div className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full float-slow"
