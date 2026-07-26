@@ -493,7 +493,7 @@ function HayaAlSalat() {
                 <TimeUnit value={pad(fajrInfo.s)} label="sec" />
               </div>
               {(() => {
-                const recMs = fajrInfo.diff - 10 * 60 * 1000;
+                const recMs = fajrInfo.diff - recitationLead * 60 * 1000;
                 if (recMs > 0) {
                   const rh = Math.floor(recMs / 3600000);
                   const rm = Math.floor((recMs % 3600000) / 60000);
