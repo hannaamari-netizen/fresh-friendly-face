@@ -662,6 +662,32 @@ function HayaAlSalat() {
               </button>
             </div>
 
+            {/* Snooze */}
+            {snoozeUntil ? (
+              <div className="mt-3 flex items-center justify-between rounded-2xl border border-amber-200/20 bg-amber-200/5 px-3 py-2">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-amber-200/80">Snoozed</p>
+                  <p className="text-sm tabular-nums text-amber-50">
+                    Resumes in {fmtTime(Math.max(0, Math.ceil((snoozeUntil - now.getTime()) / 1000)))}
+                  </p>
+                </div>
+                <button
+                  onClick={cancelSnooze}
+                  className="rounded-full border border-amber-200/30 px-3 py-1 text-xs text-amber-100 transition hover:bg-amber-200/10"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={snoozeRecitation}
+                disabled={!playing}
+                className="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Snooze 5 min
+              </button>
+            )}
+
             {/* Progress */}
             <div className="mt-4">
               <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/10">
