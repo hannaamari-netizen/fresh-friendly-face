@@ -5,10 +5,10 @@ import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX } from "lucide-rea
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Haya Al-Salat — A Fajr Experience" },
-      { name: "description", content: "A serene companion for the dawn prayer. Prepare your heart with Surat Al-Mu'minun recited by Mukhtar Al-Hajj, and awaken to Fajr." },
-      { property: "og:title", content: "Haya Al-Salat — A Fajr Experience" },
-      { property: "og:description", content: "A serene companion for the dawn prayer. Surat Al-Mu'minun by Mukhtar Al-Hajj before Fajr." },
+      { title: "Haya Al-Salat — A Peaceful Fajr Companion" },
+      { name: "description", content: "A peaceful companion that gently prepares Muslims to wake for Fajr through the beautiful recitation of Surat Al-Mu'minun by Mukhtar Al-Hajj. Begin the day with remembrance of Allah." },
+      { property: "og:title", content: "Haya Al-Salat — A Peaceful Fajr Companion" },
+      { property: "og:description", content: "A peaceful companion that gently prepares Muslims to wake for Fajr through the beautiful recitation of Surat Al-Mu'minun by Mukhtar Al-Hajj." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
