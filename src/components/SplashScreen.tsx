@@ -38,8 +38,9 @@ export function SplashScreen() {
         fadeOut ? "opacity-0" : "opacity-100"
       }`}
       style={{
-        background:
-          "radial-gradient(ellipse at 50% 30%, oklch(0.28 0.08 280) 0%, oklch(0.14 0.05 275) 45%, oklch(0.08 0.03 270) 100%)",
+        backgroundColor: "#0b0a1a",
+        backgroundImage:
+          "radial-gradient(ellipse at 50% 45%, oklch(0.28 0.08 280 / 0.75) 0%, oklch(0.14 0.05 275 / 0.45) 40%, transparent 75%)",
         paddingTop: "env(safe-area-inset-top)",
         paddingBottom: "env(safe-area-inset-bottom)",
         paddingLeft: "env(safe-area-inset-left)",
