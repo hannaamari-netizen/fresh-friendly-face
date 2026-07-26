@@ -702,7 +702,7 @@ function HayaAlSalat() {
         <footer className="mt-10 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground/70">
           Prayer of the dawn · صلاة الفجر
           <p className="mt-2 normal-case tracking-normal">
-            ✍️ Created with care by Hanna Amari
+            ✍️ Created with care by Inoxin HA
           </p>
         </footer>
 
