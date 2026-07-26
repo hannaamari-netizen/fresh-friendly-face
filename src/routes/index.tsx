@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2, Wifi, BatteryCharging, Radio, Square } from "lucide-react";
 import { FajrReminder } from "@/components/FajrReminder";
@@ -1428,6 +1428,14 @@ function HayaAlSalat() {
           Prayer of the dawn · صلاة الفجر
           <p className="mt-2 normal-case tracking-normal">
             ✍️ Created with care by Inoxin HA
+          </p>
+          <p className="mt-3 normal-case tracking-normal">
+            <Link
+              to="/privacy"
+              className="underline underline-offset-4 transition hover:text-foreground"
+            >
+              Privacy Policy
+            </Link>
           </p>
         </footer>
 
