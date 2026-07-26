@@ -242,8 +242,34 @@ function HayaAlSalat() {
   function togglePlay() {
     const el = audioRef.current;
     if (!el) return;
-    if (el.paused) { el.play(); setPlaying(true); }
+    if (el.paused) {
+      // Stop adhan if it's playing so the two audios don't overlap.
+      if (adhanRef.current && !adhanRef.current.paused) {
+        try { adhanRef.current.pause(); } catch {}
+        setAdhanPlaying(null);
+      }
+      el.play(); setPlaying(true);
+    }
     else { el.pause(); setPlaying(false); }
+  }
+
+  function toggleAdhan(prayerKey: string) {
+    const el = adhanRef.current;
+    if (!el) return;
+    // Stop surah playback if active.
+    if (audioRef.current && !audioRef.current.paused) {
+      try { audioRef.current.pause(); } catch {}
+      setPlaying(false);
+    }
+    if (adhanPlaying === prayerKey) {
+      try { el.pause(); } catch {}
+      setAdhanPlaying(null);
+      return;
+    }
+    const src = prayerKey === "Fajr" ? ADHAN_FAJR_URL : ADHAN_URL;
+    el.src = src;
+    el.currentTime = 0;
+    el.play().then(() => setAdhanPlaying(prayerKey)).catch(() => setAdhanPlaying(null));
   }
 
   // Prefer the offline blob, but only swap when playback is idle so a stream
