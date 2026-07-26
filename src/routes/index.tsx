@@ -350,6 +350,7 @@ function HayaAlSalat() {
     if (msBefore <= recitationLead * 60 * 1000 && msBefore > 0) {
       if (autoStartedForRef.current === target) return;
       if (!el.paused) return; // already playing
+      if (snoozeUntil && Date.now() < snoozeUntil) return; // user snoozed
       // Stop any adhan first.
       if (adhanRef.current && !adhanRef.current.paused) {
         try { adhanRef.current.pause(); } catch {}
