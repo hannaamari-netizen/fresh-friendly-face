@@ -91,10 +91,11 @@ function HayaAlSalat() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const adhanRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [adhanPlaying, setAdhanPlaying] = useState<string | null>(null);
+
+  // Adhan volume + mute
   const [adhanVolume, setAdhanVolume] = useState<number>(() => {
     if (typeof window === "undefined") return 0.8;
     const raw = localStorage.getItem("haya-adhan-volume");
@@ -105,6 +106,29 @@ function HayaAlSalat() {
     try { localStorage.setItem("haya-adhan-volume", String(adhanVolume)); } catch {}
     if (adhanRef.current) adhanRef.current.volume = adhanVolume;
   }, [adhanVolume]);
+
+  // Recitation volume + mute
+  const [recitationVolume, setRecitationVolume] = useState<number>(() => {
+    if (typeof window === "undefined") return 0.8;
+    const raw = localStorage.getItem("haya-recitation-volume");
+    const v = raw ? Number(raw) : NaN;
+    return Number.isFinite(v) && v >= 0 && v <= 1 ? v : 0.8;
+  });
+  const [recitationMuted, setRecitationMuted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("haya-recitation-muted") === "1";
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("haya-recitation-volume", String(recitationVolume));
+      localStorage.setItem("haya-recitation-muted", recitationMuted ? "1" : "0");
+    } catch {}
+    const el = audioRef.current;
+    if (el) {
+      el.muted = recitationMuted;
+      el.volume = recitationVolume;
+    }
+  }, [recitationVolume, recitationMuted]);
   const [recitationLead, setRecitationLead] = useState<number>(() => {
     if (typeof window === "undefined") return 10;
     const raw = localStorage.getItem("haya-recitation-lead");
@@ -179,16 +203,17 @@ function HayaAlSalat() {
     }
   }, [fadeInMs]);
   const fadeTimerRef = useRef<number | null>(null);
-  const fadeInRecitation = useCallback((durationMs?: number, target = 1) => {
+  const fadeInRecitation = useCallback((durationMs?: number, target?: number) => {
     const el = audioRef.current;
     if (!el) return;
     if (fadeTimerRef.current !== null) {
       clearInterval(fadeTimerRef.current);
       fadeTimerRef.current = null;
     }
+    const effectiveTarget = target ?? (recitationMuted ? 0 : recitationVolume);
     const dur = durationMs ?? fadeInMs;
     if (!dur || dur <= 0) {
-      el.volume = target;
+      el.volume = effectiveTarget;
       return;
     }
     el.volume = 0;
@@ -197,14 +222,14 @@ function HayaAlSalat() {
       const t = Math.min(1, (performance.now() - start) / dur);
       // ease-out cubic for a gentle rise
       const eased = 1 - Math.pow(1 - t, 3);
-      el.volume = Math.max(0, Math.min(1, eased * target));
+      el.volume = Math.max(0, Math.min(1, eased * effectiveTarget));
       if (t >= 1 && fadeTimerRef.current !== null) {
         clearInterval(fadeTimerRef.current);
         fadeTimerRef.current = null;
-        el.volume = target;
+        el.volume = effectiveTarget;
       }
     }, 50);
-  }, [fadeInMs]);
+  }, [fadeInMs, recitationMuted, recitationVolume]);
   useEffect(() => () => {
     if (fadeTimerRef.current !== null) clearInterval(fadeTimerRef.current);
   }, []);
@@ -483,7 +508,7 @@ function HayaAlSalat() {
         notifyRecitationStart();
       }).catch(() => {
         // Autoplay blocked — leave state as-is; user can tap play.
-        el.volume = 1;
+        el.volume = recitationMuted ? 0 : recitationVolume;
       });
     }
   }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
@@ -507,7 +532,7 @@ function HayaAlSalat() {
         notifyRecitationStart();
       }).catch(() => {
         // Autoplay blocked — user can tap play.
-        el.volume = 1;
+        el.volume = recitationMuted ? 0 : recitationVolume;
       });
     }
   }, [now, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
@@ -781,15 +806,11 @@ function HayaAlSalat() {
                 </p>
               </div>
               <button
-                onClick={() => {
-                  if (!audioRef.current) return;
-                  audioRef.current.muted = !audioRef.current.muted;
-                  setMuted(audioRef.current.muted);
-                }}
-                aria-label={muted ? "Unmute" : "Mute"}
+                onClick={() => setRecitationMuted((m) => !m)}
+                aria-label={recitationMuted ? "Unmute recitation" : "Mute recitation"}
                 className="rounded-full p-2 text-muted-foreground transition hover:text-foreground"
               >
-                {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                {recitationMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </button>
             </div>
 
@@ -959,6 +980,42 @@ function HayaAlSalat() {
               </div>
             </div>
 
+            {/* Recitation volume */}
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Recitation volume
+                </p>
+                <span className="text-[10px] tabular-nums text-muted-foreground">
+                  {recitationMuted ? "Muted" : `${Math.round(recitationVolume * 100)}%`}
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRecitationMuted((m) => !m)}
+                  aria-label={recitationMuted ? "Unmute recitation" : "Mute recitation"}
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-muted-foreground transition hover:text-[var(--gold)]"
+                >
+                  {recitationMuted ? (
+                    <VolumeX className="h-3.5 w-3.5" />
+                  ) : (
+                    <Volume2 className="h-3.5 w-3.5" />
+                  )}
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={recitationVolume}
+                  onChange={(e) => setRecitationVolume(Number(e.target.value))}
+                  aria-label="Recitation volume"
+                  className="haya-slider flex-1"
+                  style={{ ["--val" as any]: `${recitationVolume * 100}%` }}
+                />
+              </div>
+            </div>
 
             {/* Auto-start lead time before Fajr */}
             <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 px-3 py-3">
