@@ -58,7 +58,7 @@
   * { border-color: var(--color-border); }
   html {
     color-scheme: dark;
-    background-color: oklch(0.09 0.03 270);
+    background-color: #0b0a1a;
     -webkit-tap-highlight-color: transparent;
   }
   html, body {
