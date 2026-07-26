@@ -396,7 +396,10 @@ function HayaAlSalat() {
         setAdhanPlaying(null);
       }
       autoStartedForRef.current = target;
-      el.play().then(() => setPlaying(true)).catch(() => {
+      el.play().then(() => {
+        setPlaying(true);
+        notifyRecitationStart();
+      }).catch(() => {
         // Autoplay blocked — leave state as-is; user can tap play.
       });
     }
