@@ -391,8 +391,9 @@ function HayaAlSalat() {
     const el = audioRef.current;
     if (!el) return;
     if (el.paused) {
-      // Manual play cancels any pending snooze.
+      // Manual play cancels any pending snooze and any stop confirmation.
       setSnoozeUntil(null);
+      setStopConfirmOpen(false);
       // Stop adhan if it's playing so the two audios don't overlap.
       if (adhanRef.current && !adhanRef.current.paused) {
         try { adhanRef.current.pause(); } catch {}
@@ -402,6 +403,7 @@ function HayaAlSalat() {
     }
     else { el.pause(); setPlaying(false); }
   }
+
 
   function snoozeRecitation() {
     const el = audioRef.current;
