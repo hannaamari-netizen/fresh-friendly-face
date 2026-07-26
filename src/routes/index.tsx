@@ -203,16 +203,17 @@ function HayaAlSalat() {
     }
   }, [fadeInMs]);
   const fadeTimerRef = useRef<number | null>(null);
-  const fadeInRecitation = useCallback((durationMs?: number, target = 1) => {
+  const fadeInRecitation = useCallback((durationMs?: number, target?: number) => {
     const el = audioRef.current;
     if (!el) return;
     if (fadeTimerRef.current !== null) {
       clearInterval(fadeTimerRef.current);
       fadeTimerRef.current = null;
     }
+    const effectiveTarget = target ?? (recitationMuted ? 0 : recitationVolume);
     const dur = durationMs ?? fadeInMs;
     if (!dur || dur <= 0) {
-      el.volume = target;
+      el.volume = effectiveTarget;
       return;
     }
     el.volume = 0;
@@ -221,14 +222,14 @@ function HayaAlSalat() {
       const t = Math.min(1, (performance.now() - start) / dur);
       // ease-out cubic for a gentle rise
       const eased = 1 - Math.pow(1 - t, 3);
-      el.volume = Math.max(0, Math.min(1, eased * target));
+      el.volume = Math.max(0, Math.min(1, eased * effectiveTarget));
       if (t >= 1 && fadeTimerRef.current !== null) {
         clearInterval(fadeTimerRef.current);
         fadeTimerRef.current = null;
-        el.volume = target;
+        el.volume = effectiveTarget;
       }
     }, 50);
-  }, [fadeInMs]);
+  }, [fadeInMs, recitationMuted, recitationVolume]);
   useEffect(() => () => {
     if (fadeTimerRef.current !== null) clearInterval(fadeTimerRef.current);
   }, []);
