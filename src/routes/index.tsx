@@ -89,6 +89,7 @@ function HayaAlSalat() {
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const offline = useOfflineAudio(SURAH_URL);
 
   // Fetch location + prayer times
   useEffect(() => {
