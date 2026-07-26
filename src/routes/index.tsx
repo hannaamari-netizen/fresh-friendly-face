@@ -174,6 +174,7 @@ function HayaAlSalat() {
 
   return (
     <main className="relative min-h-screen w-full overflow-x-hidden">
+      <SplashScreen />
       <Stars />
 
       {/* Moon glow */}
