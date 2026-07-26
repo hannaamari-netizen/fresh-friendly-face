@@ -154,20 +154,36 @@ function HayaAlSalat() {
     if (perm === "granted") setNotifyOnStart(true);
   }
 
-  // Smooth 2-second volume fade-in for the recitation audio, used when it
-  // starts automatically at the scheduled time.
+  // Configurable volume fade-in for the recitation audio, used when it starts
+  // automatically at the scheduled time. 0 = disabled (start at full volume).
+  const [fadeInMs, setFadeInMs] = useState<number>(() => {
+    if (typeof window === "undefined") return 2000;
+    const raw = localStorage.getItem("haya-fade-in-ms");
+    const n = raw === null ? NaN : Number(raw);
+    return Number.isFinite(n) && n >= 0 && n <= 10000 ? n : 2000;
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("haya-fade-in-ms", String(fadeInMs));
+    }
+  }, [fadeInMs]);
   const fadeTimerRef = useRef<number | null>(null);
-  const fadeInRecitation = useCallback((durationMs = 2000, target = 1) => {
+  const fadeInRecitation = useCallback((durationMs?: number, target = 1) => {
     const el = audioRef.current;
     if (!el) return;
     if (fadeTimerRef.current !== null) {
       clearInterval(fadeTimerRef.current);
       fadeTimerRef.current = null;
     }
+    const dur = durationMs ?? fadeInMs;
+    if (!dur || dur <= 0) {
+      el.volume = target;
+      return;
+    }
     el.volume = 0;
     const start = performance.now();
     fadeTimerRef.current = window.setInterval(() => {
-      const t = Math.min(1, (performance.now() - start) / durationMs);
+      const t = Math.min(1, (performance.now() - start) / dur);
       // ease-out cubic for a gentle rise
       const eased = 1 - Math.pow(1 - t, 3);
       el.volume = Math.max(0, Math.min(1, eased * target));
@@ -177,10 +193,11 @@ function HayaAlSalat() {
         el.volume = target;
       }
     }, 50);
-  }, []);
+  }, [fadeInMs]);
   useEffect(() => () => {
     if (fadeTimerRef.current !== null) clearInterval(fadeTimerRef.current);
   }, []);
+
 
 
   // Audio auto-play unlock. Browsers block programmatic play() without a
