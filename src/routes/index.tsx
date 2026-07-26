@@ -287,10 +287,14 @@ function HayaAlSalat() {
     return "Fajr";
   }, [timings, now, loc?.tz, resolvePrayerInstant]);
 
+  const [snoozeUntil, setSnoozeUntil] = useState<number | null>(null);
+
   function togglePlay() {
     const el = audioRef.current;
     if (!el) return;
     if (el.paused) {
+      // Manual play cancels any pending snooze.
+      setSnoozeUntil(null);
       // Stop adhan if it's playing so the two audios don't overlap.
       if (adhanRef.current && !adhanRef.current.paused) {
         try { adhanRef.current.pause(); } catch {}
@@ -299,6 +303,17 @@ function HayaAlSalat() {
       el.play(); setPlaying(true);
     }
     else { el.pause(); setPlaying(false); }
+  }
+
+  function snoozeRecitation() {
+    const el = audioRef.current;
+    if (!el) return;
+    try { el.pause(); } catch {}
+    setPlaying(false);
+    setSnoozeUntil(Date.now() + 5 * 60 * 1000);
+  }
+  function cancelSnooze() {
+    setSnoozeUntil(null);
   }
 
   function toggleAdhan(prayerKey: string) {
