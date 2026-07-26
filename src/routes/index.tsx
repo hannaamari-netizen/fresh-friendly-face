@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2 } from "lucide-react";
+import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2, Wifi, BatteryCharging } from "lucide-react";
 import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
+import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
 
 export const Route = createFileRoute("/")({
@@ -85,6 +86,11 @@ function HayaAlSalat() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const offline = useOfflineAudio(SURAH_URL);
+  const auto = useAutoDownload({
+    isCached: offline.status === "cached",
+    isDownloading: offline.status === "downloading",
+    triggerDownload: offline.download,
+  });
   // Streaming-first: start with the network URL, swap to the offline blob only
   // when playback is idle so an in-flight stream is never interrupted.
   const [activeSrc, setActiveSrc] = useState<string>(SURAH_URL);
@@ -456,6 +462,89 @@ function HayaAlSalat() {
                 </button>
               )}
             </div>
+
+            {/* Auto-download on Wi-Fi & charging */}
+            <div className="mt-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
+              <label className="flex items-center justify-between gap-3 cursor-pointer">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-medium" style={{ color: "var(--gold-soft)" }}>
+                    Auto-download when safe
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">
+                    Save the recitation automatically only on Wi-Fi &amp; while charging — no mobile data used.
+                  </p>
+                </div>
+                <span
+                  className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border border-white/10 transition"
+                  style={{
+                    background: auto.settings.enabled
+                      ? "linear-gradient(140deg, var(--gold), oklch(0.65 0.14 40))"
+                      : "rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={auto.settings.enabled}
+                    onChange={(e) => auto.setSettings({ enabled: e.target.checked })}
+                    aria-label="Enable auto-download on Wi-Fi and charging"
+                  />
+                  <span
+                    className="absolute h-3.5 w-3.5 rounded-full bg-white transition-transform"
+                    style={{ transform: auto.settings.enabled ? "translateX(20px)" : "translateX(3px)" }}
+                  />
+                </span>
+              </label>
+
+              {auto.settings.enabled && (
+                <div className="mt-2.5 space-y-2">
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => auto.setSettings({ requireWifi: !auto.settings.requireWifi })}
+                      className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] transition"
+                      style={{
+                        borderColor: auto.settings.requireWifi ? "var(--gold)" : "rgba(255,255,255,0.12)",
+                        color: auto.settings.requireWifi ? "var(--gold)" : "var(--muted-foreground)",
+                        background: auto.settings.requireWifi ? "rgba(212,175,55,0.08)" : "transparent",
+                      }}
+                      aria-pressed={auto.settings.requireWifi}
+                    >
+                      <Wifi className="h-3 w-3" />
+                      Wi-Fi only
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => auto.setSettings({ requireCharging: !auto.settings.requireCharging })}
+                      className="flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] transition"
+                      style={{
+                        borderColor: auto.settings.requireCharging ? "var(--gold)" : "rgba(255,255,255,0.12)",
+                        color: auto.settings.requireCharging ? "var(--gold)" : "var(--muted-foreground)",
+                        background: auto.settings.requireCharging ? "rgba(212,175,55,0.08)" : "transparent",
+                      }}
+                      aria-pressed={auto.settings.requireCharging}
+                    >
+                      <BatteryCharging className="h-3 w-3" />
+                      While charging
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">
+                    {auto.reason === "ready" && "Conditions met — downloading soon."}
+                    {auto.reason === "cached" && "Already saved offline."}
+                    {auto.reason === "downloading" && "Saving now…"}
+                    {auto.reason === "offline" && "Waiting for a connection."}
+                    {auto.reason === "not-wifi" && "Waiting for Wi-Fi."}
+                    {auto.reason === "wifi-unknown" &&
+                      "Your browser can't detect Wi-Fi — turn off Wi-Fi only to allow any network."}
+                    {auto.reason === "not-charging" && "Waiting until the device is charging."}
+                    {auto.reason === "charging-unknown" &&
+                      "Your browser can't detect charging — turn off While charging to auto-save."}
+                  </p>
+                </div>
+              )}
+            </div>
+
+
 
             <audio
               ref={audioRef}
