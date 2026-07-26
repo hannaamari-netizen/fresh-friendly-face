@@ -336,23 +336,28 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
           </div>
 
           <div className="mt-5">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                Reminder message
-              </p>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Reminder message
+                </p>
+                <p className="mt-0.5 truncate text-[10px] text-muted-foreground/80">
+                  Saved for{" "}
+                  <span className="text-[var(--gold)]">{activeTz}</span>
+                  {settings.messages[tzKey(activeTz)] !== undefined ? " · custom" : " · default"}
+                </p>
+              </div>
               <button
                 type="button"
-                onClick={() => setSettings((s) => ({ ...s, message: DEFAULT_MESSAGE }))}
-                className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition hover:text-[var(--gold)]"
+                onClick={resetTemplateForActiveTz}
+                className="shrink-0 text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition hover:text-[var(--gold)]"
               >
                 Reset
               </button>
             </div>
             <textarea
-              value={settings.message}
-              onChange={(e) =>
-                setSettings((s) => ({ ...s, message: e.target.value.slice(0, MAX_MESSAGE_LEN) }))
-              }
+              value={activeTemplate}
+              onChange={(e) => setTemplateForActiveTz(e.target.value.slice(0, MAX_MESSAGE_LEN))}
               rows={2}
               maxLength={MAX_MESSAGE_LEN}
               placeholder={DEFAULT_MESSAGE}
@@ -362,10 +367,13 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
               <span>
                 Use <span className="text-[var(--gold)]">{"{minutes}"}</span> for the countdown.
               </span>
-              <span>{settings.message.length}/{MAX_MESSAGE_LEN}</span>
+              <span>{activeTemplate.length}/{MAX_MESSAGE_LEN}</span>
             </div>
             <p className="mt-2 text-[10px] italic text-muted-foreground/80">
-              Preview: “{renderMessage(settings.message, settings.offset)}”
+              Preview: “{renderMessage(activeTemplate, settings.offset)}”
+            </p>
+            <p className="mt-1 text-[10px] text-muted-foreground/70">
+              Messages are saved per timezone — travelling to another location keeps its own wording.
             </p>
           </div>
         </div>
