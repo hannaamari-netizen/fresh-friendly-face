@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2, Wifi, BatteryCharging } from "lucide-react";
+import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2, Wifi, BatteryCharging, Radio, Square } from "lucide-react";
 import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
@@ -27,6 +27,11 @@ export const Route = createFileRoute("/")({
 
 const SURAH_URL =
   "https://server16.mp3quran.net/mukhtar_haj/Rewayat-Hafs-A-n-Assem/023.mp3";
+
+// Adhan (call to prayer) audio. Fajr uses the special Fajr adhan which includes
+// "As-salatu khayrun min an-nawm" (prayer is better than sleep).
+const ADHAN_FAJR_URL = "https://www.islamcan.com/audio/adhan/azan2.mp3";
+const ADHAN_URL = "https://www.islamcan.com/audio/adhan/azan1.mp3";
 
 type Timings = {
   Fajr: string; Sunrise: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string;
@@ -84,10 +89,12 @@ function HayaAlSalat() {
   const [error, setError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const adhanRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [adhanPlaying, setAdhanPlaying] = useState<string | null>(null);
   const offline = useOfflineAudio(SURAH_URL);
   const auto = useAutoDownload({
     isCached: offline.status === "cached",
@@ -235,8 +242,34 @@ function HayaAlSalat() {
   function togglePlay() {
     const el = audioRef.current;
     if (!el) return;
-    if (el.paused) { el.play(); setPlaying(true); }
+    if (el.paused) {
+      // Stop adhan if it's playing so the two audios don't overlap.
+      if (adhanRef.current && !adhanRef.current.paused) {
+        try { adhanRef.current.pause(); } catch {}
+        setAdhanPlaying(null);
+      }
+      el.play(); setPlaying(true);
+    }
     else { el.pause(); setPlaying(false); }
+  }
+
+  function toggleAdhan(prayerKey: string) {
+    const el = adhanRef.current;
+    if (!el) return;
+    // Stop surah playback if active.
+    if (audioRef.current && !audioRef.current.paused) {
+      try { audioRef.current.pause(); } catch {}
+      setPlaying(false);
+    }
+    if (adhanPlaying === prayerKey) {
+      try { el.pause(); } catch {}
+      setAdhanPlaying(null);
+      return;
+    }
+    const src = prayerKey === "Fajr" ? ADHAN_FAJR_URL : ADHAN_URL;
+    el.src = src;
+    el.currentTime = 0;
+    el.play().then(() => setAdhanPlaying(prayerKey)).catch(() => setAdhanPlaying(null));
   }
 
   // Prefer the offline blob, but only swap when playback is idle so a stream
@@ -675,16 +708,61 @@ function HayaAlSalat() {
                       <p className="font-arabic text-xs text-muted-foreground">{p.ar}</p>
                     </div>
                   </div>
-                  <span
-                    className="font-display text-lg tabular-nums"
-                    style={{ color: isNext ? "var(--gold)" : "var(--foreground)" }}
-                  >
-                    {p.time}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="font-display text-lg tabular-nums"
+                      style={{ color: isNext ? "var(--gold)" : "var(--foreground)" }}
+                    >
+                      {p.time}
+                    </span>
+                    {p.key !== "Sunrise" && (
+                      <button
+                        type="button"
+                        onClick={() => toggleAdhan(p.key)}
+                        aria-label={
+                          adhanPlaying === p.key
+                            ? `Stop ${p.label} Adhan`
+                            : `Play ${p.label} Adhan`
+                        }
+                        className="flex h-8 w-8 items-center justify-center rounded-full border transition active:scale-95"
+                        style={{
+                          borderColor:
+                            adhanPlaying === p.key
+                              ? "var(--gold)"
+                              : "oklch(1 0 0 / 0.12)",
+                          background:
+                            adhanPlaying === p.key
+                              ? "oklch(0.82 0.13 85 / 0.18)"
+                              : "transparent",
+                          color:
+                            adhanPlaying === p.key
+                              ? "var(--gold)"
+                              : "var(--muted-foreground)",
+                        }}
+                      >
+                        {adhanPlaying === p.key ? (
+                          <Square className="h-3.5 w-3.5" />
+                        ) : (
+                          <Radio className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </li>
               );
             })}
           </ul>
+          <audio
+            ref={adhanRef}
+            preload="none"
+            onEnded={() => setAdhanPlaying(null)}
+            onPause={() => {
+              if (adhanRef.current && adhanRef.current.ended) return;
+            }}
+          />
+          <p className="mt-3 text-center text-[10px] text-muted-foreground/70">
+            Tap the Adhan icon to hear the call to prayer for each time.
+          </p>
         </section>
 
         <section className="mt-8">
