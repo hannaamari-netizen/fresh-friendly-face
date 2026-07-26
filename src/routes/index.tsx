@@ -85,6 +85,9 @@ function HayaAlSalat() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const offline = useOfflineAudio(SURAH_URL);
+  // Streaming-first: start with the network URL, swap to the offline blob only
+  // when playback is idle so an in-flight stream is never interrupted.
+  const [activeSrc, setActiveSrc] = useState<string>(SURAH_URL);
 
   // Fetch location + prayer times (timezone-aware, refetches on day rollover / focus)
   const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
