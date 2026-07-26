@@ -4,9 +4,11 @@ import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCi
 import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
+import { InstallSteps } from "@/components/InstallSteps";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
