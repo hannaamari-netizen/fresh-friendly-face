@@ -459,10 +459,11 @@ function HayaAlSalat() {
 
             <audio
               ref={audioRef}
-              src={offline.localUrl ?? SURAH_URL}
+              src={activeSrc}
               preload="metadata"
               onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
               onTimeUpdate={(e) => setProgress(e.currentTarget.currentTime)}
+              onPause={() => setPlaying(false)}
               onEnded={() => setPlaying(false)}
             />
           </div>
