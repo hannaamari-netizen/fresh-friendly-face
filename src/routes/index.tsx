@@ -89,10 +89,12 @@ function HayaAlSalat() {
   const [error, setError] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const adhanRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [adhanPlaying, setAdhanPlaying] = useState<string | null>(null);
   const offline = useOfflineAudio(SURAH_URL);
   const auto = useAutoDownload({
     isCached: offline.status === "cached",
