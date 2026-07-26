@@ -53,6 +53,7 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
     typeof Notification !== "undefined" ? Notification.permission : "default"
   );
   const [bgStatus, setBgStatus] = useState<"idle" | "syncing" | "on" | "error">("idle");
+  const [testStatus, setTestStatus] = useState<"idle" | "sending" | "sent">("idle");
   const supported = typeof window !== "undefined" && "Notification" in window;
   const canBackground = pushSupported();
 
@@ -156,6 +157,40 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
   }
 
   const active = settings.enabled && permission === "granted";
+  async function sendTestNotification() {
+    if (!supported) return;
+    let perm = permission;
+    if (perm !== "granted") {
+      perm = await Notification.requestPermission();
+      setPermission(perm);
+    }
+    if (perm !== "granted") return;
+    setTestStatus("sending");
+    const body = renderMessage(settings.message, settings.offset);
+    try {
+      // Prefer the SW so it works on iOS PWAs and matches real reminder delivery.
+      const reg = canBackground ? await navigator.serviceWorker.getRegistration("/sw.js") : null;
+      if (reg) {
+        await reg.showNotification("Haya Al-Salat — test", {
+          body,
+          icon: "/icon-192.png",
+          badge: "/icon-192.png",
+          tag: "fajr-reminder-test",
+        });
+      } else {
+        new Notification("Haya Al-Salat — test", {
+          body,
+          icon: "/icon-192.png",
+          tag: "fajr-reminder-test",
+        });
+      }
+      setTestStatus("sent");
+      window.setTimeout(() => setTestStatus("idle"), 2000);
+    } catch {
+      setTestStatus("idle");
+    }
+  }
+
 
   return (
     <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur">
@@ -184,6 +219,15 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
               : "Get a gentle nudge before the call to Fajr."}
           </p>
         </div>
+        {supported && permission !== "denied" && (
+          <button
+            type="button"
+            onClick={sendTestNotification}
+            className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition hover:border-[var(--gold)]/60 hover:text-[var(--gold)]"
+          >
+            {testStatus === "sent" ? "Sent ✓" : testStatus === "sending" ? "Sending…" : "Test"}
+          </button>
+        )}
       </div>
 
       {active && (
