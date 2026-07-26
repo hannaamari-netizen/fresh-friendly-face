@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2 } from "lucide-react";
 import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
+import { formatInZone, todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,16 +28,9 @@ type Timings = {
   Fajr: string; Sunrise: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string;
 };
 
-type LocInfo = { city: string; country: string; lat: number; lon: number } | null;
+type LocInfo = { city: string; country: string; lat: number; lon: number; tz: string } | null;
 
 function pad(n: number) { return n.toString().padStart(2, "0"); }
-
-function parseHHMM(hhmm: string, base: Date) {
-  const [h, m] = hhmm.split(":").map(Number);
-  const d = new Date(base);
-  d.setHours(h, m, 0, 0);
-  return d;
-}
 
 function useNow(intervalMs = 1000) {
   const [now, setNow] = useState(() => new Date());
