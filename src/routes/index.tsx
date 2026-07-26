@@ -86,6 +86,11 @@ function HayaAlSalat() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const offline = useOfflineAudio(SURAH_URL);
+  const auto = useAutoDownload({
+    isCached: offline.status === "cached",
+    isDownloading: offline.status === "downloading",
+    triggerDownload: offline.download,
+  });
   // Streaming-first: start with the network URL, swap to the offline blob only
   // when playback is idle so an in-flight stream is never interrupted.
   const [activeSrc, setActiveSrc] = useState<string>(SURAH_URL);
