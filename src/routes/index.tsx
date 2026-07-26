@@ -114,6 +114,35 @@ function HayaAlSalat() {
   useEffect(() => {
     try { localStorage.setItem("haya-recitation-lead", String(recitationLead)); } catch {}
   }, [recitationLead]);
+
+  // Audio auto-play unlock. Browsers block programmatic play() without a
+  // prior user gesture, so show a prompt until the user taps once. On tap,
+  // we call play()+pause() on both audio elements to "unlock" the tab.
+  const [audioUnlocked, setAudioUnlocked] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return sessionStorage.getItem("haya-audio-unlocked") === "1";
+  });
+  const unlockAudio = useCallback(async () => {
+    const els = [audioRef.current, adhanRef.current].filter(Boolean) as HTMLAudioElement[];
+    for (const el of els) {
+      const prevMuted = el.muted;
+      const prevSrc = el.src;
+      try {
+        el.muted = true;
+        if (!el.src) el.src = SURAH_URL; // needs a src to play
+        await el.play();
+        el.pause();
+        el.currentTime = 0;
+      } catch {
+        // ignore — user gesture still lets subsequent play() work
+      } finally {
+        el.muted = prevMuted;
+        if (!prevSrc && el === adhanRef.current) el.removeAttribute("src");
+      }
+    }
+    try { sessionStorage.setItem("haya-audio-unlocked", "1"); } catch {}
+    setAudioUnlocked(true);
+  }, []);
   const offline = useOfflineAudio(SURAH_URL);
   const auto = useAutoDownload({
     isCached: offline.status === "cached",
