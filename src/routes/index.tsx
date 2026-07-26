@@ -115,6 +115,45 @@ function HayaAlSalat() {
     try { localStorage.setItem("haya-recitation-lead", String(recitationLead)); } catch {}
   }, [recitationLead]);
 
+  // Desktop notification when Surat Al-Mu'minun auto-starts before Fajr.
+  const [notifyOnStart, setNotifyOnStart] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("haya-notify-recitation-start") === "1";
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("haya-notify-recitation-start", notifyOnStart ? "1" : "0");
+    } catch {}
+  }, [notifyOnStart]);
+  const notifSupported = typeof window !== "undefined" && "Notification" in window;
+  const notifyRecitationStart = useCallback(async () => {
+    if (!notifyOnStart || !notifSupported) return;
+    if (Notification.permission !== "granted") return;
+    const title = "Haya Al-Salat";
+    const body = "Surat Al-Mu'minun is now playing before Fajr.";
+    const options: NotificationOptions = {
+      body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      tag: "haya-recitation-start",
+    };
+    try {
+      if ("serviceWorker" in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg) { await reg.showNotification(title, options); return; }
+      }
+      new Notification(title, options);
+    } catch {}
+  }, [notifyOnStart, notifSupported]);
+  async function enableStartNotifications() {
+    if (!notifSupported) return;
+    let perm = Notification.permission;
+    if (perm === "default") {
+      try { perm = await Notification.requestPermission(); } catch {}
+    }
+    if (perm === "granted") setNotifyOnStart(true);
+  }
+
   // Audio auto-play unlock. Browsers block programmatic play() without a
   // prior user gesture, so show a prompt until the user taps once. On tap,
   // we call play()+pause() on both audio elements to "unlock" the tab.
@@ -357,11 +396,14 @@ function HayaAlSalat() {
         setAdhanPlaying(null);
       }
       autoStartedForRef.current = target;
-      el.play().then(() => setPlaying(true)).catch(() => {
+      el.play().then(() => {
+        setPlaying(true);
+        notifyRecitationStart();
+      }).catch(() => {
         // Autoplay blocked — leave state as-is; user can tap play.
       });
     }
-  }, [fajrInfo, now, recitationLead, snoozeUntil]);
+  }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart]);
 
   // Auto-resume Surat when the 5-minute snooze elapses.
   useEffect(() => {
@@ -375,11 +417,14 @@ function HayaAlSalat() {
     }
     const el = audioRef.current;
     if (el && el.paused) {
-      el.play().then(() => setPlaying(true)).catch(() => {
+      el.play().then(() => {
+        setPlaying(true);
+        notifyRecitationStart();
+      }).catch(() => {
         // Autoplay blocked — user can tap play.
       });
     }
-  }, [now, snoozeUntil]);
+  }, [now, snoozeUntil, notifyRecitationStart]);
 
   // Prefer the offline blob, but only swap when playback is idle so a stream
   // in progress plays through uninterrupted. On next play, the local copy is used.
@@ -738,6 +783,39 @@ function HayaAlSalat() {
                 Surat Al-Mu'minun begins {recitationLead} minutes before the Fajr adhan.
               </p>
             </div>
+
+            {/* Desktop notification when Surat starts */}
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-2.5">
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-medium text-amber-50">Notify me when it starts</p>
+                <p className="text-[10px] text-muted-foreground/80">
+                  {!notifSupported
+                    ? "Notifications aren't supported on this device."
+                    : Notification.permission === "denied"
+                    ? "Notifications blocked in browser settings."
+                    : notifyOnStart
+                    ? "You'll get a desktop alert when Surat Al-Mu'minun starts."
+                    : "Get a desktop alert the moment Surat Al-Mu'minun begins."}
+                </p>
+              </div>
+              {notifyOnStart ? (
+                <button
+                  onClick={() => setNotifyOnStart(false)}
+                  className="rounded-full border border-amber-200/30 px-3 py-1 text-[11px] text-amber-100 transition hover:bg-amber-200/10"
+                >
+                  On
+                </button>
+              ) : (
+                <button
+                  onClick={enableStartNotifications}
+                  disabled={!notifSupported || (notifSupported && Notification.permission === "denied")}
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Enable
+                </button>
+              )}
+            </div>
+
 
 
             {/* Offline caching */}
