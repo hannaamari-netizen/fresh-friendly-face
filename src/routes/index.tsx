@@ -262,6 +262,83 @@ function HayaAlSalat() {
     }
   }, [offline.localUrl, activeSrc, playing]);
 
+  // Media Session — lock screen / notification shade controls & metadata
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    const ms = navigator.mediaSession;
+    ms.metadata = new MediaMetadata({
+      title: "Surat Al-Mu'minun — سورة المؤمنون",
+      artist: "Mukhtar Al-Hajj — مختار الحاج",
+      album: "Haya Al-Salat · Peaceful Fajr Companion",
+      artwork: [
+        { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
+        { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
+        { src: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      ],
+    });
+
+    const el = () => audioRef.current;
+    const safe = (fn: () => void) => { try { fn(); } catch { /* ignore */ } };
+
+    ms.setActionHandler("play", () => {
+      const a = el(); if (!a) return;
+      a.play().then(() => setPlaying(true)).catch(() => {});
+    });
+    ms.setActionHandler("pause", () => {
+      const a = el(); if (!a) return;
+      safe(() => a.pause()); setPlaying(false);
+    });
+    ms.setActionHandler("seekbackward", (d) => {
+      const a = el(); if (!a) return;
+      a.currentTime = Math.max(0, a.currentTime - (d.seekOffset || 10));
+    });
+    ms.setActionHandler("seekforward", (d) => {
+      const a = el(); if (!a) return;
+      a.currentTime = Math.min(a.duration || a.currentTime, a.currentTime + (d.seekOffset || 10));
+    });
+    ms.setActionHandler("seekto", (d) => {
+      const a = el(); if (!a || d.seekTime == null) return;
+      if (d.fastSeek && "fastSeek" in a) (a as any).fastSeek(d.seekTime);
+      else a.currentTime = d.seekTime;
+    });
+    // Single-track recitation: previous restarts, next replays from the beginning.
+    ms.setActionHandler("previoustrack", () => {
+      const a = el(); if (!a) return;
+      a.currentTime = 0;
+    });
+    ms.setActionHandler("nexttrack", () => {
+      const a = el(); if (!a) return;
+      a.currentTime = 0;
+      a.play().then(() => setPlaying(true)).catch(() => {});
+    });
+
+    return () => {
+      ["play","pause","seekbackward","seekforward","seekto","previoustrack","nexttrack"].forEach((k) => {
+        try { ms.setActionHandler(k as MediaSessionAction, null); } catch {}
+      });
+    };
+  }, []);
+
+  // Keep OS playback state & position in sync so the lock screen scrubber is accurate.
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    navigator.mediaSession.playbackState = playing ? "playing" : "paused";
+  }, [playing]);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+    if (!("setPositionState" in navigator.mediaSession)) return;
+    if (!duration || !Number.isFinite(duration)) return;
+    try {
+      navigator.mediaSession.setPositionState({
+        duration,
+        position: Math.min(progress, duration),
+        playbackRate: audioRef.current?.playbackRate || 1,
+      });
+    } catch { /* ignore */ }
+  }, [progress, duration]);
+
+
   return (
     <main className="relative min-h-dvh w-full overflow-x-hidden safe-px">
       <SplashScreen />
