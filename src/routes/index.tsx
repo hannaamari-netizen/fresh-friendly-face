@@ -105,6 +105,15 @@ function HayaAlSalat() {
     try { localStorage.setItem("haya-adhan-volume", String(adhanVolume)); } catch {}
     if (adhanRef.current) adhanRef.current.volume = adhanVolume;
   }, [adhanVolume]);
+  const [recitationLead, setRecitationLead] = useState<number>(() => {
+    if (typeof window === "undefined") return 10;
+    const raw = localStorage.getItem("haya-recitation-lead");
+    const v = raw ? Number(raw) : NaN;
+    return Number.isFinite(v) && v >= 1 && v <= 60 ? Math.round(v) : 10;
+  });
+  useEffect(() => {
+    try { localStorage.setItem("haya-recitation-lead", String(recitationLead)); } catch {}
+  }, [recitationLead]);
   const offline = useOfflineAudio(SURAH_URL);
   const auto = useAutoDownload({
     isCached: offline.status === "cached",
