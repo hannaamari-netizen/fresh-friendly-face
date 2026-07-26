@@ -425,14 +425,18 @@ function HayaAlSalat() {
         setAdhanPlaying(null);
       }
       autoStartedForRef.current = target;
+      // Start silent, then ramp volume up over ~2s for a gentle entrance.
+      el.volume = 0;
       el.play().then(() => {
         setPlaying(true);
+        fadeInRecitation();
         notifyRecitationStart();
       }).catch(() => {
         // Autoplay blocked — leave state as-is; user can tap play.
+        el.volume = 1;
       });
     }
-  }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart]);
+  }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
 
   // Auto-resume Surat when the 5-minute snooze elapses.
   useEffect(() => {
