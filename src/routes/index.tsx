@@ -95,6 +95,16 @@ function HayaAlSalat() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [adhanPlaying, setAdhanPlaying] = useState<string | null>(null);
+  const [adhanVolume, setAdhanVolume] = useState<number>(() => {
+    if (typeof window === "undefined") return 0.8;
+    const raw = localStorage.getItem("haya-adhan-volume");
+    const v = raw ? Number(raw) : NaN;
+    return Number.isFinite(v) && v >= 0 && v <= 1 ? v : 0.8;
+  });
+  useEffect(() => {
+    try { localStorage.setItem("haya-adhan-volume", String(adhanVolume)); } catch {}
+    if (adhanRef.current) adhanRef.current.volume = adhanVolume;
+  }, [adhanVolume]);
   const offline = useOfflineAudio(SURAH_URL);
   const auto = useAutoDownload({
     isCached: offline.status === "cached",
@@ -269,6 +279,7 @@ function HayaAlSalat() {
     const src = prayerKey === "Fajr" ? ADHAN_FAJR_URL : ADHAN_URL;
     el.src = src;
     el.currentTime = 0;
+    el.volume = adhanVolume;
     el.play().then(() => setAdhanPlaying(prayerKey)).catch(() => setAdhanPlaying(null));
   }
 
@@ -786,6 +797,41 @@ function HayaAlSalat() {
               if (adhanRef.current && adhanRef.current.ended) return;
             }}
           />
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                Adhan volume
+              </p>
+              <span className="text-[10px] tabular-nums text-muted-foreground">
+                {Math.round(adhanVolume * 100)}%
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setAdhanVolume(adhanVolume > 0 ? 0 : 0.8)}
+                aria-label={adhanVolume === 0 ? "Unmute Adhan" : "Mute Adhan"}
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-muted-foreground transition hover:text-[var(--gold)]"
+              >
+                {adhanVolume === 0 ? (
+                  <VolumeX className="h-3.5 w-3.5" />
+                ) : (
+                  <Volume2 className="h-3.5 w-3.5" />
+                )}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.01}
+                value={adhanVolume}
+                onChange={(e) => setAdhanVolume(Number(e.target.value))}
+                aria-label="Adhan volume"
+                className="haya-slider flex-1"
+                style={{ ["--val" as any]: `${adhanVolume * 100}%` }}
+              />
+            </div>
+          </div>
           <p className="mt-3 text-center text-[10px] text-muted-foreground/70">
             Tap the Adhan icon to hear the call to prayer for each time.
           </p>
