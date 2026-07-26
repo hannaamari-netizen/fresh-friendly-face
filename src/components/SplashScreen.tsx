@@ -40,6 +40,10 @@ export function SplashScreen() {
       style={{
         background:
           "radial-gradient(ellipse at 50% 30%, oklch(0.28 0.08 280) 0%, oklch(0.14 0.05 275) 45%, oklch(0.08 0.03 270) 100%)",
+        paddingTop: "env(safe-area-inset-top)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+        paddingLeft: "env(safe-area-inset-left)",
+        paddingRight: "env(safe-area-inset-right)",
       }}
       aria-hidden="true"
     >

@@ -228,7 +228,7 @@ function HayaAlSalat() {
   }
 
   return (
-    <main className="relative min-h-screen w-full overflow-x-hidden">
+    <main className="relative min-h-dvh w-full overflow-x-hidden safe-px">
       <SplashScreen />
       <Stars />
 
@@ -236,7 +236,13 @@ function HayaAlSalat() {
       <div className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full float-slow"
            style={{ background: "radial-gradient(circle, oklch(0.9 0.05 90 / 0.35), transparent 70%)" }} />
 
-      <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col px-6 pb-12 pt-10">
+      <div
+        className="relative mx-auto flex min-h-dvh w-full max-w-md flex-col px-6"
+        style={{
+          paddingTop: "calc(2.5rem + env(safe-area-inset-top))",
+          paddingBottom: "calc(3rem + env(safe-area-inset-bottom))",
+        }}
+      >
         {/* Header */}
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-gold-soft/80" style={{ color: "var(--gold-soft)" }}>
