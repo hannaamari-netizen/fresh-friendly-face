@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX } from "lucide-react";
+import { FajrReminder } from "@/components/FajrReminder";
 
 export const Route = createFileRoute("/")({
   head: () => ({
