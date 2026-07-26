@@ -28,6 +28,12 @@ const config: CapacitorConfig = {
     contentInset: "always",
     limitsNavigationsToAppBoundDomains: true,
     backgroundColor: "#0b0a1a",
+    // Ensures the status bar text stays light against the dark theme.
+    // Override in Info.plist if you need further control.
+    statusBarStyle: "DARK",
+    // Allows the web app to keep playing audio when the device is locked.
+    // Must be paired with the "audio" UIBackgroundMode in Info.plist.
+    backgroundColor: "#0b0a1a",
   },
 
   android: {
@@ -42,6 +48,10 @@ const config: CapacitorConfig = {
       androidScaleType: "CENTER_CROP",
       showSpinner: false,
       splashImmersive: true,
+    },
+    StatusBar: {
+      style: "DARK",
+      backgroundColor: "#0b0a1a",
     },
   },
 };

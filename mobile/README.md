@@ -142,3 +142,7 @@ Bundle (.aab)**. Create/reuse a keystore and store it outside the repo. Bump
 - [ ] Screenshots: iPhone 6.7"/6.5"/5.5" + iPad 12.9" (iOS), phone + 7"/10" tablet (Android)
 - [ ] Age rating questionnaire completed
 - [ ] Apple: demo notes explaining Fajr auto-recitation for the reviewer
+
+## 7. App Store specifics
+
+See [`APP_STORE.md`](./APP_STORE.md) for the complete iOS upload workflow, Xcode configuration, Info.plist entries, review demo notes, and suggested store listing text.
