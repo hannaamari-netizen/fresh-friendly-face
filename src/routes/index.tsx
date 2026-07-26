@@ -384,6 +384,8 @@ function HayaAlSalat() {
   }, [timings, now, loc?.tz, resolvePrayerInstant]);
 
   const [snoozeUntil, setSnoozeUntil] = useState<number | null>(null);
+  const [stopConfirmOpen, setStopConfirmOpen] = useState(false);
+
 
   function togglePlay() {
     const el = audioRef.current;
