@@ -239,6 +239,11 @@ function HayaAlSalat() {
           )}
         </section>
 
+        {/* Fajr reminder */}
+        <section className="mt-6">
+          <FajrReminder fajrDate={fajrInfo?.fajr ?? null} />
+        </section>
+
         {/* Recitation player */}
         <section className="mt-6">
           <div className="rounded-3xl border border-white/10 bg-black/25 p-5 backdrop-blur">
