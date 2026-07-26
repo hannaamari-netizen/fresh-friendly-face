@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2 } from "lucide-react";
 import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
+import { MotionToggle } from "@/components/MotionToggle";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 
 export const Route = createFileRoute("/")({
@@ -422,6 +423,10 @@ function HayaAlSalat() {
               );
             })}
           </ul>
+        </section>
+
+        <section className="mt-8">
+          <MotionToggle />
         </section>
 
         <footer className="mt-10 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground/70">
