@@ -1436,6 +1436,13 @@ function HayaAlSalat() {
             >
               Privacy Policy
             </Link>
+            <span className="mx-2 text-muted-foreground/50">·</span>
+            <Link
+              to="/licenses"
+              className="underline underline-offset-4 transition hover:text-foreground"
+            >
+              Open Source Licenses
+            </Link>
           </p>
         </footer>
 
