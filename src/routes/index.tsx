@@ -115,6 +115,45 @@ function HayaAlSalat() {
     try { localStorage.setItem("haya-recitation-lead", String(recitationLead)); } catch {}
   }, [recitationLead]);
 
+  // Desktop notification when Surat Al-Mu'minun auto-starts before Fajr.
+  const [notifyOnStart, setNotifyOnStart] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("haya-notify-recitation-start") === "1";
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("haya-notify-recitation-start", notifyOnStart ? "1" : "0");
+    } catch {}
+  }, [notifyOnStart]);
+  const notifSupported = typeof window !== "undefined" && "Notification" in window;
+  const notifyRecitationStart = useCallback(async () => {
+    if (!notifyOnStart || !notifSupported) return;
+    if (Notification.permission !== "granted") return;
+    const title = "Haya Al-Salat";
+    const body = "Surat Al-Mu'minun is now playing before Fajr.";
+    const options: NotificationOptions = {
+      body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      tag: "haya-recitation-start",
+    };
+    try {
+      if ("serviceWorker" in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg) { await reg.showNotification(title, options); return; }
+      }
+      new Notification(title, options);
+    } catch {}
+  }, [notifyOnStart, notifSupported]);
+  async function enableStartNotifications() {
+    if (!notifSupported) return;
+    let perm = Notification.permission;
+    if (perm === "default") {
+      try { perm = await Notification.requestPermission(); } catch {}
+    }
+    if (perm === "granted") setNotifyOnStart(true);
+  }
+
   // Audio auto-play unlock. Browsers block programmatic play() without a
   // prior user gesture, so show a prompt until the user taps once. On tap,
   // we call play()+pause() on both audio elements to "unlock" the tab.
