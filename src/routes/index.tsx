@@ -316,7 +316,7 @@ function HayaAlSalat() {
         // Autoplay blocked — leave state as-is; user can tap play.
       });
     }
-  }, [fajrInfo, now]);
+  }, [fajrInfo, now, recitationLead]);
 
   // Prefer the offline blob, but only swap when playback is idle so a stream
   // in progress plays through uninterrupted. On next play, the local copy is used.
