@@ -361,7 +361,25 @@ function HayaAlSalat() {
         // Autoplay blocked — leave state as-is; user can tap play.
       });
     }
-  }, [fajrInfo, now, recitationLead]);
+  }, [fajrInfo, now, recitationLead, snoozeUntil]);
+
+  // Auto-resume Surat when the 5-minute snooze elapses.
+  useEffect(() => {
+    if (!snoozeUntil) return;
+    if (now.getTime() < snoozeUntil) return;
+    setSnoozeUntil(null);
+    // Stop adhan if playing, then resume Surat.
+    if (adhanRef.current && !adhanRef.current.paused) {
+      try { adhanRef.current.pause(); } catch {}
+      setAdhanPlaying(null);
+    }
+    const el = audioRef.current;
+    if (el && el.paused) {
+      el.play().then(() => setPlaying(true)).catch(() => {
+        // Autoplay blocked — user can tap play.
+      });
+    }
+  }, [now, snoozeUntil]);
 
   // Prefer the offline blob, but only swap when playback is idle so a stream
   // in progress plays through uninterrupted. On next play, the local copy is used.
