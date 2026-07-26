@@ -60,10 +60,6 @@ export function ShareApp() {
       }
       await nav.clipboard.writeText(msg.text);
       setStatus("copied");
-        return;
-      }
-      await navigator.clipboard.writeText(`${msg.text}`);
-      setStatus("copied");
     } catch (err) {
       // User cancelled share sheet — don't treat as error
       if ((err as Error)?.name === "AbortError") {
