@@ -199,10 +199,10 @@ function HayaAlSalat() {
             حَيَّ عَلَى الصَّلَاة
           </p>
           <h1 className="mt-4 font-display text-5xl font-medium leading-tight gold-shimmer">
-            A dawn is<br />coming.
+            Wake gently<br />before Fajr.
           </h1>
           <p className="mt-3 text-sm text-muted-foreground">
-            Prepare your heart before Fajr.
+            A peaceful companion to begin the day with remembrance of Allah.
           </p>
         </div>
 
