@@ -483,9 +483,35 @@ function HayaAlSalat() {
                 <span className="pb-3 text-3xl text-white/30">:</span>
                 <TimeUnit value={pad(fajrInfo.s)} label="sec" />
               </div>
+              {(() => {
+                const recMs = fajrInfo.diff - 10 * 60 * 1000;
+                if (recMs > 0) {
+                  const rh = Math.floor(recMs / 3600000);
+                  const rm = Math.floor((recMs % 3600000) / 60000);
+                  const rs = Math.floor((recMs % 60000) / 1000);
+                  const label = rh > 0 ? `${rh}h ${pad(rm)}m ${pad(rs)}s` : `${rm}m ${pad(rs)}s`;
+                  return (
+                    <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-3 py-2 text-[11px] text-muted-foreground">
+                      <Play className="h-3 w-3" style={{ color: "var(--gold)" }} />
+                      <span>Surat Al-Mu'minun begins in</span>
+                      <span className="tabular-nums font-medium" style={{ color: "var(--gold)" }}>{label}</span>
+                    </div>
+                  );
+                }
+                if (fajrInfo.diff > 0) {
+                  return (
+                    <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl border border-[var(--gold)]/40 bg-[oklch(0.82_0.13_85/0.12)] px-3 py-2 text-[11px]" style={{ color: "var(--gold)" }}>
+                      <Play className="h-3 w-3" />
+                      <span>Surat Al-Mu'minun is reciting now — {Math.max(1, Math.ceil(fajrInfo.diff / 60000))} min to Fajr</span>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
             </div>
           )}
         </section>
+
 
         {/* Fajr reminder */}
         <section className="mt-6">
