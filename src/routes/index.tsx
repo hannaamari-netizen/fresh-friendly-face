@@ -776,14 +776,24 @@ function HayaAlSalat() {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={snoozeRecitation}
-                disabled={!playing}
-                className="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Snooze 5 min
-              </button>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  onClick={snoozeRecitation}
+                  disabled={!playing}
+                  className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Snooze 5 min
+                </button>
+                <button
+                  onClick={stopRecitation}
+                  disabled={!playing && (audioRef.current?.currentTime ?? 0) === 0}
+                  className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-rose-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <Square className="h-3 w-3" fill="currentColor" /> Stop
+                </button>
+              </div>
             )}
+
 
             {/* Progress */}
             <div className="mt-4">
