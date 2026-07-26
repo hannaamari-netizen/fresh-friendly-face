@@ -115,6 +115,17 @@ function HayaAlSalat() {
     try { localStorage.setItem("haya-recitation-lead", String(recitationLead)); } catch {}
   }, [recitationLead]);
 
+  // Configurable snooze duration for the recitation player.
+  const [snoozeDuration, setSnoozeDuration] = useState<number>(() => {
+    if (typeof window === "undefined") return 5;
+    const raw = localStorage.getItem("haya-snooze-duration");
+    const v = raw ? Number(raw) : NaN;
+    return [5, 10, 15, 30].includes(v) ? v : 5;
+  });
+  useEffect(() => {
+    try { localStorage.setItem("haya-snooze-duration", String(snoozeDuration)); } catch {}
+  }, [snoozeDuration]);
+
   // Desktop notification when Surat Al-Mu'minun auto-starts before Fajr.
   const [notifyOnStart, setNotifyOnStart] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
@@ -395,7 +406,7 @@ function HayaAlSalat() {
     if (!el) return;
     try { el.pause(); } catch {}
     setPlaying(false);
-    setSnoozeUntil(Date.now() + 5 * 60 * 1000);
+    setSnoozeUntil(Date.now() + snoozeDuration * 60 * 1000);
   }
   function cancelSnooze() {
     setSnoozeUntil(null);
@@ -471,7 +482,7 @@ function HayaAlSalat() {
     }
   }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
 
-  // Auto-resume Surat when the 5-minute snooze elapses.
+  // Auto-resume Surat when the selected snooze duration elapses.
   useEffect(() => {
     if (!snoozeUntil) return;
     if (now.getTime() < snoozeUntil) return;
@@ -793,21 +804,46 @@ function HayaAlSalat() {
                 </button>
               </div>
             ) : (
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button
-                  onClick={snoozeRecitation}
-                  disabled={!playing}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Snooze 5 min
-                </button>
-                <button
-                  onClick={stopRecitation}
-                  disabled={!playing && (audioRef.current?.currentTime ?? 0) === 0}
-                  className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-rose-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <Square className="h-3 w-3" fill="currentColor" /> Stop
-                </button>
+              <div className="mt-3 rounded-2xl border border-white/10 bg-white/5 p-2">
+                <div className="mb-2 flex items-center justify-between px-1">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Snooze duration</p>
+                  <span className="text-[10px] tabular-nums" style={{ color: "var(--gold)" }}>{snoozeDuration} min</span>
+                </div>
+                <div className="flex gap-1.5">
+                  {[5, 10, 15, 30].map((m) => {
+                    const sel = snoozeDuration === m;
+                    return (
+                      <button
+                        key={m}
+                        onClick={() => setSnoozeDuration(m)}
+                        className="flex-1 rounded-full border px-2 py-1 text-[11px] font-medium transition"
+                        style={{
+                          borderColor: sel ? "var(--gold)" : "oklch(1 0 0 / 0.12)",
+                          background: sel ? "oklch(0.82 0.13 85 / 0.15)" : "transparent",
+                          color: sel ? "var(--gold)" : "var(--foreground)",
+                        }}
+                      >
+                        {m}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <button
+                    onClick={snoozeRecitation}
+                    disabled={!playing}
+                    className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Snooze {snoozeDuration} min
+                  </button>
+                  <button
+                    onClick={stopRecitation}
+                    disabled={!playing && (audioRef.current?.currentTime ?? 0) === 0}
+                    className="flex items-center justify-center gap-1.5 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-rose-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <Square className="h-3 w-3" fill="currentColor" /> Stop
+                  </button>
+                </div>
               </div>
             )}
 
