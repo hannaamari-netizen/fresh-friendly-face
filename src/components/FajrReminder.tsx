@@ -21,12 +21,27 @@ const STORAGE_KEY = "haya-fajr-reminder";
 const OFFSETS = [5, 15, 30, 60];
 const DEFAULT_MESSAGE = "Fajr is in {minutes} minutes. Wake gently for the prayer of the dawn.";
 const MAX_MESSAGE_LEN = 140;
+const GLOBAL_TZ_KEY = "__global__";
 
-type Settings = { enabled: boolean; offset: number; message: string; background: boolean };
+type Settings = {
+  enabled: boolean;
+  offset: number;
+  /** Legacy single template; kept as fallback for any timezone without an override. */
+  message: string;
+  /** Per-IANA-timezone reminder templates. */
+  messages: Record<string, string>;
+  background: boolean;
+};
 
 function loadSettings(): Settings {
-  if (typeof window === "undefined")
-    return { enabled: false, offset: 15, message: DEFAULT_MESSAGE, background: false };
+  const base: Settings = {
+    enabled: false,
+    offset: 15,
+    message: DEFAULT_MESSAGE,
+    messages: {},
+    background: false,
+  };
+  if (typeof window === "undefined") return base;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -35,11 +50,21 @@ function loadSettings(): Settings {
         enabled: !!p.enabled,
         offset: p.offset ?? 15,
         message: p.message ?? DEFAULT_MESSAGE,
+        messages: p.messages && typeof p.messages === "object" ? p.messages : {},
         background: !!p.background,
       };
     }
   } catch {}
-  return { enabled: false, offset: 15, message: DEFAULT_MESSAGE, background: false };
+  return base;
+}
+
+function tzKey(tz: string | null | undefined) {
+  return (tz && tz.trim()) || GLOBAL_TZ_KEY;
+}
+
+function messageFor(settings: Settings, tz: string | null | undefined) {
+  const key = tzKey(tz);
+  return settings.messages[key] ?? settings.message ?? DEFAULT_MESSAGE;
 }
 
 function renderMessage(template: string, minutes: number) {
@@ -56,6 +81,26 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
   const [testStatus, setTestStatus] = useState<"idle" | "sending" | "sent">("idle");
   const supported = typeof window !== "undefined" && "Notification" in window;
   const canBackground = pushSupported();
+
+  const activeTz =
+    timezone ||
+    (typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC");
+  const activeTemplate = messageFor(settings, activeTz);
+
+  function setTemplateForActiveTz(value: string) {
+    setSettings((s) => ({
+      ...s,
+      messages: { ...s.messages, [tzKey(activeTz)]: value },
+    }));
+  }
+
+  function resetTemplateForActiveTz() {
+    setSettings((s) => {
+      const next = { ...s.messages };
+      delete next[tzKey(activeTz)];
+      return { ...s, messages: next };
+    });
+  }
 
   const savePush = useServerFn(savePushSubscription);
   const removePush = useServerFn(deletePushSubscription);
@@ -76,7 +121,7 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
       id = window.setTimeout(() => {
         try {
           new Notification("Haya Al-Salat", {
-            body: renderMessage(settings.message, settings.offset),
+            body: renderMessage(activeTemplate, settings.offset),
             icon: "/icon-192.png",
             badge: "/icon-192.png",
             tag: "fajr-reminder",
@@ -109,7 +154,7 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
             latitude,
             longitude,
             offsetMinutes: settings.offset,
-            messageTemplate: settings.message,
+            messageTemplate: activeTemplate,
             title: "Haya Al-Salat",
             calcMethod: 2,
           }),
@@ -121,7 +166,7 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
     })();
     return () => { cancelled = true; };
   }, [
-    settings.enabled, settings.background, settings.offset, settings.message,
+    settings.enabled, settings.background, settings.offset, activeTemplate,
     permission, timezone, latitude, longitude, canBackground, savePush,
   ]);
 
@@ -166,7 +211,7 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
     }
     if (perm !== "granted") return;
     setTestStatus("sending");
-    const body = renderMessage(settings.message, settings.offset);
+    const body = renderMessage(activeTemplate, settings.offset);
     try {
       // Prefer the SW so it works on iOS PWAs and matches real reminder delivery.
       const reg = canBackground ? await navigator.serviceWorker.getRegistration("/sw.js") : null;
@@ -291,23 +336,28 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
           </div>
 
           <div className="mt-5">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-                Reminder message
-              </p>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Reminder message
+                </p>
+                <p className="mt-0.5 truncate text-[10px] text-muted-foreground/80">
+                  Saved for{" "}
+                  <span className="text-[var(--gold)]">{activeTz}</span>
+                  {settings.messages[tzKey(activeTz)] !== undefined ? " · custom" : " · default"}
+                </p>
+              </div>
               <button
                 type="button"
-                onClick={() => setSettings((s) => ({ ...s, message: DEFAULT_MESSAGE }))}
-                className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition hover:text-[var(--gold)]"
+                onClick={resetTemplateForActiveTz}
+                className="shrink-0 text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition hover:text-[var(--gold)]"
               >
                 Reset
               </button>
             </div>
             <textarea
-              value={settings.message}
-              onChange={(e) =>
-                setSettings((s) => ({ ...s, message: e.target.value.slice(0, MAX_MESSAGE_LEN) }))
-              }
+              value={activeTemplate}
+              onChange={(e) => setTemplateForActiveTz(e.target.value.slice(0, MAX_MESSAGE_LEN))}
               rows={2}
               maxLength={MAX_MESSAGE_LEN}
               placeholder={DEFAULT_MESSAGE}
@@ -317,10 +367,13 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
               <span>
                 Use <span className="text-[var(--gold)]">{"{minutes}"}</span> for the countdown.
               </span>
-              <span>{settings.message.length}/{MAX_MESSAGE_LEN}</span>
+              <span>{activeTemplate.length}/{MAX_MESSAGE_LEN}</span>
             </div>
             <p className="mt-2 text-[10px] italic text-muted-foreground/80">
-              Preview: “{renderMessage(settings.message, settings.offset)}”
+              Preview: “{renderMessage(activeTemplate, settings.offset)}”
+            </p>
+            <p className="mt-1 text-[10px] text-muted-foreground/70">
+              Messages are saved per timezone — travelling to another location keeps its own wording.
             </p>
           </div>
         </div>
