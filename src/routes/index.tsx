@@ -287,10 +287,14 @@ function HayaAlSalat() {
     return "Fajr";
   }, [timings, now, loc?.tz, resolvePrayerInstant]);
 
+  const [snoozeUntil, setSnoozeUntil] = useState<number | null>(null);
+
   function togglePlay() {
     const el = audioRef.current;
     if (!el) return;
     if (el.paused) {
+      // Manual play cancels any pending snooze.
+      setSnoozeUntil(null);
       // Stop adhan if it's playing so the two audios don't overlap.
       if (adhanRef.current && !adhanRef.current.paused) {
         try { adhanRef.current.pause(); } catch {}
@@ -299,6 +303,17 @@ function HayaAlSalat() {
       el.play(); setPlaying(true);
     }
     else { el.pause(); setPlaying(false); }
+  }
+
+  function snoozeRecitation() {
+    const el = audioRef.current;
+    if (!el) return;
+    try { el.pause(); } catch {}
+    setPlaying(false);
+    setSnoozeUntil(Date.now() + 5 * 60 * 1000);
+  }
+  function cancelSnooze() {
+    setSnoozeUntil(null);
   }
 
   function toggleAdhan(prayerKey: string) {
@@ -335,6 +350,7 @@ function HayaAlSalat() {
     if (msBefore <= recitationLead * 60 * 1000 && msBefore > 0) {
       if (autoStartedForRef.current === target) return;
       if (!el.paused) return; // already playing
+      if (snoozeUntil && Date.now() < snoozeUntil) return; // user snoozed
       // Stop any adhan first.
       if (adhanRef.current && !adhanRef.current.paused) {
         try { adhanRef.current.pause(); } catch {}
@@ -345,7 +361,25 @@ function HayaAlSalat() {
         // Autoplay blocked — leave state as-is; user can tap play.
       });
     }
-  }, [fajrInfo, now, recitationLead]);
+  }, [fajrInfo, now, recitationLead, snoozeUntil]);
+
+  // Auto-resume Surat when the 5-minute snooze elapses.
+  useEffect(() => {
+    if (!snoozeUntil) return;
+    if (now.getTime() < snoozeUntil) return;
+    setSnoozeUntil(null);
+    // Stop adhan if playing, then resume Surat.
+    if (adhanRef.current && !adhanRef.current.paused) {
+      try { adhanRef.current.pause(); } catch {}
+      setAdhanPlaying(null);
+    }
+    const el = audioRef.current;
+    if (el && el.paused) {
+      el.play().then(() => setPlaying(true)).catch(() => {
+        // Autoplay blocked — user can tap play.
+      });
+    }
+  }, [now, snoozeUntil]);
 
   // Prefer the offline blob, but only swap when playback is idle so a stream
   // in progress plays through uninterrupted. On next play, the local copy is used.
@@ -627,6 +661,32 @@ function HayaAlSalat() {
                 {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </button>
             </div>
+
+            {/* Snooze */}
+            {snoozeUntil ? (
+              <div className="mt-3 flex items-center justify-between rounded-2xl border border-amber-200/20 bg-amber-200/5 px-3 py-2">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.25em] text-amber-200/80">Snoozed</p>
+                  <p className="text-sm tabular-nums text-amber-50">
+                    Resumes in {fmtTime(Math.max(0, Math.ceil((snoozeUntil - now.getTime()) / 1000)))}
+                  </p>
+                </div>
+                <button
+                  onClick={cancelSnooze}
+                  className="rounded-full border border-amber-200/30 px-3 py-1 text-xs text-amber-100 transition hover:bg-amber-200/10"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={snoozeRecitation}
+                disabled={!playing}
+                className="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Snooze 5 min
+              </button>
+            )}
 
             {/* Progress */}
             <div className="mt-4">
