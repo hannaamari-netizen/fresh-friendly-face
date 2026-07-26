@@ -211,7 +211,7 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
     }
     if (perm !== "granted") return;
     setTestStatus("sending");
-    const body = renderMessage(settings.message, settings.offset);
+    const body = renderMessage(activeTemplate, settings.offset);
     try {
       // Prefer the SW so it works on iOS PWAs and matches real reminder delivery.
       const reg = canBackground ? await navigator.serviceWorker.getRegistration("/sw.js") : null;
