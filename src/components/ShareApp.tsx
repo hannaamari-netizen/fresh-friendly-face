@@ -51,10 +51,15 @@ export function ShareApp() {
 
   const handleShare = async () => {
     const payload = { title: msg.title, text: msg.text, url: APP_URL };
+    const nav: any = typeof navigator !== "undefined" ? navigator : null;
     try {
-      if (typeof navigator !== "undefined" && "share" in navigator) {
-        await navigator.share(payload);
+      if (nav && typeof nav.share === "function") {
+        await nav.share(payload);
         setStatus("shared");
+        return;
+      }
+      await nav.clipboard.writeText(msg.text);
+      setStatus("copied");
         return;
       }
       await navigator.clipboard.writeText(`${msg.text}`);
