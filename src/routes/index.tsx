@@ -115,6 +115,17 @@ function HayaAlSalat() {
     try { localStorage.setItem("haya-recitation-lead", String(recitationLead)); } catch {}
   }, [recitationLead]);
 
+  // Configurable snooze duration for the recitation player.
+  const [snoozeDuration, setSnoozeDuration] = useState<number>(() => {
+    if (typeof window === "undefined") return 5;
+    const raw = localStorage.getItem("haya-snooze-duration");
+    const v = raw ? Number(raw) : NaN;
+    return [5, 10, 15, 30].includes(v) ? v : 5;
+  });
+  useEffect(() => {
+    try { localStorage.setItem("haya-snooze-duration", String(snoozeDuration)); } catch {}
+  }, [snoozeDuration]);
+
   // Desktop notification when Surat Al-Mu'minun auto-starts before Fajr.
   const [notifyOnStart, setNotifyOnStart] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
