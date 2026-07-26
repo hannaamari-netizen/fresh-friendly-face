@@ -482,7 +482,7 @@ function HayaAlSalat() {
     }
   }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
 
-  // Auto-resume Surat when the 5-minute snooze elapses.
+  // Auto-resume Surat when the selected snooze duration elapses.
   useEffect(() => {
     if (!snoozeUntil) return;
     if (now.getTime() < snoozeUntil) return;
