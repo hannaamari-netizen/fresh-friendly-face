@@ -508,7 +508,7 @@ function HayaAlSalat() {
         notifyRecitationStart();
       }).catch(() => {
         // Autoplay blocked — leave state as-is; user can tap play.
-        el.volume = 1;
+        el.volume = recitationMuted ? 0 : recitationVolume;
       });
     }
   }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
