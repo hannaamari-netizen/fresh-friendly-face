@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LicensesRouteImport } from './routes/licenses'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicCronFajrPushRouteImport } from './routes/api/public/cron/fajr-push'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesById {
@@ -52,25 +60,45 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/licenses' | '/privacy' | '/api/public/cron/fajr-push'
+  fullPaths:
+    | '/'
+    | '/licenses'
+    | '/privacy'
+    | '/terms'
+    | '/api/public/cron/fajr-push'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/licenses' | '/privacy' | '/api/public/cron/fajr-push'
-  id: '__root__' | '/' | '/licenses' | '/privacy' | '/api/public/cron/fajr-push'
+  to: '/' | '/licenses' | '/privacy' | '/terms' | '/api/public/cron/fajr-push'
+  id:
+    | '__root__'
+    | '/'
+    | '/licenses'
+    | '/privacy'
+    | '/terms'
+    | '/api/public/cron/fajr-push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LicensesRoute: typeof LicensesRoute
   PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   ApiPublicCronFajrPushRoute: typeof ApiPublicCronFajrPushRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -106,6 +134,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LicensesRoute: LicensesRoute,
   PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   ApiPublicCronFajrPushRoute: ApiPublicCronFajrPushRoute,
 }
 export const routeTree = rootRouteImport

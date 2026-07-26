@@ -1438,6 +1438,13 @@ function HayaAlSalat() {
             </Link>
             <span className="mx-2 text-muted-foreground/50">·</span>
             <Link
+              to="/terms"
+              className="underline underline-offset-4 transition hover:text-foreground"
+            >
+              Terms of Service
+            </Link>
+            <span className="mx-2 text-muted-foreground/50">·</span>
+            <Link
               to="/licenses"
               className="underline underline-offset-4 transition hover:text-foreground"
             >
