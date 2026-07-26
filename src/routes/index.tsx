@@ -5,6 +5,7 @@ import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
 import { InstallSteps } from "@/components/InstallSteps";
+import { ShareApp } from "@/components/ShareApp";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
@@ -692,6 +693,10 @@ function HayaAlSalat() {
 
         <section className="mt-6">
           <InstallSteps />
+        </section>
+
+        <section className="mt-6">
+          <ShareApp />
         </section>
 
         <footer className="mt-10 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground/70">
