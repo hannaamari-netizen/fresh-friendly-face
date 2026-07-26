@@ -154,6 +154,35 @@ function HayaAlSalat() {
     if (perm === "granted") setNotifyOnStart(true);
   }
 
+  // Smooth 2-second volume fade-in for the recitation audio, used when it
+  // starts automatically at the scheduled time.
+  const fadeTimerRef = useRef<number | null>(null);
+  const fadeInRecitation = useCallback((durationMs = 2000, target = 1) => {
+    const el = audioRef.current;
+    if (!el) return;
+    if (fadeTimerRef.current !== null) {
+      clearInterval(fadeTimerRef.current);
+      fadeTimerRef.current = null;
+    }
+    el.volume = 0;
+    const start = performance.now();
+    fadeTimerRef.current = window.setInterval(() => {
+      const t = Math.min(1, (performance.now() - start) / durationMs);
+      // ease-out cubic for a gentle rise
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.volume = Math.max(0, Math.min(1, eased * target));
+      if (t >= 1 && fadeTimerRef.current !== null) {
+        clearInterval(fadeTimerRef.current);
+        fadeTimerRef.current = null;
+        el.volume = target;
+      }
+    }, 50);
+  }, []);
+  useEffect(() => () => {
+    if (fadeTimerRef.current !== null) clearInterval(fadeTimerRef.current);
+  }, []);
+
+
   // Audio auto-play unlock. Browsers block programmatic play() without a
   // prior user gesture, so show a prompt until the user taps once. On tap,
   // we call play()+pause() on both audio elements to "unlock" the tab.
@@ -396,14 +425,18 @@ function HayaAlSalat() {
         setAdhanPlaying(null);
       }
       autoStartedForRef.current = target;
+      // Start silent, then ramp volume up over ~2s for a gentle entrance.
+      el.volume = 0;
       el.play().then(() => {
         setPlaying(true);
+        fadeInRecitation();
         notifyRecitationStart();
       }).catch(() => {
         // Autoplay blocked — leave state as-is; user can tap play.
+        el.volume = 1;
       });
     }
-  }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart]);
+  }, [fajrInfo, now, recitationLead, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
 
   // Auto-resume Surat when the 5-minute snooze elapses.
   useEffect(() => {
@@ -417,14 +450,17 @@ function HayaAlSalat() {
     }
     const el = audioRef.current;
     if (el && el.paused) {
+      el.volume = 0;
       el.play().then(() => {
         setPlaying(true);
+        fadeInRecitation();
         notifyRecitationStart();
       }).catch(() => {
         // Autoplay blocked — user can tap play.
+        el.volume = 1;
       });
     }
-  }, [now, snoozeUntil, notifyRecitationStart]);
+  }, [now, snoozeUntil, notifyRecitationStart, fadeInRecitation]);
 
   // Prefer the offline blob, but only swap when playback is idle so a stream
   // in progress plays through uninterrupted. On next play, the local copy is used.
