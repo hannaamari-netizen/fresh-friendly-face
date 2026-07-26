@@ -272,6 +272,32 @@ function HayaAlSalat() {
     el.play().then(() => setAdhanPlaying(prayerKey)).catch(() => setAdhanPlaying(null));
   }
 
+  // Auto-start Surat Al-Mu'minun 10 minutes before Fajr, once per Fajr instant.
+  // Browsers may block autoplay without a prior user gesture; the app is
+  // typically opened at least once, which grants permission for this tab.
+  const autoStartedForRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!fajrInfo) return;
+    const el = audioRef.current;
+    if (!el) return;
+    const target = fajrInfo.fajr.getTime();
+    const msBefore = target - now.getTime();
+    // Window: from 10 min before Fajr up to Fajr itself.
+    if (msBefore <= 10 * 60 * 1000 && msBefore > 0) {
+      if (autoStartedForRef.current === target) return;
+      if (!el.paused) return; // already playing
+      // Stop any adhan first.
+      if (adhanRef.current && !adhanRef.current.paused) {
+        try { adhanRef.current.pause(); } catch {}
+        setAdhanPlaying(null);
+      }
+      autoStartedForRef.current = target;
+      el.play().then(() => setPlaying(true)).catch(() => {
+        // Autoplay blocked — leave state as-is; user can tap play.
+      });
+    }
+  }, [fajrInfo, now]);
+
   // Prefer the offline blob, but only swap when playback is idle so a stream
   // in progress plays through uninterrupted. On next play, the local copy is used.
   useEffect(() => {
