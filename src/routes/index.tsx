@@ -298,7 +298,12 @@ function HayaAlSalat() {
 
         {/* Fajr reminder */}
         <section className="mt-6">
-          <FajrReminder fajrDate={fajrInfo?.fajr ?? null} />
+          <FajrReminder
+            fajrDate={fajrInfo?.fajr ?? null}
+            timezone={loc?.tz ?? null}
+            latitude={loc?.lat ?? null}
+            longitude={loc?.lon ?? null}
+          />
         </section>
 
         {/* Recitation player */}

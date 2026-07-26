@@ -1,25 +1,45 @@
 import { useEffect, useState } from "react";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, CloudMoon } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  ensurePushSubscription,
+  getDeviceToken,
+  pushSupported,
+  removeLocalSubscription,
+  subscriptionToPayload,
+} from "@/lib/push";
+import { deletePushSubscription, savePushSubscription } from "@/lib/push.functions";
 
-type Props = { fajrDate: Date | null };
+type Props = {
+  fajrDate: Date | null;
+  timezone: string | null;
+  latitude: number | null;
+  longitude: number | null;
+};
 
 const STORAGE_KEY = "haya-fajr-reminder";
 const OFFSETS = [5, 15, 30, 60];
 const DEFAULT_MESSAGE = "Fajr is in {minutes} minutes. Wake gently for the prayer of the dawn.";
 const MAX_MESSAGE_LEN = 140;
 
-type Settings = { enabled: boolean; offset: number; message: string };
+type Settings = { enabled: boolean; offset: number; message: string; background: boolean };
 
 function loadSettings(): Settings {
-  if (typeof window === "undefined") return { enabled: false, offset: 15, message: DEFAULT_MESSAGE };
+  if (typeof window === "undefined")
+    return { enabled: false, offset: 15, message: DEFAULT_MESSAGE, background: false };
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const p = JSON.parse(raw);
-      return { enabled: !!p.enabled, offset: p.offset ?? 15, message: p.message ?? DEFAULT_MESSAGE };
+      return {
+        enabled: !!p.enabled,
+        offset: p.offset ?? 15,
+        message: p.message ?? DEFAULT_MESSAGE,
+        background: !!p.background,
+      };
     }
   } catch {}
-  return { enabled: false, offset: 15, message: DEFAULT_MESSAGE };
+  return { enabled: false, offset: 15, message: DEFAULT_MESSAGE, background: false };
 }
 
 function renderMessage(template: string, minutes: number) {
@@ -27,23 +47,26 @@ function renderMessage(template: string, minutes: number) {
   return t.replace(/\{minutes\}/gi, String(minutes));
 }
 
-export function FajrReminder({ fajrDate }: Props) {
+export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props) {
   const [settings, setSettings] = useState<Settings>(() => loadSettings());
   const [permission, setPermission] = useState<NotificationPermission>(
     typeof Notification !== "undefined" ? Notification.permission : "default"
   );
+  const [bgStatus, setBgStatus] = useState<"idle" | "syncing" | "on" | "error">("idle");
   const supported = typeof window !== "undefined" && "Notification" in window;
+  const canBackground = pushSupported();
+
+  const savePush = useServerFn(savePushSubscription);
+  const removePush = useServerFn(deletePushSubscription);
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch {}
   }, [settings]);
 
-  // Schedule notification. fajrDate is an absolute UTC instant computed in the
-  // location's timezone, so this fires correctly across travel and DST.
+  // In-tab fallback timer (only used when background isn't active).
   useEffect(() => {
-    if (!settings.enabled || !fajrDate || permission !== "granted") return;
+    if (!settings.enabled || settings.background || !fajrDate || permission !== "granted") return;
     let id: number | undefined;
-
     const schedule = () => {
       if (id !== undefined) window.clearTimeout(id);
       const fireAt = fajrDate.getTime() - settings.offset * 60 * 1000;
@@ -60,10 +83,7 @@ export function FajrReminder({ fajrDate }: Props) {
         } catch {}
       }, delay);
     };
-
     schedule();
-    // Re-arm the timer when the tab regains focus — device sleep, travel, or
-    // DST can invalidate the pending setTimeout delay.
     const onVis = () => { if (document.visibilityState === "visible") schedule(); };
     document.addEventListener("visibilitychange", onVis);
     return () => {
@@ -71,6 +91,38 @@ export function FajrReminder({ fajrDate }: Props) {
       document.removeEventListener("visibilitychange", onVis);
     };
   }, [settings, fajrDate, permission]);
+
+  // Sync push subscription whenever background is on and settings/location change.
+  useEffect(() => {
+    if (!settings.enabled || !settings.background || permission !== "granted") return;
+    if (!canBackground) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        setBgStatus("syncing");
+        const sub = await ensurePushSubscription();
+        if (!sub) { if (!cancelled) setBgStatus("error"); return; }
+        await savePush({
+          data: subscriptionToPayload(sub, {
+            timezone: timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+            latitude,
+            longitude,
+            offsetMinutes: settings.offset,
+            messageTemplate: settings.message,
+            title: "Haya Al-Salat",
+            calcMethod: 2,
+          }),
+        });
+        if (!cancelled) setBgStatus("on");
+      } catch {
+        if (!cancelled) setBgStatus("error");
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [
+    settings.enabled, settings.background, settings.offset, settings.message,
+    permission, timezone, latitude, longitude, canBackground, savePush,
+  ]);
 
   async function toggle() {
     if (!supported) return;
@@ -82,7 +134,24 @@ export function FajrReminder({ fajrDate }: Props) {
       }
       if (perm === "granted") setSettings((s) => ({ ...s, enabled: true }));
     } else {
-      setSettings((s) => ({ ...s, enabled: false }));
+      if (settings.background) {
+        try { await removePush({ data: { deviceToken: getDeviceToken() } }); } catch {}
+        await removeLocalSubscription();
+      }
+      setSettings((s) => ({ ...s, enabled: false, background: false }));
+      setBgStatus("idle");
+    }
+  }
+
+  async function toggleBackground() {
+    if (!canBackground || permission !== "granted") return;
+    if (settings.background) {
+      try { await removePush({ data: { deviceToken: getDeviceToken() } }); } catch {}
+      await removeLocalSubscription();
+      setSettings((s) => ({ ...s, background: false }));
+      setBgStatus("idle");
+    } else {
+      setSettings((s) => ({ ...s, background: true }));
     }
   }
 
@@ -140,6 +209,41 @@ export function FajrReminder({ fajrDate }: Props) {
                 </button>
               );
             })}
+          </div>
+
+          {/* Background push toggle */}
+          <div className="mt-5 flex items-start gap-3 rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 text-[var(--gold)]">
+              <CloudMoon className="h-4 w-4" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-medium">Background reminders</p>
+                <button
+                  onClick={toggleBackground}
+                  disabled={!canBackground}
+                  className="rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.2em] transition disabled:opacity-40"
+                  style={{
+                    borderColor: settings.background ? "var(--gold)" : "oklch(1 0 0 / 0.15)",
+                    background: settings.background ? "oklch(0.82 0.13 85 / 0.15)" : "transparent",
+                    color: settings.background ? "var(--gold)" : "var(--foreground)",
+                  }}
+                >
+                  {settings.background ? "On" : "Off"}
+                </button>
+              </div>
+              <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+                {!canBackground
+                  ? "Not supported on this browser. Reminders will still work while the app is open."
+                  : settings.background
+                  ? bgStatus === "syncing"
+                    ? "Syncing your reminder with our server…"
+                    : bgStatus === "error"
+                    ? "Couldn't sync. We'll retry — reminders still work while the app is open."
+                    : "Delivered even when the app is closed."
+                  : "Wakes you gently even when the app is closed."}
+              </p>
+            </div>
           </div>
 
           <div className="mt-5">
