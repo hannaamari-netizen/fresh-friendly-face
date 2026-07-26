@@ -588,6 +588,41 @@ function HayaAlSalat() {
               </div>
             </div>
 
+            {/* Auto-start lead time before Fajr */}
+            <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 px-3 py-3">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                  Start reciting before Fajr
+                </p>
+                <span className="text-[10px] tabular-nums" style={{ color: "var(--gold)" }}>
+                  {recitationLead} min
+                </span>
+              </div>
+              <div className="flex gap-2">
+                {[5, 10, 15, 20, 30].map((m) => {
+                  const sel = recitationLead === m;
+                  return (
+                    <button
+                      key={m}
+                      onClick={() => setRecitationLead(m)}
+                      className="flex-1 rounded-full border px-2 py-1.5 text-[11px] font-medium transition"
+                      style={{
+                        borderColor: sel ? "var(--gold)" : "oklch(1 0 0 / 0.12)",
+                        background: sel ? "oklch(0.82 0.13 85 / 0.15)" : "transparent",
+                        color: sel ? "var(--gold)" : "var(--foreground)",
+                      }}
+                    >
+                      {m}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-[10px] text-muted-foreground/80">
+                Surat Al-Mu'minun begins {recitationLead} minutes before the Fajr adhan.
+              </p>
+            </div>
+
+
             {/* Offline caching */}
             <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-2">
               <div className="min-w-0 flex-1">
