@@ -118,3 +118,28 @@ html[data-reduced-motion="true"] *::after {
   transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
 }
+
+.haya-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--val, 80%), oklch(1 0 0 / 0.12) var(--val, 80%), oklch(1 0 0 / 0.12) 100%);
+  outline: none;
+}
+.haya-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 9999px;
+  background: var(--gold);
+  border: 2px solid oklch(0.15 0.02 280);
+  cursor: pointer;
+}
+.haya-slider::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: 9999px;
+  background: var(--gold);
+  border: 2px solid oklch(0.15 0.02 280);
+  cursor: pointer;
+}
