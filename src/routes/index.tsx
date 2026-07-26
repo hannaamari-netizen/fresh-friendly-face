@@ -304,9 +304,69 @@ function HayaAlSalat() {
               </div>
             </div>
 
+            {/* Offline caching */}
+            <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-black/20 px-3 py-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-medium" style={{ color: "var(--gold-soft)" }}>
+                  {offline.status === "cached"
+                    ? "Saved for offline"
+                    : offline.status === "downloading"
+                    ? `Saving… ${offline.progress}%`
+                    : offline.status === "error"
+                    ? "Couldn't save — try again"
+                    : "Save for weak connection"}
+                </p>
+                {offline.status === "downloading" && (
+                  <div className="mt-1 h-0.5 w-full overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full transition-all"
+                      style={{
+                        width: `${offline.progress}%`,
+                        background: "linear-gradient(90deg, var(--gold), var(--dawn))",
+                      }}
+                    />
+                  </div>
+                )}
+                {offline.status !== "downloading" && (
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">
+                    {offline.status === "cached"
+                      ? "Plays without internet."
+                      : "Download once, listen anywhere."}
+                  </p>
+                )}
+              </div>
+              {offline.status === "cached" ? (
+                <button
+                  onClick={offline.clear}
+                  aria-label="Remove offline copy"
+                  className="flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11px] text-muted-foreground transition hover:text-foreground"
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5" style={{ color: "var(--gold)" }} />
+                  Saved
+                </button>
+              ) : offline.status === "downloading" ? (
+                <span className="flex h-8 w-8 items-center justify-center rounded-full">
+                  <Loader2 className="h-4 w-4 animate-spin" style={{ color: "var(--gold)" }} />
+                </span>
+              ) : (
+                <button
+                  onClick={offline.download}
+                  aria-label="Save recitation for offline"
+                  className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-medium transition active:scale-95"
+                  style={{
+                    background: "linear-gradient(140deg, var(--gold), oklch(0.65 0.14 40))",
+                    color: "var(--primary-foreground)",
+                  }}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Save
+                </button>
+              )}
+            </div>
+
             <audio
               ref={audioRef}
-              src={SURAH_URL}
+              src={offline.localUrl ?? SURAH_URL}
               preload="metadata"
               onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
               onTimeUpdate={(e) => setProgress(e.currentTarget.currentTime)}
