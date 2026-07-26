@@ -455,6 +455,34 @@ function HayaAlSalat() {
       <SplashScreen />
       <Stars />
 
+      {!audioUnlocked && (
+        <div
+          className="fixed inset-x-0 z-50 flex justify-center px-4"
+          style={{ bottom: "calc(1rem + env(safe-area-inset-bottom))" }}
+          role="dialog"
+          aria-live="polite"
+        >
+          <button
+            type="button"
+            onClick={unlockAudio}
+            className="group flex w-full max-w-sm items-center gap-3 rounded-2xl border border-amber-200/30 bg-[#0b0a1a]/90 px-4 py-3 text-left shadow-2xl backdrop-blur transition hover:border-amber-200/60"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-200/15 text-amber-100 text-lg">
+              🔔
+            </span>
+            <span className="flex-1">
+              <span className="block text-sm font-medium text-amber-50">Tap to enable audio</span>
+              <span className="block text-xs text-amber-100/70">
+                Required so the Adhan and Surat Al-Mu'minun can auto-play before Fajr.
+              </span>
+            </span>
+            <span className="text-xs font-semibold text-amber-200 group-hover:text-amber-100">Enable</span>
+          </button>
+        </div>
+      )}
+
+
+
       {/* Moon glow */}
       <div className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full float-slow"
            style={{ background: "radial-gradient(circle, oklch(0.9 0.05 90 / 0.35), transparent 70%)" }} />
