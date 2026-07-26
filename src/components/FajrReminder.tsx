@@ -28,23 +28,38 @@ export function FajrReminder({ fajrDate }: Props) {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch {}
   }, [settings]);
 
-  // Schedule notification
+  // Schedule notification. fajrDate is an absolute UTC instant computed in the
+  // location's timezone, so this fires correctly across travel and DST.
   useEffect(() => {
     if (!settings.enabled || !fajrDate || permission !== "granted") return;
-    const fireAt = fajrDate.getTime() - settings.offset * 60 * 1000;
-    const delay = fireAt - Date.now();
-    if (delay <= 0 || delay > 2_147_000_000) return;
-    const id = window.setTimeout(() => {
-      try {
-        new Notification("Haya Al-Salat", {
-          body: `Fajr is in ${settings.offset} minutes. Wake gently for the prayer of the dawn.`,
-          icon: "/icon-192.png",
-          badge: "/icon-192.png",
-          tag: "fajr-reminder",
-        });
-      } catch {}
-    }, delay);
-    return () => window.clearTimeout(id);
+    let id: number | undefined;
+
+    const schedule = () => {
+      if (id !== undefined) window.clearTimeout(id);
+      const fireAt = fajrDate.getTime() - settings.offset * 60 * 1000;
+      const delay = fireAt - Date.now();
+      if (delay <= 0 || delay > 2_147_000_000) return;
+      id = window.setTimeout(() => {
+        try {
+          new Notification("Haya Al-Salat", {
+            body: `Fajr is in ${settings.offset} minutes. Wake gently for the prayer of the dawn.`,
+            icon: "/icon-192.png",
+            badge: "/icon-192.png",
+            tag: "fajr-reminder",
+          });
+        } catch {}
+      }, delay);
+    };
+
+    schedule();
+    // Re-arm the timer when the tab regains focus — device sleep, travel, or
+    // DST can invalidate the pending setTimeout delay.
+    const onVis = () => { if (document.visibilityState === "visible") schedule(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      if (id !== undefined) window.clearTimeout(id);
+      document.removeEventListener("visibilitychange", onVis);
+    };
   }, [settings, fajrDate, permission]);
 
   async function toggle() {

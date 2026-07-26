@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2 } from "lucide-react";
 import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
+import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,16 +28,9 @@ type Timings = {
   Fajr: string; Sunrise: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string;
 };
 
-type LocInfo = { city: string; country: string; lat: number; lon: number } | null;
+type LocInfo = { city: string; country: string; lat: number; lon: number; tz: string } | null;
 
 function pad(n: number) { return n.toString().padStart(2, "0"); }
-
-function parseHHMM(hhmm: string, base: Date) {
-  const [h, m] = hhmm.split(":").map(Number);
-  const d = new Date(base);
-  d.setHours(h, m, 0, 0);
-  return d;
-}
 
 function useNow(intervalMs = 1000) {
   const [now, setNow] = useState(() => new Date());
@@ -92,59 +86,117 @@ function HayaAlSalat() {
   const [duration, setDuration] = useState(0);
   const offline = useOfflineAudio(SURAH_URL);
 
-  // Fetch location + prayer times
+  // Fetch location + prayer times (timezone-aware, refetches on day rollover / focus)
+  const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
+  const [fetchTick, setFetchTick] = useState(0);
+
+  const load = useCallback(async (lat: number, lon: number) => {
+    // Use the *device* current date as a starting query; the API returns the
+    // correct set for the coordinates' timezone even if the date differs by a day.
+    const d = new Date();
+    const date = `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+    try {
+      const res = await fetch(
+        `https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=2`
+      );
+      const j = await res.json();
+      const m = j.data.meta;
+      const tz: string = m.timezone;
+      // If the location's local date differs from device date, re-query with the
+      // location's calendar day so prayer times match the user's actual day.
+      const zoneToday = todayInZone(tz);
+      const zoneDateStr = `${pad(zoneToday.d)}-${pad(zoneToday.m)}-${zoneToday.y}`;
+      let timings = j.data.timings;
+      if (zoneDateStr !== date) {
+        const res2 = await fetch(
+          `https://api.aladhan.com/v1/timings/${zoneDateStr}?latitude=${lat}&longitude=${lon}&method=2`
+        );
+        const j2 = await res2.json();
+        timings = j2.data.timings;
+      }
+      setTimings(timings);
+      setLoc({
+        city: tz.split("/").pop()?.replace(/_/g, " ") ?? "Your city",
+        country: "",
+        lat: m.latitude,
+        lon: m.longitude,
+        tz,
+      });
+      setError(null);
+      setLoading(false);
+    } catch {
+      setError("Couldn't fetch prayer times.");
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
-    async function load(lat: number, lon: number) {
-      const d = new Date();
-      const date = `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
-      try {
-        const res = await fetch(
-          `https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=2`
-        );
-        const j = await res.json();
-        if (cancelled) return;
-        setTimings(j.data.timings);
-        const m = j.data.meta;
-        setLoc({
-          city: j.data.meta.timezone.split("/").pop()?.replace(/_/g, " ") ?? "Your city",
-          country: "",
-          lat: m.latitude,
-          lon: m.longitude,
-        });
-        setLoading(false);
-      } catch (e) {
-        setError("Couldn't fetch prayer times.");
-        setLoading(false);
-      }
-    }
+    const use = (lat: number, lon: number) => {
+      if (cancelled) return;
+      coordsRef.current = { lat, lon };
+      load(lat, lon);
+    };
     if (!navigator.geolocation) {
-      load(21.4225, 39.8262); // Mecca fallback
-      return;
+      use(21.4225, 39.8262); // Mecca fallback
+      return () => { cancelled = true; };
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => load(pos.coords.latitude, pos.coords.longitude),
-      () => load(21.4225, 39.8262),
+      (pos) => use(pos.coords.latitude, pos.coords.longitude),
+      () => use(21.4225, 39.8262),
       { timeout: 5000 }
     );
     return () => { cancelled = true; };
+  }, [load, fetchTick]);
+
+  // Refetch on tab focus (handles device travel + wake-from-sleep) and hourly
+  // (handles DST transitions + day rollover mid-session).
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === "visible") setFetchTick((t) => t + 1);
+    };
+    document.addEventListener("visibilitychange", onVis);
+    const hourly = window.setInterval(() => setFetchTick((t) => t + 1), 60 * 60 * 1000);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      window.clearInterval(hourly);
+    };
   }, []);
 
-  // Compute Fajr countdown
+  // Refetch when the local-zone calendar day changes (crosses midnight).
+  const zoneDayKey = loc?.tz ? (() => { const t = todayInZone(loc.tz); return `${t.y}-${t.m}-${t.d}`; })() : "";
+  useEffect(() => {
+    if (loc?.tz && coordsRef.current) load(coordsRef.current.lat, coordsRef.current.lon);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zoneDayKey]);
+
+  // Resolve a prayer HH:MM string to an absolute UTC Date in the location's tz.
+  const resolvePrayerInstant = useCallback(
+    (hhmm: string): Date | null => {
+      if (!loc?.tz) return null;
+      const t = todayInZone(loc.tz);
+      return zonedDateTimeToUtc(t.y, t.m, t.d, hhmm, loc.tz);
+    },
+    [loc?.tz]
+  );
+
+  // Compute Fajr countdown (timezone-aware)
   const fajrInfo = useMemo(() => {
-    if (!timings) return null;
-    const today = new Date();
-    let fajr = parseHHMM(timings.Fajr, today);
+    if (!timings || !loc?.tz) return null;
+    let fajr = resolvePrayerInstant(timings.Fajr);
+    if (!fajr) return null;
     if (fajr.getTime() < now.getTime()) {
-      // next day approx (times shift slightly but this is a graceful fallback)
-      fajr = new Date(fajr.getTime() + 24 * 60 * 60 * 1000);
+      // Compute tomorrow's Fajr in the location's zone.
+      const t = todayInZone(loc.tz);
+      const tomorrowUtc = zonedDateTimeToUtc(t.y, t.m, t.d + 1, timings.Fajr, loc.tz);
+      fajr = tomorrowUtc;
     }
     const diff = fajr.getTime() - now.getTime();
     const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
     return { fajr, h, m, s, diff };
-  }, [timings, now]);
+  }, [timings, now, loc?.tz, resolvePrayerInstant]);
 
   const prayerRows = timings
     ? [
@@ -157,16 +209,16 @@ function HayaAlSalat() {
       ]
     : [];
 
-  // Determine which prayer is next
+  // Determine which prayer is next (timezone-aware)
   const nextPrayerKey = useMemo(() => {
-    if (!timings) return "Fajr";
-    const today = new Date();
+    if (!timings || !loc?.tz) return "Fajr";
     const order: (keyof Timings)[] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
     for (const k of order) {
-      if (parseHHMM(timings[k], today).getTime() > now.getTime()) return k;
+      const instant = resolvePrayerInstant(timings[k]);
+      if (instant && instant.getTime() > now.getTime()) return k;
     }
     return "Fajr";
-  }, [timings, now]);
+  }, [timings, now, loc?.tz, resolvePrayerInstant]);
 
   function togglePlay() {
     const el = audioRef.current;
