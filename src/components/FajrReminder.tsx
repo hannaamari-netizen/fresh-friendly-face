@@ -184,6 +184,15 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
               : "Get a gentle nudge before the call to Fajr."}
           </p>
         </div>
+        {supported && permission !== "denied" && (
+          <button
+            type="button"
+            onClick={sendTestNotification}
+            className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition hover:border-[var(--gold)]/60 hover:text-[var(--gold)]"
+          >
+            {testStatus === "sent" ? "Sent ✓" : testStatus === "sending" ? "Sending…" : "Test"}
+          </button>
+        )}
       </div>
 
       {active && (
