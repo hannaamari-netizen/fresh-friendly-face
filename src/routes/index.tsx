@@ -708,16 +708,61 @@ function HayaAlSalat() {
                       <p className="font-arabic text-xs text-muted-foreground">{p.ar}</p>
                     </div>
                   </div>
-                  <span
-                    className="font-display text-lg tabular-nums"
-                    style={{ color: isNext ? "var(--gold)" : "var(--foreground)" }}
-                  >
-                    {p.time}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="font-display text-lg tabular-nums"
+                      style={{ color: isNext ? "var(--gold)" : "var(--foreground)" }}
+                    >
+                      {p.time}
+                    </span>
+                    {p.key !== "Sunrise" && (
+                      <button
+                        type="button"
+                        onClick={() => toggleAdhan(p.key)}
+                        aria-label={
+                          adhanPlaying === p.key
+                            ? `Stop ${p.label} Adhan`
+                            : `Play ${p.label} Adhan`
+                        }
+                        className="flex h-8 w-8 items-center justify-center rounded-full border transition active:scale-95"
+                        style={{
+                          borderColor:
+                            adhanPlaying === p.key
+                              ? "var(--gold)"
+                              : "oklch(1 0 0 / 0.12)",
+                          background:
+                            adhanPlaying === p.key
+                              ? "oklch(0.82 0.13 85 / 0.18)"
+                              : "transparent",
+                          color:
+                            adhanPlaying === p.key
+                              ? "var(--gold)"
+                              : "var(--muted-foreground)",
+                        }}
+                      >
+                        {adhanPlaying === p.key ? (
+                          <Square className="h-3.5 w-3.5" />
+                        ) : (
+                          <Radio className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </li>
               );
             })}
           </ul>
+          <audio
+            ref={adhanRef}
+            preload="none"
+            onEnded={() => setAdhanPlaying(null)}
+            onPause={() => {
+              if (adhanRef.current && adhanRef.current.ended) return;
+            }}
+          />
+          <p className="mt-3 text-center text-[10px] text-muted-foreground/70">
+            Tap the Adhan icon to hear the call to prayer for each time.
+          </p>
         </section>
 
         <section className="mt-8">
