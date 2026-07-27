@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Copy, Check, Share2, ClipboardCopy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAppInfo } from "@/lib/app-info";
+import { useDeviceInfo } from "@/lib/device-info";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -63,6 +64,7 @@ function AboutPage() {
   const APP_BUILD = info.build;
   const BUNDLE_ID = info.bundleId;
   const BUILD_DATE = info.buildDate;
+  const device = useDeviceInfo();
   const [ua, setUa] = useState("");
   const [standalone, setStandalone] = useState(false);
   useEffect(() => {
@@ -99,7 +101,10 @@ function AboutPage() {
       `Build date     : ${BUILD_DATE}`,
       "",
       `Installed PWA  : ${standalone ? "yes" : "no"}`,
-      `Platform       : ${platform}`,
+      `Device model   : ${device.model}`,
+      `Manufacturer   : ${device.manufacturer}`,
+      `OS             : ${device.osName} ${device.osVersion}`,
+      `Platform       : ${platform || device.platform}`,
       `Language       : ${lang}`,
       `Timezone       : ${tz}`,
       `Viewport       : ${viewport} @${dpr}x`,
@@ -110,7 +115,7 @@ function AboutPage() {
       `Support        : ${SUPPORT_EMAIL}`,
     ];
     return lines.join("\n");
-  }, [ua, standalone, APP_NAME, APP_VERSION, APP_BUILD, BUNDLE_ID, BUILD_DATE]);
+  }, [ua, standalone, APP_NAME, APP_VERSION, APP_BUILD, BUNDLE_ID, BUILD_DATE, device]);
 
   const [copiedReport, setCopiedReport] = useState(false);
   const [shareState, setShareState] = useState<"idle" | "sharing" | "done">("idle");
@@ -185,6 +190,10 @@ function AboutPage() {
         <CopyRow label="Privacy Policy URL" value="https://fresh-friendly-face.lovable.app/privacy" />
         <CopyRow label="Terms of Service URL" value="https://fresh-friendly-face.lovable.app/terms" />
         <CopyRow label="Installed as PWA" value={standalone ? "yes" : "no"} />
+        <CopyRow label="Device model" value={device.model} />
+        <CopyRow label="Manufacturer" value={device.manufacturer} />
+        <CopyRow label="Operating system" value={`${device.osName} ${device.osVersion}`.trim()} />
+        <CopyRow label="Platform" value={device.platform} />
         {ua && <CopyRow label="User agent" value={ua} />}
       </section>
 
