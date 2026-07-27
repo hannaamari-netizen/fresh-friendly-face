@@ -44,7 +44,10 @@ function TermsPage() {
           Haya Al-Salat
         </p>
         <h1 className="mt-2 font-display text-3xl leading-tight">Terms of Service</h1>
-        <p className="mt-2 text-xs text-muted-foreground">Last updated: {LAST_UPDATED}</p>
+        <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-gold-soft/30 bg-gold-soft/10 px-3 py-1.5 text-xs text-gold-soft">
+          <CalendarDays className="h-3.5 w-3.5" />
+          <span>Last updated: {LAST_UPDATED}</span>
+        </div>
       </header>
 
       <section className="space-y-6 text-sm leading-relaxed text-muted-foreground">
