@@ -3,6 +3,7 @@ import { ArrowLeft, Copy, Check, Share2, ClipboardCopy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAppInfo } from "@/lib/app-info";
 import { useDeviceInfo } from "@/lib/device-info";
+import { useLifecycleState } from "@/lib/lifecycle-state";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -65,6 +66,7 @@ function AboutPage() {
   const BUNDLE_ID = info.bundleId;
   const BUILD_DATE = info.buildDate;
   const device = useDeviceInfo();
+  const lifecycle = useLifecycleState();
   const [ua, setUa] = useState("");
   const [standalone, setStandalone] = useState(false);
   useEffect(() => {
@@ -112,10 +114,16 @@ function AboutPage() {
       `URL            : ${url}`,
       `User agent     : ${ua}`,
       "",
+      `App state      : ${lifecycle.appState} (source: ${lifecycle.source})`,
+      `Visibility     : ${lifecycle.visibility}`,
+      `Window focused : ${lifecycle.focused ? "yes" : "no"}`,
+      `Last foreground: ${lifecycle.lastForegroundAt ?? "—"}`,
+      `Last background: ${lifecycle.lastBackgroundAt ?? "—"}`,
+      "",
       `Support        : ${SUPPORT_EMAIL}`,
     ];
     return lines.join("\n");
-  }, [ua, standalone, APP_NAME, APP_VERSION, APP_BUILD, BUNDLE_ID, BUILD_DATE, device]);
+  }, [ua, standalone, APP_NAME, APP_VERSION, APP_BUILD, BUNDLE_ID, BUILD_DATE, device, lifecycle]);
 
   const [copiedReport, setCopiedReport] = useState(false);
   const [shareState, setShareState] = useState<"idle" | "sharing" | "done">("idle");
@@ -194,6 +202,11 @@ function AboutPage() {
         <CopyRow label="Manufacturer" value={device.manufacturer} />
         <CopyRow label="Operating system" value={`${device.osName} ${device.osVersion}`.trim()} />
         <CopyRow label="Platform" value={device.platform} />
+        <CopyRow label="App state" value={`${lifecycle.appState} (${lifecycle.source})`} />
+        <CopyRow label="Visibility" value={lifecycle.visibility} />
+        <CopyRow label="Window focused" value={lifecycle.focused ? "yes" : "no"} />
+        <CopyRow label="Last foreground" value={lifecycle.lastForegroundAt ?? "—"} />
+        <CopyRow label="Last background" value={lifecycle.lastBackgroundAt ?? "—"} />
         {ua && <CopyRow label="User agent" value={ua} />}
       </section>
 
