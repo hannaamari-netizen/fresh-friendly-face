@@ -1424,6 +1424,68 @@ function HayaAlSalat() {
           <ShareApp />
         </section>
 
+        {/* Legal & App Info — surfaced in-app for reviewer access */}
+        <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm">
+          <div className="mb-4 flex items-center gap-2">
+            <Shield className="h-4 w-4" style={{ color: "var(--gold)" }} />
+            <h2 className="font-display text-lg">Legal & App Info</h2>
+          </div>
+          <p className="mb-4 text-xs text-muted-foreground">
+            Reviewer quick links. Privacy Policy, Terms of Service, licenses, and app details are available inside the app.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Link
+              to="/privacy"
+              className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm transition hover:bg-white/5"
+            >
+              <span className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-muted-foreground" />
+                Privacy Policy
+              </span>
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+            </Link>
+            <Link
+              to="/terms"
+              className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm transition hover:bg-white/5"
+            >
+              <span className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                Terms of Service
+              </span>
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+            </Link>
+            <Link
+              to="/licenses"
+              className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm transition hover:bg-white/5"
+            >
+              <span className="flex items-center gap-2">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                Open Source Licenses
+              </span>
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+            </Link>
+            <Link
+              to="/about"
+              className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm transition hover:bg-white/5"
+            >
+              <span className="flex items-center gap-2">
+                <Info className="h-4 w-4 text-muted-foreground" />
+                About
+              </span>
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+            </Link>
+          </div>
+          <p className="mt-4 text-center text-[11px] text-muted-foreground/70">
+            Privacy contact:{" "}
+            <a
+              href="mailto:privacy@hayaalsalat.app?subject=Privacy%20inquiry%20%E2%80%94%20Haya%20Al-Salat"
+              className="underline underline-offset-4 transition hover:text-foreground"
+            >
+              privacy@hayaalsalat.app
+            </a>
+          </p>
+        </section>
+
         <footer className="mt-10 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground/70">
           Prayer of the dawn · صلاة الفجر
           <p className="mt-2 normal-case tracking-normal">
