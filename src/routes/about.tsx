@@ -190,6 +190,10 @@ function AboutPage() {
         <CopyRow label="Privacy Policy URL" value="https://fresh-friendly-face.lovable.app/privacy" />
         <CopyRow label="Terms of Service URL" value="https://fresh-friendly-face.lovable.app/terms" />
         <CopyRow label="Installed as PWA" value={standalone ? "yes" : "no"} />
+        <CopyRow label="Device model" value={device.model} />
+        <CopyRow label="Manufacturer" value={device.manufacturer} />
+        <CopyRow label="Operating system" value={`${device.osName} ${device.osVersion}`.trim()} />
+        <CopyRow label="Platform" value={device.platform} />
         {ua && <CopyRow label="User agent" value={ua} />}
       </section>
 
