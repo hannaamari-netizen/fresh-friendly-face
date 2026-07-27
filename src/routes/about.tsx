@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Copy, Check } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowLeft, Copy, Check, Share2, ClipboardCopy } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -75,6 +75,81 @@ function AboutPage() {
     setStandalone(!!isStandalone);
   }, []);
 
+  const report = useMemo(() => {
+    const lang = typeof navigator !== "undefined" ? navigator.language : "";
+    const platform =
+      typeof navigator !== "undefined"
+        ? (navigator as unknown as { platform?: string }).platform ?? ""
+        : "";
+    const viewport =
+      typeof window !== "undefined" ? `${window.innerWidth}x${window.innerHeight}` : "";
+    const dpr = typeof window !== "undefined" ? String(window.devicePixelRatio ?? 1) : "";
+    const tz =
+      typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "";
+    const online = typeof navigator !== "undefined" ? String(navigator.onLine) : "";
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const lines = [
+      `${APP_NAME} — Debug Report`,
+      `Generated: ${new Date().toISOString()}`,
+      "",
+      `App name       : ${APP_NAME}`,
+      `Version        : ${APP_VERSION}`,
+      `Build          : ${APP_BUILD}`,
+      `Bundle ID      : ${BUNDLE_ID}`,
+      `Release channel: ${RELEASE_CHANNEL}`,
+      `Build date     : ${BUILD_DATE}`,
+      "",
+      `Installed PWA  : ${standalone ? "yes" : "no"}`,
+      `Platform       : ${platform}`,
+      `Language       : ${lang}`,
+      `Timezone       : ${tz}`,
+      `Viewport       : ${viewport} @${dpr}x`,
+      `Online         : ${online}`,
+      `URL            : ${url}`,
+      `User agent     : ${ua}`,
+      "",
+      `Support        : ${SUPPORT_EMAIL}`,
+    ];
+    return lines.join("\n");
+  }, [ua, standalone]);
+
+  const [copiedReport, setCopiedReport] = useState(false);
+  const [shareState, setShareState] = useState<"idle" | "sharing" | "done">("idle");
+
+  const copyReport = async () => {
+    try {
+      await navigator.clipboard.writeText(report);
+      setCopiedReport(true);
+      setTimeout(() => setCopiedReport(false), 1800);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const shareReport = async () => {
+    setShareState("sharing");
+    const shareData = {
+      title: `${APP_NAME} — Debug Report`,
+      text: report,
+    };
+    try {
+      if (typeof navigator !== "undefined" && "share" in navigator) {
+        await (navigator as Navigator & { share: (d: ShareData) => Promise<void> }).share(
+          shareData,
+        );
+      } else {
+        const subject = encodeURIComponent(`${APP_NAME} debug report (v${APP_VERSION} build ${APP_BUILD})`);
+        const body = encodeURIComponent(report);
+        window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
+      }
+      setShareState("done");
+      setTimeout(() => setShareState("idle"), 1800);
+    } catch {
+      setShareState("idle");
+    }
+  };
+
+
   return (
     <main className="mx-auto max-w-2xl px-5 py-10 pb-safe pt-safe text-foreground">
       <Link
@@ -109,6 +184,33 @@ function AboutPage() {
         <CopyRow label="Support" value={SUPPORT_EMAIL} />
         <CopyRow label="Installed as PWA" value={standalone ? "yes" : "no"} />
         {ua && <CopyRow label="User agent" value={ua} />}
+      </section>
+
+      <section className="mt-6 rounded-lg border border-white/10 bg-white/[0.03] p-4">
+        <h2 className="font-display text-lg text-foreground">Debug report</h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Bundles version, build, bundle ID, and device details in one message for support or App
+          Store review.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            onClick={copyReport}
+            className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs uppercase tracking-[0.2em] text-foreground transition hover:bg-white/10"
+          >
+            {copiedReport ? <Check className="h-3.5 w-3.5" /> : <ClipboardCopy className="h-3.5 w-3.5" />}
+            {copiedReport ? "Copied" : "Copy debug report"}
+          </button>
+          <button
+            onClick={shareReport}
+            className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs uppercase tracking-[0.2em] text-foreground transition hover:bg-white/10"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            {shareState === "done" ? "Shared" : "Share"}
+          </button>
+        </div>
+        <pre className="mt-4 max-h-64 overflow-auto whitespace-pre-wrap rounded-md border border-white/5 bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-muted-foreground">
+{report}
+        </pre>
       </section>
 
       <section className="mt-8 space-y-2 text-sm leading-relaxed text-muted-foreground">
