@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Copy, Check, Share2, ClipboardCopy } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppInfo } from "@/lib/app-info";
 import { useDeviceInfo } from "@/lib/device-info";
 import { useLifecycleState } from "@/lib/lifecycle-state";
@@ -78,7 +78,7 @@ function AboutPage() {
     setStandalone(!!isStandalone);
   }, []);
 
-  const report = useMemo(() => {
+  const buildReport = useCallback(() => {
     const lang = typeof navigator !== "undefined" ? navigator.language : "";
     const platform =
       typeof navigator !== "undefined"
@@ -91,9 +91,19 @@ function AboutPage() {
       typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "";
     const online = typeof navigator !== "undefined" ? String(navigator.onLine) : "";
     const url = typeof window !== "undefined" ? window.location.href : "";
+    // Stamp a fresh generated-at each call so copy/share reports can be correlated across sessions.
+    const now = new Date();
+    const offsetMin = -now.getTimezoneOffset(); // JS returns inverted sign; flip so +02:00 = UTC+2
+    const sign = offsetMin >= 0 ? "+" : "-";
+    const abs = Math.abs(offsetMin);
+    const hh = String(Math.floor(abs / 60)).padStart(2, "0");
+    const mm = String(abs % 60).padStart(2, "0");
+    const offsetStr = `UTC${sign}${hh}:${mm}`;
     const lines = [
       `${APP_NAME} — Debug Report`,
-      `Generated: ${new Date().toISOString()}`,
+      `Generated at   : ${now.toISOString()}`,
+      `Local time     : ${now.toString()}`,
+      `Timezone offset: ${offsetStr}`,
       "",
       `App name       : ${APP_NAME}`,
       `Version        : ${APP_VERSION}`,
@@ -108,7 +118,7 @@ function AboutPage() {
       `OS             : ${device.osName} ${device.osVersion}`,
       `Platform       : ${platform || device.platform}`,
       `Language       : ${lang}`,
-      `Timezone       : ${tz}`,
+      `Timezone       : ${tz} (${offsetStr})`,
       `Viewport       : ${viewport} @${dpr}x`,
       `Online         : ${online}`,
       `URL            : ${url}`,
@@ -125,12 +135,21 @@ function AboutPage() {
     return lines.join("\n");
   }, [ua, standalone, APP_NAME, APP_VERSION, APP_BUILD, BUNDLE_ID, BUILD_DATE, device, lifecycle]);
 
+  // Live preview refreshes every second so the shown timestamp stays current.
+  const [previewTick, setPreviewTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setPreviewTick((n) => n + 1), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const report = useMemo(() => buildReport(), [buildReport, previewTick]);
+
   const [copiedReport, setCopiedReport] = useState(false);
   const [shareState, setShareState] = useState<"idle" | "sharing" | "done">("idle");
 
   const copyReport = async () => {
     try {
-      await navigator.clipboard.writeText(report);
+      // Re-stamp at the moment of copy so the pasted report reflects the actual action time.
+      await navigator.clipboard.writeText(buildReport());
       setCopiedReport(true);
       setTimeout(() => setCopiedReport(false), 1800);
     } catch {
@@ -140,9 +159,10 @@ function AboutPage() {
 
   const shareReport = async () => {
     setShareState("sharing");
+    const freshReport = buildReport();
     const shareData = {
       title: `${APP_NAME} — Debug Report`,
-      text: report,
+      text: freshReport,
     };
     try {
       if (typeof navigator !== "undefined" && "share" in navigator) {
@@ -151,7 +171,7 @@ function AboutPage() {
         );
       } else {
         const subject = encodeURIComponent(`${APP_NAME} debug report (v${APP_VERSION} build ${APP_BUILD})`);
-        const body = encodeURIComponent(report);
+        const body = encodeURIComponent(freshReport);
         window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
       }
       setShareState("done");
