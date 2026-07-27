@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Copy, Check, Share2, ClipboardCopy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useAppInfo } from "@/lib/app-info";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -23,15 +24,7 @@ export const Route = createFileRoute("/about")({
   component: AboutPage,
 });
 
-// Keep these in sync with the native projects at release time.
-// iOS      → Info.plist CFBundleShortVersionString / CFBundleVersion
-// Android  → android/app/build.gradle versionName / versionCode
-const APP_NAME = "Haya Al-Salat";
-const APP_VERSION = "1.0.0"; // marketing version (CFBundleShortVersionString / versionName)
-const APP_BUILD = "1";        // build number   (CFBundleVersion / versionCode)
-const BUNDLE_ID = "app.hayaalsalat.companion";
 const RELEASE_CHANNEL = import.meta.env.MODE === "production" ? "production" : "preview";
-const BUILD_DATE = new Date().toISOString().slice(0, 10);
 const OWNER = "Inoxin HA";
 const SUPPORT_EMAIL = "hello@hayaalsalat.app";
 
@@ -64,6 +57,12 @@ function CopyRow({ label, value }: { label: string; value: string }) {
 }
 
 function AboutPage() {
+  const info = useAppInfo();
+  const APP_NAME = info.name;
+  const APP_VERSION = info.version;
+  const APP_BUILD = info.build;
+  const BUNDLE_ID = info.bundleId;
+  const BUILD_DATE = info.buildDate;
   const [ua, setUa] = useState("");
   const [standalone, setStandalone] = useState(false);
   useEffect(() => {
@@ -111,7 +110,7 @@ function AboutPage() {
       `Support        : ${SUPPORT_EMAIL}`,
     ];
     return lines.join("\n");
-  }, [ua, standalone]);
+  }, [ua, standalone, APP_NAME, APP_VERSION, APP_BUILD, BUNDLE_ID, BUILD_DATE]);
 
   const [copiedReport, setCopiedReport] = useState(false);
   const [shareState, setShareState] = useState<"idle" | "sharing" | "done">("idle");
@@ -178,6 +177,7 @@ function AboutPage() {
         <CopyRow label="Version" value={APP_VERSION} />
         <CopyRow label="Build" value={APP_BUILD} />
         <CopyRow label="Bundle ID" value={BUNDLE_ID} />
+        <CopyRow label="Version source" value={info.source === "native" ? "native binary" : "web build"} />
         <CopyRow label="Release channel" value={RELEASE_CHANNEL} />
         <CopyRow label="Build date" value={BUILD_DATE} />
         <CopyRow label="Owner" value={OWNER} />
