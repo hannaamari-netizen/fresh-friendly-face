@@ -1450,6 +1450,13 @@ function HayaAlSalat() {
             >
               Open Source Licenses
             </Link>
+            <span className="mx-2 text-muted-foreground/50">·</span>
+            <Link
+              to="/about"
+              className="underline underline-offset-4 transition hover:text-foreground"
+            >
+              About
+            </Link>
           </p>
         </footer>
 
