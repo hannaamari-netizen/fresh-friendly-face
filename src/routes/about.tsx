@@ -202,6 +202,11 @@ function AboutPage() {
         <CopyRow label="Manufacturer" value={device.manufacturer} />
         <CopyRow label="Operating system" value={`${device.osName} ${device.osVersion}`.trim()} />
         <CopyRow label="Platform" value={device.platform} />
+        <CopyRow label="App state" value={`${lifecycle.appState} (${lifecycle.source})`} />
+        <CopyRow label="Visibility" value={lifecycle.visibility} />
+        <CopyRow label="Window focused" value={lifecycle.focused ? "yes" : "no"} />
+        <CopyRow label="Last foreground" value={lifecycle.lastForegroundAt ?? "—"} />
+        <CopyRow label="Last background" value={lifecycle.lastBackgroundAt ?? "—"} />
         {ua && <CopyRow label="User agent" value={ua} />}
       </section>
 
