@@ -3,6 +3,7 @@ import { ArrowLeft, Copy, Check, Share2, ClipboardCopy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAppInfo } from "@/lib/app-info";
 import { useDeviceInfo } from "@/lib/device-info";
+import { useLifecycleState } from "@/lib/lifecycle-state";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
