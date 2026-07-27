@@ -1458,6 +1458,14 @@ function HayaAlSalat() {
               About
             </Link>
           </p>
+          <p className="mt-3 normal-case tracking-normal">
+            <a
+              href="mailto:privacy@hayaalsalat.app?subject=Privacy%20inquiry%20%E2%80%94%20Haya%20Al-Salat"
+              className="underline underline-offset-4 transition hover:text-foreground"
+            >
+              Privacy contact: privacy@hayaalsalat.app
+            </a>
+          </p>
         </footer>
 
       </div>
