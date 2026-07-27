@@ -183,6 +183,13 @@ function AboutPage() {
         <CopyRow label="Support" value={SUPPORT_EMAIL} />
         <CopyRow label="Privacy Policy URL" value="https://fresh-friendly-face.lovable.app/privacy" />
         <CopyRow label="Terms of Service URL" value="https://fresh-friendly-face.lovable.app/terms" />
+        <CopyRow label="Version source" value={info.source === "native" ? "native binary" : "web build"} />
+        <CopyRow label="Release channel" value={RELEASE_CHANNEL} />
+        <CopyRow label="Build date" value={BUILD_DATE} />
+        <CopyRow label="Owner" value={OWNER} />
+        <CopyRow label="Support" value={SUPPORT_EMAIL} />
+        <CopyRow label="Privacy Policy URL" value="https://fresh-friendly-face.lovable.app/privacy" />
+        <CopyRow label="Terms of Service URL" value="https://fresh-friendly-face.lovable.app/terms" />
         <CopyRow label="Installed as PWA" value={standalone ? "yes" : "no"} />
         {ua && <CopyRow label="User agent" value={ua} />}
       </section>
