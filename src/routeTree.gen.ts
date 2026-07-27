@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LicensesRouteImport } from './routes/licenses'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicCronFajrPushRouteImport } from './routes/api/public/cron/fajr-push'
 
@@ -30,6 +31,11 @@ const LicensesRoute = LicensesRouteImport.update({
   path: '/licenses',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +49,7 @@ const ApiPublicCronFajrPushRoute = ApiPublicCronFajrPushRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -67,15 +76,23 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/licenses'
     | '/privacy'
     | '/terms'
     | '/api/public/cron/fajr-push'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/licenses' | '/privacy' | '/terms' | '/api/public/cron/fajr-push'
+  to:
+    | '/'
+    | '/about'
+    | '/licenses'
+    | '/privacy'
+    | '/terms'
+    | '/api/public/cron/fajr-push'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/licenses'
     | '/privacy'
     | '/terms'
@@ -84,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   LicensesRoute: typeof LicensesRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -113,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LicensesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -132,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   LicensesRoute: LicensesRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
