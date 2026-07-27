@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Copy, Check, Share2, ClipboardCopy } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useAppInfo } from "@/lib/app-info";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -23,15 +24,7 @@ export const Route = createFileRoute("/about")({
   component: AboutPage,
 });
 
-// Keep these in sync with the native projects at release time.
-// iOS      → Info.plist CFBundleShortVersionString / CFBundleVersion
-// Android  → android/app/build.gradle versionName / versionCode
-const APP_NAME = "Haya Al-Salat";
-const APP_VERSION = "1.0.0"; // marketing version (CFBundleShortVersionString / versionName)
-const APP_BUILD = "1";        // build number   (CFBundleVersion / versionCode)
-const BUNDLE_ID = "app.hayaalsalat.companion";
 const RELEASE_CHANNEL = import.meta.env.MODE === "production" ? "production" : "preview";
-const BUILD_DATE = new Date().toISOString().slice(0, 10);
 const OWNER = "Inoxin HA";
 const SUPPORT_EMAIL = "hello@hayaalsalat.app";
 
