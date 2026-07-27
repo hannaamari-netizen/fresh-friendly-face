@@ -114,10 +114,16 @@ function AboutPage() {
       `URL            : ${url}`,
       `User agent     : ${ua}`,
       "",
+      `App state      : ${lifecycle.appState} (source: ${lifecycle.source})`,
+      `Visibility     : ${lifecycle.visibility}`,
+      `Window focused : ${lifecycle.focused ? "yes" : "no"}`,
+      `Last foreground: ${lifecycle.lastForegroundAt ?? "—"}`,
+      `Last background: ${lifecycle.lastBackgroundAt ?? "—"}`,
+      "",
       `Support        : ${SUPPORT_EMAIL}`,
     ];
     return lines.join("\n");
-  }, [ua, standalone, APP_NAME, APP_VERSION, APP_BUILD, BUNDLE_ID, BUILD_DATE, device]);
+  }, [ua, standalone, APP_NAME, APP_VERSION, APP_BUILD, BUNDLE_ID, BUILD_DATE, device, lifecycle]);
 
   const [copiedReport, setCopiedReport] = useState(false);
   const [shareState, setShareState] = useState<"idle" | "sharing" | "done">("idle");
