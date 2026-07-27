@@ -57,6 +57,12 @@ function CopyRow({ label, value }: { label: string; value: string }) {
 }
 
 function AboutPage() {
+  const info = useAppInfo();
+  const APP_NAME = info.name;
+  const APP_VERSION = info.version;
+  const APP_BUILD = info.build;
+  const BUNDLE_ID = info.bundleId;
+  const BUILD_DATE = info.buildDate;
   const [ua, setUa] = useState("");
   const [standalone, setStandalone] = useState(false);
   useEffect(() => {
