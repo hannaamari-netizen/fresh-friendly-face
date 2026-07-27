@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CalendarDays } from "lucide-react";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
