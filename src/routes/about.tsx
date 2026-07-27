@@ -66,6 +66,7 @@ function AboutPage() {
   const BUNDLE_ID = info.bundleId;
   const BUILD_DATE = info.buildDate;
   const device = useDeviceInfo();
+  const lifecycle = useLifecycleState();
   const [ua, setUa] = useState("");
   const [standalone, setStandalone] = useState(false);
   useEffect(() => {
