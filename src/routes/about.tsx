@@ -64,6 +64,7 @@ function AboutPage() {
   const APP_BUILD = info.build;
   const BUNDLE_ID = info.bundleId;
   const BUILD_DATE = info.buildDate;
+  const device = useDeviceInfo();
   const [ua, setUa] = useState("");
   const [standalone, setStandalone] = useState(false);
   useEffect(() => {
