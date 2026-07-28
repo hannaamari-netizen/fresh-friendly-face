@@ -109,13 +109,26 @@ Open the project in Xcode:
 npx cap open ios
 ```
 
-### 5.1 Signing & Capabilities
+### 5.1 Signing & Capabilities — exact settings
 
-1. Select the `App` target.
+Open the project in Xcode (`npx cap open ios`), then:
+
+1. In the navigator, select **App** (the top-level project) → select the **App** target.
 2. Open the **Signing & Capabilities** tab.
-3. Choose your **Team**.
-4. Set the **Bundle Identifier** to match `capacitor.config.ts`.
-5. Enable **Automatically manage signing**.
+3. Set **Team** to your paid Apple Developer Team.
+4. Set **Bundle Identifier** to exactly:
+   ```
+   app.hayaalsalat.companion
+   ```
+   > This must match `capacitor.config.ts` and the bundle ID registered in App Store Connect.
+5. Set **Provisioning Profile** to **Automatically manage signing** (checked).
+6. Set **Signing Certificate** to **Apple Development** for Debug and **Apple Distribution** for Release (Xcode picks these automatically once the Team is selected).
+7. Verify the **Capability** list includes:
+   - **Push Notifications** (required for Fajr reminders)
+   - **Background Modes** → check **Audio, AirPlay, and Picture in Picture**, **Background fetch**, and **Remote notifications**
+
+If you see a provisioning error, click the **Resolve Issue** button or choose **Product → Clean Build Folder** (`Shift+Cmd+K`) and rebuild.
+
 
 ### 5.2 Info.plist — already configured
 
