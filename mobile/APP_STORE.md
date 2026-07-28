@@ -12,6 +12,7 @@ This document walks you through publishing **Haya Al-Salat** on the Apple App St
 - Xcode 15 or later (from the Mac App Store)
 - Apple Developer Program membership ($99/year)
 - **Apple Team ID:** `D47J65KQXJ` (select this exact team in Xcode Signing & Capabilities)
+- **App Store Connect App ID:** `3b2ab217-8afd-4c24-b752-4dbd82d31ba7`
 - App Store Connect record created for the app
 
 ---
