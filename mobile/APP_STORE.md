@@ -43,22 +43,36 @@ Example alternatives:
 
 > The bundle ID cannot be changed after the first upload without creating a new app record.
 
+The current placeholder is already configured as `app.hayaalsalat.companion`.
+
 ---
 
-## 3. Build the web bundle and add iOS native project
+## 3. Build the web bundle and sync the iOS native project
+
+The web app is built with TanStack Start, which produces a server bundle by default. A post-build prerender step generates the static `index.html` that Capacitor's WebView needs.
+
+Run everything in one command:
+
+```bash
+bun run mobile:ios
+```
+
+This executes:
+
+1. `bun run build` — production web bundle
+2. `node mobile/scripts/prerender.js` — static `dist/client/index.html`
+3. `npx cap sync ios` — copy web assets into the native iOS project
+4. `npx cap open ios` — open Xcode
+
+If you only want to sync without opening Xcode:
 
 ```bash
 bun run build
-npx cap add ios
+bun run mobile:prerender
+npx cap sync ios
 ```
 
-Run this once. It creates the `ios/` directory with an Xcode project.
-
-For every subsequent update:
-
-```bash
-bun run build && npx cap sync ios
-```
+The `ios/` directory is already generated in this repo, so you do not need to run `npx cap add ios` again unless you delete it.
 
 ---
 
