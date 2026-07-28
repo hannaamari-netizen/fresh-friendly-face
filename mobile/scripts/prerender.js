@@ -21,7 +21,8 @@ const request = new Request("http://localhost/", {
   },
 });
 
-const response = await server.fetch(request, {}, { waitUntil: () => {} });
+const response = await server.default.fetch(request, {}, { waitUntil: () => {} });
+
 const html = await response.text();
 
 await writeFile("dist/client/index.html", html, "utf-8");
