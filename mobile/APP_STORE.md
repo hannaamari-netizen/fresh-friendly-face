@@ -117,15 +117,15 @@ npx cap open ios
 4. Set the **Bundle Identifier** to match `capacitor.config.ts`.
 5. Enable **Automatically manage signing**.
 
-### 5.2 Info.plist — required entries
+### 5.2 Info.plist — already configured
 
-Add or verify these keys in `ios/App/App/Info.plist`:
+The following entries are already set in `ios/App/App/Info.plist`. Verify them in Xcode if you re-generate the project:
 
 ```xml
 <key>UILaunchStoryboardName</key>
 <string>LaunchScreen</string>
 
-<!-- Background audio for Adhan and Surat Al-Mu'minun -->
+<!-- Background audio for Adhan and Surat Al-Mu'minun; remote notifications -->
 <key>UIBackgroundModes</key>
 <array>
   <string>audio</string>
@@ -135,16 +135,18 @@ Add or verify these keys in `ios/App/App/Info.plist`:
 
 <!-- User-facing permission strings -->
 <key>NSUserNotificationUsageDescription</key>
-<string>Haya Al-Salat sends a gentle reminder before Fajr prayer.</string>
+<string>Haya Al-Salat sends Fajr reminders and prayer-time notifications.</string>
 
 <key>NSLocationWhenInUseUsageDescription</key>
-<string>Your location is used to calculate accurate local prayer times.</string>
+<string>Haya Al-Salat uses your approximate location to calculate accurate local prayer times.</string>
+
+<!-- No custom encryption -->
+<key>ITSAppUsesNonExemptEncryption</key>
+<false/>
 
 <!-- Status bar appearance -->
 <key>UIViewControllerBasedStatusBarAppearance</key>
-<false/>
-<key>UIStatusBarStyle</key>
-<string>UIStatusBarStyleLightContent</string>
+<true/>
 ```
 
 ### 5.3 Versioning
