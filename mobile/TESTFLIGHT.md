@@ -10,9 +10,11 @@ Archive and upload the first Haya Al-Salat build to TestFlight before the full A
 
 - Paid Apple Developer Program membership (active).
 - **Apple Team ID:** `D47J65KQXJ` — use this in Xcode under Signing & Capabilities → Team.
+- **App Store Connect App ID:** `3b2ab217-8afd-4c24-b752-4dbd82d31ba7`
 - App Store Connect app record created:
   - **Name:** Haya Al-Salat
   - **Bundle ID:** `app.hayaalsalat.companion` (must match `capacitor.config.ts`)
+  - **App Store Connect App ID:** `3b2ab217-8afd-4c24-b752-4dbd82d31ba7`
   - **SKU:** any unique string (e.g. `haya-al-salat-001`)
   - **Primary language:** English
 - Xcode signed in with your Apple ID: Xcode → Settings → Accounts.
