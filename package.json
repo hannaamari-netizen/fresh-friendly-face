@@ -12,11 +12,12 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "mobile:prerender": "node mobile/scripts/prerender.js",
     "mobile:assets": "bash mobile/scripts/generate-assets.sh",
-    "mobile:ios": "bash mobile/scripts/build-ios.sh",
     "mobile:sync": "npx cap sync",
     "mobile:open:ios": "npx cap open ios",
-    "mobile:open:android": "npx cap open android"
+    "mobile:open:android": "npx cap open android",
+    "mobile:ios": "bun run build && bun run mobile:prerender && bun run mobile:sync && npx cap open ios"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",
