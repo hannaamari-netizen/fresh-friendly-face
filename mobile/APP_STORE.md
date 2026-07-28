@@ -264,8 +264,8 @@ Typical review time: 24–48 hours.
 
 For every new release:
 
-1. Bump `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in Xcode.
-2. Run `bun run build && npx cap sync ios`.
+1. Bump `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in Xcode (or in `ios/App/App.xcodeproj/project.pbxproj`).
+2. Run `bun run mobile:ios` (or `bun run build && bun run mobile:prerender && npx cap sync ios`).
 3. Archive and upload again.
 4. Submit the new build in App Store Connect.
 
