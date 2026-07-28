@@ -11,6 +11,7 @@ This document walks you through publishing **Haya Al-Salat** on the Apple App St
 - Mac with macOS Sonoma or later
 - Xcode 15 or later (from the Mac App Store)
 - Apple Developer Program membership ($99/year)
+- **Apple Team ID:** `D47J65KQXJ` (select this exact team in Xcode Signing & Capabilities)
 - App Store Connect record created for the app
 
 ---
@@ -115,7 +116,7 @@ Open the project in Xcode (`npx cap open ios`), then:
 
 1. In the navigator, select **App** (the top-level project) → select the **App** target.
 2. Open the **Signing & Capabilities** tab.
-3. Set **Team** to your paid Apple Developer Team.
+3. Set **Team** to `D47J65KQXJ` (your paid Apple Developer Team ID).
 4. Set **Bundle Identifier** to exactly:
    ```
    app.hayaalsalat.companion
