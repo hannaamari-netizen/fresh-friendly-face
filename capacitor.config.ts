@@ -33,7 +33,6 @@ const config: CapacitorConfig = {
     statusBarStyle: "DARK",
     // Allows the web app to keep playing audio when the device is locked.
     // Must be paired with the "audio" UIBackgroundMode in Info.plist.
-    backgroundColor: "#0b0a1a",
   },
 
   android: {
