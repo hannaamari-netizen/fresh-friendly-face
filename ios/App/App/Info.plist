@@ -30,6 +30,18 @@
 	<array>
 		<string>armv7</string>
 	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Haya Al-Salat uses your approximate location to calculate accurate local prayer times.</string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>Haya Al-Salat sends Fajr reminders and prayer-time notifications.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
