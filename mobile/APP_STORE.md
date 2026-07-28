@@ -43,22 +43,36 @@ Example alternatives:
 
 > The bundle ID cannot be changed after the first upload without creating a new app record.
 
+The current placeholder is already configured as `app.hayaalsalat.companion`.
+
 ---
 
-## 3. Build the web bundle and add iOS native project
+## 3. Build the web bundle and sync the iOS native project
+
+The web app is built with TanStack Start, which produces a server bundle by default. A post-build prerender step generates the static `index.html` that Capacitor's WebView needs.
+
+Run everything in one command:
+
+```bash
+bun run mobile:ios
+```
+
+This executes:
+
+1. `bun run build` — production web bundle
+2. `node mobile/scripts/prerender.js` — static `dist/client/index.html`
+3. `npx cap sync ios` — copy web assets into the native iOS project
+4. `npx cap open ios` — open Xcode
+
+If you only want to sync without opening Xcode:
 
 ```bash
 bun run build
-npx cap add ios
+bun run mobile:prerender
+npx cap sync ios
 ```
 
-Run this once. It creates the `ios/` directory with an Xcode project.
-
-For every subsequent update:
-
-```bash
-bun run build && npx cap sync ios
-```
+The `ios/` directory is already generated in this repo, so you do not need to run `npx cap add ios` again unless you delete it.
 
 ---
 
@@ -103,15 +117,15 @@ npx cap open ios
 4. Set the **Bundle Identifier** to match `capacitor.config.ts`.
 5. Enable **Automatically manage signing**.
 
-### 5.2 Info.plist — required entries
+### 5.2 Info.plist — already configured
 
-Add or verify these keys in `ios/App/App/Info.plist`:
+The following entries are already set in `ios/App/App/Info.plist`. Verify them in Xcode if you re-generate the project:
 
 ```xml
 <key>UILaunchStoryboardName</key>
 <string>LaunchScreen</string>
 
-<!-- Background audio for Adhan and Surat Al-Mu'minun -->
+<!-- Background audio for Adhan and Surat Al-Mu'minun; remote notifications -->
 <key>UIBackgroundModes</key>
 <array>
   <string>audio</string>
@@ -121,16 +135,18 @@ Add or verify these keys in `ios/App/App/Info.plist`:
 
 <!-- User-facing permission strings -->
 <key>NSUserNotificationUsageDescription</key>
-<string>Haya Al-Salat sends a gentle reminder before Fajr prayer.</string>
+<string>Haya Al-Salat sends Fajr reminders and prayer-time notifications.</string>
 
 <key>NSLocationWhenInUseUsageDescription</key>
-<string>Your location is used to calculate accurate local prayer times.</string>
+<string>Haya Al-Salat uses your approximate location to calculate accurate local prayer times.</string>
+
+<!-- No custom encryption -->
+<key>ITSAppUsesNonExemptEncryption</key>
+<false/>
 
 <!-- Status bar appearance -->
 <key>UIViewControllerBasedStatusBarAppearance</key>
-<false/>
-<key>UIStatusBarStyle</key>
-<string>UIStatusBarStyleLightContent</string>
+<true/>
 ```
 
 ### 5.3 Versioning
@@ -248,8 +264,8 @@ Typical review time: 24–48 hours.
 
 For every new release:
 
-1. Bump `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in Xcode.
-2. Run `bun run build && npx cap sync ios`.
+1. Bump `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in Xcode (or in `ios/App/App.xcodeproj/project.pbxproj`).
+2. Run `bun run mobile:ios` (or `bun run build && bun run mobile:prerender && npx cap sync ios`).
 3. Archive and upload again.
 4. Submit the new build in App Store Connect.
 

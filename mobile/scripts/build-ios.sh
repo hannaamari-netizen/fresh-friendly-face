@@ -10,6 +10,9 @@ cd "$ROOT"
 echo "Building production web bundle..."
 bun run build
 
+echo "Prerendering static entry point for Capacitor..."
+node mobile/scripts/prerender.js
+
 echo "Syncing Capacitor iOS project..."
 npx cap sync ios
 
