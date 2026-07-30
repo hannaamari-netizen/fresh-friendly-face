@@ -83,7 +83,7 @@ A peaceful Fajr companion. Rise to the recitation of Surat Al-Mu'minun by Mukhta
 ## 3. Keywords (100 characters max)
 
 ```text
-fajr,prayer times,islam,quran,adhan,muslim,dawn,reminder,surah,recitation
+fajr,prayer times,islam,quran,adhan,muslim,dawn,reminder,surah,recitation,mukhtar al hajj
 ```
 
 ## 4. Subtitle (30 characters max)
