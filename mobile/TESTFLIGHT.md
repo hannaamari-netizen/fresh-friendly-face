@@ -21,19 +21,24 @@ Archive and upload the first Haya Al-Salat build to TestFlight before the full A
 
 ---
 
-## 1. Sync the latest web build into iOS
+## 1. Run the iOS preflight check, then open Xcode
 
-From the project root on your Mac:
+From the project root on your Mac, first run the preflight script to catch signing, bundle ID, Team ID, and provisioning issues early:
 
 ```bash
 bun install
-bun run build
-node mobile/scripts/prerender.js
-npx cap sync ios
-npx cap open ios
+bun run mobile:preflight
 ```
 
-This copies the compiled web assets into `ios/App/App/public` and opens Xcode.
+Fix any reported issues before continuing.
+
+Then build and open the iOS project:
+
+```bash
+bun run mobile:ios
+```
+
+This runs the full pipeline (build → prerender → cap sync ios) and opens Xcode.
 
 ---
 
