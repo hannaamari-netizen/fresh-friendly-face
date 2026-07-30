@@ -1,5 +1,7 @@
 # Haya Al-Salat — App Store Submission Guide
 
+> **Quick start:** For a printable step-by-step checklist tailored to this project, see [`APP_STORE_SUBMISSION_CHECKLIST.md`](./APP_STORE_SUBMISSION_CHECKLIST.md).
+
 This document walks you through publishing **Haya Al-Salat** on the Apple App Store. The web app is wrapped as a native iOS app using [Capacitor](https://capacitorjs.com). You run these steps on a Mac with Xcode after exporting the project from Lovable.
 
 > **Lovable cannot create the final `.ipa` or submit to App Store Connect for you.** Apple requires macOS + Xcode for iOS builds and a paid Apple Developer account for submission.
