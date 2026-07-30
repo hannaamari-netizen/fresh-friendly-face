@@ -1,5 +1,7 @@
 # TestFlight — First Build Upload
 
+> **Quick start:** For a printable step-by-step checklist tailored to this project, see [`APP_STORE_SUBMISSION_CHECKLIST.md`](./APP_STORE_SUBMISSION_CHECKLIST.md).
+
 Archive and upload the first Haya Al-Salat build to TestFlight before the full App Store release.
 
 > All steps run on a Mac with Xcode 15+ and a paid Apple Developer account.
