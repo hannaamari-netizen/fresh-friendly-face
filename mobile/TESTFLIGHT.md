@@ -161,8 +161,9 @@ For **external testers** (up to 10,000), the first build must pass a short **Bet
 ## Re-uploading a new build
 
 1. Bump the **Build** number in Xcode (e.g. 1 → 2).
-2. `bun run build && node mobile/scripts/prerender.js && npx cap sync ios`
-3. Product → Archive → Distribute App → Upload.
+2. `bun run mobile:preflight` — fix any reported issues.
+3. `bun run mobile:ios`
+4. Product → Archive → Distribute App → Upload.
 
 ---
 
