@@ -326,12 +326,12 @@ function HayaAlSalat() {
       load(lat, lon);
     };
     if (!navigator.geolocation) {
-      use(21.4225, 39.8262); // Mecca fallback
+      use(59.3293, 18.0686); // Stockholm fallback
       return () => { cancelled = true; };
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => use(pos.coords.latitude, pos.coords.longitude),
-      () => use(21.4225, 39.8262),
+      () => use(59.3293, 18.0686),
       { timeout: 5000 }
     );
     return () => { cancelled = true; };
