@@ -18,6 +18,7 @@
     "mobile:open:ios": "npx cap open ios",
     "mobile:open:android": "npx cap open android",
     "mobile:preflight": "bash mobile/scripts/preflight-ios.sh",
+    "mobile:check-copy": "node mobile/scripts/check-store-copy.js",
     "mobile:archive": "bash mobile/scripts/archive-ios.sh",
     "mobile:ios": "bun run mobile:preflight && bun run build && bun run mobile:prerender && bun run mobile:sync && npx cap open ios"
   },
