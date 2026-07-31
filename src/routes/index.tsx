@@ -51,16 +51,21 @@ function useNow(intervalMs = 1000) {
 }
 
 function Stars() {
-  const stars = useMemo(
-    () =>
-      Array.from({ length: 40 }).map((_, i) => ({
-        top: Math.random() * 70,
-        left: Math.random() * 100,
-        size: Math.random() * 2 + 1,
-        delay: Math.random() * 3,
-      })),
-    []
-  );
+  // Deterministic pseudo-random so SSR and client render identical markup.
+  const stars = useMemo(() => {
+    let seed = 20260731;
+    const rand = () => {
+      seed = (seed * 1664525 + 1013904223) % 4294967296;
+      return seed / 4294967296;
+    };
+    return Array.from({ length: 40 }).map(() => ({
+      top: +(rand() * 70).toFixed(4),
+      left: +(rand() * 100).toFixed(4),
+      size: +(rand() * 2 + 1).toFixed(4),
+      delay: +(rand() * 3).toFixed(4),
+    }));
+  }, []);
+
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       {stars.map((s, i) => (
