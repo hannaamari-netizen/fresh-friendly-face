@@ -40,9 +40,37 @@ else
 fi
 
 if command -v xcodebuild >/dev/null 2>&1; then
-  pass "xcodebuild found ($(xcodebuild -version | head -1))"
+  pass "xcodebuild found ($(xcodebuild -version 2>/dev/null | head -1))"
 else
-  fail "xcodebuild not found — install Xcode from the Mac App Store"
+  fail "xcodebuild not found — install Xcode from the Mac App Store, then run: xcode-select --install"
+fi
+
+if command -v xcode-select >/dev/null 2>&1; then
+  dev_dir="$(xcode-select -p 2>/dev/null || true)"
+  if [[ -z "${dev_dir:-}" ]]; then
+    fail "xcode-select has no active developer directory — run: sudo xcode-select -s /Applications/Xcode.app"
+  elif [[ "$dev_dir" == *"/Xcode.app/Contents/Developer"* ]]; then
+    pass "Active developer directory = $dev_dir"
+  else
+    fail "Active developer directory is '$dev_dir' (CommandLineTools only) — run: sudo xcode-select -s /Applications/Xcode.app"
+  fi
+
+  if [[ -d "/Applications/Xcode.app" ]]; then
+    xc_ver="$(defaults read /Applications/Xcode.app/Contents/Info CFBundleShortVersionString 2>/dev/null || echo unknown)"
+    pass "Xcode.app present (version $xc_ver)"
+  else
+    warn "/Applications/Xcode.app not found — Xcode may be installed elsewhere"
+  fi
+else
+  fail "xcode-select not found — install Xcode command line tools: xcode-select --install"
+fi
+
+if command -v xcodebuild >/dev/null 2>&1; then
+  if xcodebuild -checkFirstLaunchStatus >/dev/null 2>&1; then
+    pass "Xcode first-launch setup complete"
+  else
+    fail "Xcode needs first-launch setup — run: sudo xcodebuild -runFirstLaunch && sudo xcodebuild -license accept"
+  fi
 fi
 
 if command -v xcrun >/dev/null 2>&1; then
@@ -50,6 +78,7 @@ if command -v xcrun >/dev/null 2>&1; then
 else
   warn "xcrun not found — Xcode command-line tools may be missing"
 fi
+
 
 head "Capacitor config"
 if [[ -f "$CAP_CONFIG" ]]; then
