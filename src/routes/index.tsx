@@ -244,10 +244,14 @@ function HayaAlSalat() {
   // Audio auto-play unlock. Browsers block programmatic play() without a
   // prior user gesture, so show a prompt until the user taps once. On tap,
   // we call play()+pause() on both audio elements to "unlock" the tab.
-  const [audioUnlocked, setAudioUnlocked] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    return sessionStorage.getItem("haya-audio-unlocked") === "1";
-  });
+  // Start true so SSR and the first client render match; after hydration we
+  // read sessionStorage and show the prompt only if the tab is still locked.
+  const [audioUnlocked, setAudioUnlocked] = useState<boolean>(true);
+  useEffect(() => {
+    if (sessionStorage.getItem("haya-audio-unlocked") !== "1") {
+      setAudioUnlocked(false);
+    }
+  }, []);
   const unlockAudio = useCallback(async () => {
     const els = [audioRef.current, adhanRef.current].filter(Boolean) as HTMLAudioElement[];
     for (const el of els) {
