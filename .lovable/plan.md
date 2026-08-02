@@ -1,42 +1,57 @@
-## Full Web Push for Haya Al-Salat
+# Plan: Get Xcode downloaded and fix preview hydration warning
 
-Real background reminders need a **push server** that wakes the phone even when the app is closed. Here's the plan.
+## 1. Troubleshoot Xcode download from Apple Developer site
 
-### 1. Backend (Lovable Cloud)
-- Enable Lovable Cloud.
-- Generate VAPID keys (server keeps the private key; the app uses the public key to subscribe).
-- Table `push_subscriptions`: `user_id` (nullable — anonymous device allowed), `endpoint`, `p256dh`, `auth`, `timezone`, `latitude`, `longitude`, `offset_minutes`, `message_template`, `next_fajr_utc`, `last_sent_utc`. RLS scoped by a device token stored in the browser.
-- Table grants + RLS policies per Lovable rules.
+Common causes and fixes, in order:
 
-### 2. Service worker (`public/sw.js`)
-- Handles `push` → shows the notification with title, body, icon, tag.
-- Handles `notificationclick` → focuses/opens the app.
-- Registered only in production (guards against Lovable preview, iframe, dev, `?sw=off`).
+1. **Sign-in issues**
+   - Make sure you are signed into **developer.apple.com** with the same Apple ID that has (or will have) the Apple Developer Program membership.
+   - If you have a free account, the .xip download may still be available; if the site loops back to the membership page, that means you need to enroll first.
 
-### 3. Client wiring
-- On enabling reminders: request `Notification.permission`, register SW, `pushManager.subscribe({ userVisibleOnly, applicationServerKey: VAPID_PUBLIC })`, POST the subscription + timezone + coords + offset + custom message to a server function.
-- Update-on-change: whenever the offset, message text, or location changes, re-sync.
-- Delete subscription on disable.
+2. **Browser / download problems**
+   - Safari usually works best for Apple’s developer downloads.
+   - If the download starts but stalls, try:
+     - A different network (some corporate/public Wi-Fi blocks large downloads).
+     - Disabling browser extensions or using a Private/Incognito window.
+     - Copying the direct `.xip` link and using `curl` in Terminal (resumable):
+       ```bash
+       curl -C - -O "https://...xip"
+       ```
 
-### 4. Scheduler
-- A public API route `/api/public/cron/fajr-push` (secured by a shared secret header).
-- pg_cron every minute → `net.http_post` to that route with the secret.
-- Route loads due subscriptions (`next_fajr_utc - offset_minutes` in the last minute window, not yet sent today), sends the web-push (using `web-push` protocol built with WebCrypto — Node's `web-push` package isn't Worker-safe, so signing is done inline), then advances `next_fajr_utc` by fetching Aladhan for the next day.
+3. **Extracting the .xip**
+   - After download, double-click the `.xip` in Finder or run:
+     ```bash
+     xip --expand Xcode_16.xip
+     ```
+   - This can take 10–30 minutes on slower Macs. Do not interrupt it.
 
-### 5. UI
-- Fajr reminder card gets a status line ("Background reminders on for this device") plus a fallback message when Notifications API is missing (iOS Safari not installed to Home Screen).
-- Keep the in-tab `setTimeout` as a secondary safety net when the tab happens to be open.
+4. **Move to /Applications**
+   - Drag the extracted `Xcode.app` into `/Applications`.
+   - Run:
+     ```bash
+     sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+     sudo xcodebuild -runFirstLaunch
+     sudo xcodebuild -license accept
+     ```
 
-### iOS caveat (called out to the user)
-iOS delivers web push only when the app is installed to the Home Screen (iOS 16.4+). Android/desktop Chrome/Firefox work with the tab fully closed.
+5. **Verify**
+   ```bash
+   xcodebuild -version
+   ```
 
-### Files touched
-- `supabase/migrations/<new>.sql` — table, grants, RLS, pg_cron job
-- `public/sw.js` — push service worker
-- `src/lib/push.ts` — subscribe/unsubscribe helpers (browser)
-- `src/lib/push.functions.ts` — `saveSubscription`, `deleteSubscription` server fns
-- `src/routes/api/public/cron/fajr-push.ts` — cron route + signed web-push sender
-- `src/components/FajrReminder.tsx` — wire subscribe/unsubscribe alongside existing UI
-- Secrets: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET`
+## 2. Fix the preview hydration mismatch
 
-Shall I proceed?
+The runtime error shows the server rendering a decorative element (likely the moon glow) while the client renders a dialog/toast. This usually means a component is conditionally rendering different markup on server vs client.
+
+- Inspect `src/routes/index.tsx` around the reported lines.
+- Look for any `typeof window !== 'undefined'` branch, `useHydrated`-style hooks, or notification/toast components that render different HTML during SSR.
+- Replace with a consistent server-safe fallback, or defer the differing markup behind a client-only guard.
+
+## 3. Re-run preflight after Xcode is ready
+
+Once Xcode is installed and selected:
+```bash
+bun run mobile:preflight
+```
+
+Then proceed with the existing `bun run mobile:publish` workflow.
