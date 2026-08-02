@@ -79,7 +79,12 @@ export function FajrReminder({ fajrDate, timezone, latitude, longitude }: Props)
   );
   const [bgStatus, setBgStatus] = useState<"idle" | "syncing" | "on" | "error">("idle");
   const [testStatus, setTestStatus] = useState<"idle" | "sending" | "sent">("idle");
-  const supported = typeof window !== "undefined" && "Notification" in window;
+  // Resolved after hydration so SSR and the first client render agree.
+  const [supported, setSupported] = useState(false);
+  useEffect(() => {
+    setSupported(typeof window !== "undefined" && "Notification" in window);
+  }, []);
+
   const canBackground = pushSupported();
 
   const activeTz =

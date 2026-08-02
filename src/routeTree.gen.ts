@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as XcodeSetupRouteImport } from './routes/xcode-setup'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LicensesRouteImport } from './routes/licenses'
@@ -16,6 +17,11 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicCronFajrPushRouteImport } from './routes/api/public/cron/fajr-push'
 
+const XcodeSetupRoute = XcodeSetupRouteImport.update({
+  id: '/xcode-setup',
+  path: '/xcode-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/xcode-setup': typeof XcodeSetupRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/xcode-setup': typeof XcodeSetupRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/xcode-setup': typeof XcodeSetupRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/licenses'
     | '/privacy'
     | '/terms'
+    | '/xcode-setup'
     | '/api/public/cron/fajr-push'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/licenses'
     | '/privacy'
     | '/terms'
+    | '/xcode-setup'
     | '/api/public/cron/fajr-push'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/licenses'
     | '/privacy'
     | '/terms'
+    | '/xcode-setup'
     | '/api/public/cron/fajr-push'
   fileRoutesById: FileRoutesById
 }
@@ -105,11 +117,19 @@ export interface RootRouteChildren {
   LicensesRoute: typeof LicensesRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  XcodeSetupRoute: typeof XcodeSetupRoute
   ApiPublicCronFajrPushRoute: typeof ApiPublicCronFajrPushRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/xcode-setup': {
+      id: '/xcode-setup'
+      path: '/xcode-setup'
+      fullPath: '/xcode-setup'
+      preLoaderRoute: typeof XcodeSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -161,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   LicensesRoute: LicensesRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  XcodeSetupRoute: XcodeSetupRoute,
   ApiPublicCronFajrPushRoute: ApiPublicCronFajrPushRoute,
 }
 export const routeTree = rootRouteImport
