@@ -1483,7 +1483,18 @@ function HayaAlSalat() {
               </span>
               <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
             </Link>
+            <Link
+              to="/xcode-setup"
+              className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm transition hover:bg-white/5"
+            >
+              <span className="flex items-center gap-2">
+                <Info className="h-4 w-4 text-muted-foreground" />
+                Xcode setup wizard
+              </span>
+              <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+            </Link>
           </div>
+
           <p className="mt-4 text-center text-[11px] text-muted-foreground/70">
             Privacy contact:{" "}
             <a
