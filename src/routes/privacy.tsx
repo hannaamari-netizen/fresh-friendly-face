@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, CalendarDays } from "lucide-react";
+import { ArrowLeft, Shield, Mail, MapPin, Bell, BarChart3, Server, Lock, Baby, FilePenLine } from "lucide-react";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -8,22 +8,24 @@ export const Route = createFileRoute("/privacy")({
       {
         name: "description",
         content:
-          "How Haya Al-Salat handles location, notifications, and audio data on your device.",
+          "Privacy Policy for Haya Al-Salat. Learn how we handle your location, notifications, and personal data.",
       },
       { property: "og:title", content: "Privacy Policy — Haya Al-Salat" },
       {
         property: "og:description",
         content:
-          "How Haya Al-Salat handles location, notifications, and audio data on your device.",
+          "Privacy Policy for Haya Al-Salat. Learn how we handle your location, notifications, and personal data.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "index,follow" },
     ],
   }),
   component: PrivacyPage,
 });
 
-const LAST_UPDATED = "July 26, 2026";
-const CONTACT_EMAIL = "hello@hayaalsalat.app"; // TODO: replace with your real contact address
+const EFFECTIVE_DATE = "August 2026";
+const CONTACT_EMAIL = "support@hayaalsalat.com";
 
 function PrivacyPage() {
   return (
@@ -36,7 +38,7 @@ function PrivacyPage() {
         Back to app
       </Link>
 
-      <header className="mb-8">
+      <header className="mb-10">
         <p
           className="text-[11px] uppercase tracking-[0.3em]"
           style={{ color: "var(--gold-soft)" }}
@@ -44,121 +46,91 @@ function PrivacyPage() {
           Haya Al-Salat
         </p>
         <h1 className="mt-2 font-display text-3xl leading-tight">Privacy Policy</h1>
-        <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-gold-soft/30 bg-gold-soft/10 px-3 py-1.5 text-xs text-gold-soft">
-          <CalendarDays className="h-3.5 w-3.5" />
-          <span>Last updated: {LAST_UPDATED}</span>
-        </div>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Effective Date: {EFFECTIVE_DATE}
+        </p>
       </header>
 
-      <section className="space-y-6 text-sm leading-relaxed text-muted-foreground">
-        <p>
-          Haya Al-Salat is a peaceful companion that gently prepares Muslims to wake for Fajr
-          through the recitation of Surat Al-Mu'minun by Mukhtar Al-Hajj. This page explains what
-          the app does with your data. It is maintained by the app owner (Inoxin HA) and is not an
-          independent certification.
+      <section className="space-y-8 text-sm leading-relaxed text-muted-foreground">
+        <p className="text-base text-foreground/90">
+          Haya Al-Salat respects your privacy. This policy explains what information the app
+          handles, how it is used, and the choices available to you.
         </p>
 
-        <div>
-          <h2 className="mb-2 font-display text-lg text-foreground">Information we handle</h2>
-          <ul className="list-disc space-y-1.5 pl-5">
+        <PolicySection icon={Shield} title="Information We Collect">
+          <ul className="list-disc space-y-2 pl-5">
+            <li>We do not require users to create an account.</li>
+            <li>We do not sell or share personal information.</li>
             <li>
-              <strong className="text-foreground">Location:</strong> If you allow it, your device's
-              approximate coordinates are sent to the Aladhan prayer-times API to compute your
-              local Fajr time. Coordinates are not stored on our servers with your identity.
-            </li>
-            <li>
-              <strong className="text-foreground">Notifications:</strong> If you enable Fajr
-              reminders, we store a browser push subscription (a random endpoint issued by your
-              OS/browser) together with your timezone, offset preference, and custom reminder text
-              so the scheduler can wake your device at the right time.
-            </li>
-            <li>
-              <strong className="text-foreground">On-device preferences:</strong> Volume, snooze
-              duration, fade-in length, reminder text, and the saved recitation audio live in your
-              device's local storage and cache. They never leave the device.
-            </li>
-            <li>
-              <strong className="text-foreground">No accounts, no analytics trackers,</strong> no
-              advertising IDs, and no sale of personal data.
+              Prayer times, Qibla direction, reminders, and calendar features work locally or by
+              using trusted public services.
             </li>
           </ul>
-        </div>
+        </PolicySection>
 
-        <div>
-          <h2 className="mb-2 font-display text-lg text-foreground">Third-party services</h2>
-          <ul className="list-disc space-y-1.5 pl-5">
-            <li>
-              <a
-                href="https://aladhan.com/prayer-times-api"
-                target="_blank"
-                rel="noreferrer"
-                className="underline hover:text-foreground"
-              >
-                Aladhan Prayer Times API
-              </a>{" "}
-              — receives your coordinates to return prayer times.
-            </li>
-            <li>
-              Recitation audio is streamed from a public archive of Mukhtar Al-Hajj's recitation.
-            </li>
-            <li>
-              Push notifications are delivered through your browser vendor's push service (Apple,
-              Google, or Mozilla), which relays messages to your device.
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h2 className="mb-2 font-display text-lg text-foreground">Permissions the app requests</h2>
-          <ul className="list-disc space-y-1.5 pl-5">
-            <li>
-              <strong className="text-foreground">Location</strong> — only to compute local Fajr.
-              You can decline; you'll simply need to enter your city manually if that option is
-              offered.
-            </li>
-            <li>
-              <strong className="text-foreground">Notifications</strong> — only used to send Fajr
-              reminders. Revoke anytime in your device settings.
-            </li>
-            <li>
-              <strong className="text-foreground">Storage</strong> — used only to cache the
-              recitation audio for weak-connection playback.
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h2 className="mb-2 font-display text-lg text-foreground">Your choices</h2>
+        <PolicySection icon={MapPin} title="Location">
           <p>
-            Disable reminders in the app to delete your push subscription from our scheduler. Clear
-            your browser's site data (or uninstall the app) to remove all locally stored
-            preferences and cached audio. No further action is required.
+            If the user grants permission, location is used only to calculate accurate prayer times
+            and Qibla direction. Location data is never sold.
           </p>
-        </div>
+        </PolicySection>
 
-        <div>
-          <h2 className="mb-2 font-display text-lg text-foreground">Children</h2>
+        <PolicySection icon={Bell} title="Notifications">
           <p>
-            Haya Al-Salat is a general-audience spiritual companion. It does not knowingly collect
-            data from children.
+            The app uses local notifications only for prayer reminders selected by the user. These
+            alerts are scheduled on the device and are not sent to any server.
           </p>
-        </div>
+        </PolicySection>
 
-        <div>
-          <h2 className="mb-2 font-display text-lg text-foreground">Changes to this policy</h2>
+        <PolicySection icon={BarChart3} title="Analytics">
           <p>
-            If we change how the app handles data, we'll update this page and the "Last updated"
-            date above.
+            We do not collect personal analytics or advertising identifiers. No behavioral or
+            demographic data is gathered for marketing purposes.
           </p>
-        </div>
+        </PolicySection>
 
-        <div>
-          <h2 className="mb-2 font-display text-lg text-foreground">Contact</h2>
+        <PolicySection icon={Server} title="Third Parties">
           <p>
-            Questions or requests about your data? Email{" "}
+            The app may use Apple services required for app functionality, such as push
+            notification delivery and app distribution. These services operate under their own
+            privacy terms.
+          </p>
+        </PolicySection>
+
+        <PolicySection icon={Lock} title="Data Security">
+          <p>
+            We take reasonable measures to protect user information. Sensitive operations are
+            performed on the device whenever possible, and data sent to trusted services is limited to
+            what is necessary for the requested feature.
+          </p>
+        </PolicySection>
+
+        <PolicySection icon={Baby} title="Children's Privacy">
+          <p>
+            The app is suitable for all ages and does not knowingly collect personal information
+            from children.
+          </p>
+        </PolicySection>
+
+        <PolicySection icon={FilePenLine} title="Changes to This Policy">
+          <p>
+            This policy may be updated from time to time. Any changes will be posted on this page with
+            an updated effective date. Continued use of the app after changes constitutes acceptance
+            of the revised policy.
+          </p>
+        </PolicySection>
+
+        <div className="rounded-2xl border border-white/5 bg-black/20 p-5">
+          <h2 className="mb-2 flex items-center gap-2 font-display text-lg text-foreground">
+            <Mail className="h-4 w-4" style={{ color: "var(--gold-soft)" }} />
+            Contact
+          </h2>
+          <p>
+            If you have any questions about this Privacy Policy, please contact us at{" "}
             <a
               href={`mailto:${CONTACT_EMAIL}`}
-              className="underline hover:text-foreground"
+              className="underline transition hover:text-foreground"
+              style={{ color: "var(--gold-soft)" }}
             >
               {CONTACT_EMAIL}
             </a>
@@ -167,9 +139,29 @@ function PrivacyPage() {
         </div>
       </section>
 
-      <footer className="mt-10 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground/70">
+      <footer className="mt-12 text-center text-[11px] uppercase tracking-[0.3em] text-muted-foreground/70">
         ✍️ Created with care by Inoxin HA
       </footer>
     </main>
+  );
+}
+
+function PolicySection({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <h2 className="mb-3 flex items-center gap-2 font-display text-lg text-foreground">
+        <Icon className="h-4 w-4" style={{ color: "var(--gold-soft)" }} />
+        {title}
+      </h2>
+      <div className="space-y-2">{children}</div>
+    </div>
   );
 }

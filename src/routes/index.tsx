@@ -166,6 +166,8 @@ function HayaAlSalat() {
     } catch {}
   }, [notifyOnStart]);
   const notifSupported = typeof window !== "undefined" && "Notification" in window;
+  const [notifMounted, setNotifMounted] = useState(false);
+  useEffect(() => { setNotifMounted(true); }, []);
   const notifyRecitationStart = useCallback(async () => {
     if (!notifyOnStart || !notifSupported) return;
     if (Notification.permission !== "granted") return;
@@ -1108,7 +1110,7 @@ function HayaAlSalat() {
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-medium text-amber-50">Notify me when it starts</p>
                 <p className="text-[10px] text-muted-foreground/80">
-                  {!notifSupported
+                  {!notifMounted || !notifSupported
                     ? "Notifications aren't supported on this device."
                     : Notification.permission === "denied"
                     ? "Notifications blocked in browser settings."
