@@ -166,6 +166,8 @@ function HayaAlSalat() {
     } catch {}
   }, [notifyOnStart]);
   const notifSupported = typeof window !== "undefined" && "Notification" in window;
+  const [notifMounted, setNotifMounted] = useState(false);
+  useEffect(() => { setNotifMounted(true); }, []);
   const notifyRecitationStart = useCallback(async () => {
     if (!notifyOnStart || !notifSupported) return;
     if (Notification.permission !== "granted") return;
