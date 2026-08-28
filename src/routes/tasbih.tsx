@@ -136,7 +136,6 @@ function TasbihPage() {
   };
 
   const phrase = PHRASES[state.phrase];
-  const notifUnsupported = typeof Notification === "undefined";
 
   return (
     <main className="relative min-h-dvh w-full overflow-x-hidden safe-px">
