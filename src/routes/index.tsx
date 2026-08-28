@@ -6,6 +6,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
 import { InstallSteps } from "@/components/InstallSteps";
 import { ShareApp } from "@/components/ShareApp";
+import { AppStoreBadge } from "@/components/AppStoreBadge";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
