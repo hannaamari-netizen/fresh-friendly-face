@@ -18,10 +18,20 @@ Sources: `mobile/RELEASE_NOTES.md`, `mobile/APP_PRIVACY_MAPPING.md`.
 ### English (primary)
 
 ```text
-This update raises the minimum supported iOS version to 15.0 to comply with App Store Connect requirements and ensure continued distribution.
+Haya Al-Salat is now a fuller prayer companion. Wake gently for Fajr, explore the Quran, find Qibla, and remember Allah throughout the day.
 
-• Minimum iOS version updated to 15.0 (resolves ITMS-90068)
-• Stability and compatibility improvements
+• Choose your favorite Surah to recite before Fajr (was Surat Al-Mu'minun only)
+• New, clearer Adhan voice for Dhuhr, Asr, Maghrib, and Isha — Fajr Adhan stays unchanged
+• Preview and test every Adhan inside the app, then rate each prayer's audio
+• Adhan audio is now preloaded and cached so alerts start instantly
+• Added Asma Allah al-Husna — the 99 Names of Allah
+• New Tasbih counter with customizable phrases, reminders, and Astaghfir Allah
+• Full Quran in Arabic, English, and Swedish with bookmarks, reading progress, streaks, and export/import
+• Dua collection: before/after prayer, morning & evening Athkar, with audio and bookmarks
+• Qibla direction with city search, recent history, and saved favorite locations
+• Smarter prayer-time calculation for your country (e.g. Umm al-Qura for Saudi Arabia / Riyadh)
+• "As-salatu khayrun min an-nawm" reminder before the Fajr Adhan
+• Minimum iOS version raised to 15.0 to comply with App Store Connect requirements
 
 May your Fajr be blessed. — Inoxin HA
 ```
@@ -29,10 +39,20 @@ May your Fajr be blessed. — Inoxin HA
 ### Arabic (locale: Arabic)
 
 ```text
-تم رفع الحد الأدنى لإصدار iOS المدعوم إلى 15.0 لضمان الامتثال لمتطلبات App Store Connect واستمرار توزيع التطبيق.
+أصبح "حيّ على الصلاة" رفيق صلاة أكثر اكتمالاً. استيقظ بهدوء للفجر، واقرأ القرآن، ووجه القبلة، واذكر الله طوال يومك.
 
-• تحديث الحد الأدنى لإصدار iOS إلى 15.0 (لحل ITMS-90068)
-• تحسينات الاستقرار والتوافق
+• اختر السورة المفضلة للتسميع قبل الفجر (كانت سورة المؤمنون فقط)
+• صوت أذان أوضح للظهر والعصر والمغرب والعشاء — أذان الفجر يبقى كما هو
+• معاينة واختبار كل أذان داخل التطبيق مع تقييم صوت كل صلاة
+• تحميل وتخزين ملفات الأذان مسبقًا لتعمل فورًا
+• إضافة أسماء الله الحسنى
+• عداد التسبيح مع عبارات قابلة للتخصيص وتذكيرات وأستغفر الله
+• القرآن الكريم كاملًا بالعربية والإنجليزية والسويدية مع علامات مرجعية وتقدم القراءة وسلاسل يومية وتصدير/استيراد
+• مجموعة الأدعية: قبل وبعد الصلاة، وأذكار الصباح والمساء، مع صوت وعلامات مرجعية
+• اتجاه القبلة مع البحث عن المدينة وسجل التاريخ والمواقع المفضلة
+• حساب أوقات الصلاة حسب بلدك (مثل أم القرى للسعودية / الرياض)
+• تذكير "الصلاة خير من النوم" قبل أذان الفجر
+• رفع الحد الأدنى لإصدار iOS إلى 15.0
 
 نسأل الله أن يتقبل منكم. — Inoxin HA
 ```
@@ -40,10 +60,20 @@ May your Fajr be blessed. — Inoxin HA
 ### Swedish (locale: Swedish)
 
 ```text
-Denna uppdatering höjer den lägsta stödda iOS-versionen till 15.0 för att uppfylla App Store Connect-kraven och säkerställa fortsatt distribution.
+Haya Al-Salat är nu en mer komplett böne följeslagare. Vakna mjukt för Fajr, utforska Koranen, hitta Qibla och kom ihåg Allah under dagen.
 
-• Minimi-iOS-version uppdaterad till 15.0 (löser ITMS-90068)
-• Stabilitets- och kompatibilitetsförbättringar
+• Välj din favoritsura att recitera före Fajr (tidigare endast Surat Al-Mu'minun)
+• Tydligare Adhan-röst för Dhuhr, Asr, Maghrib och Isha — Fajr-Adhan förblir oförändrad
+• Förhandsgranska och testa varje Adhan i appen, betygsätt sedan varje böns ljud
+• Adhan-ljud förhandsladdas och cachelagras så att varningar startar direkt
+• Tillagt Asma Allah al-Husna — Allahs 99 namn
+• Ny Tasbih-räknare med anpassningsbara fraser, påminnelser och Astaghfir Allah
+• Fullständig Koranen på arabiska, engelska och svenska med bokmärken, läsframsteg, streaks och export/import
+• Dua-samling: före/efter bön, morgon- och kvälls-athkar, med ljud och bokmärken
+• Qibla-riktning med stadsökning, senaste historik och sparade favoritplatser
+• Smartare bönetidsberäkning för ditt land (t.ex. Umm al-Qura för Saudiarabien / Riyadh)
+• Påminnelse "As-salatu khayrun min an-nawm" före Fajr-Adhan
+• Minimi-iOS-version höjd till 15.0
 
 Må din Fajr vara välsignad. — Inoxin HA
 ```
