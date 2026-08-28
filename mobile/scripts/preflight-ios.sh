@@ -178,6 +178,13 @@ else
   warn "security(1) not available — cannot check Keychain"
 fi
 
+head "Audio safeguards"
+if node scripts/check-fajr-adhan.mjs >/dev/null 2>&1; then
+  pass "Fajr Adhan URL pinned and unchanged"
+else
+  fail "Fajr Adhan URL changed or missing — run: bun run check:fajr-adhan"
+fi
+
 head "Reference IDs"
 pass "Apple Team ID:            $EXPECTED_TEAM_ID"
 pass "Bundle Identifier:        $EXPECTED_BUNDLE_ID"
