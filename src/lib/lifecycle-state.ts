@@ -27,12 +27,16 @@ function readWebState(): Pick<LifecycleState, "appState" | "visibility" | "focus
 }
 
 export function useLifecycleState(): LifecycleState {
-  const [state, setState] = useState<LifecycleState>(() => ({
-    ...readWebState(),
+  // Always initialize with SSR-safe values; real device state is applied in
+  // useEffect below so server-rendered HTML matches the first client render.
+  const [state, setState] = useState<LifecycleState>({
+    appState: "active",
+    visibility: "unknown",
+    focused: true,
     lastForegroundAt: null,
     lastBackgroundAt: null,
     source: "web",
-  }));
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -58,6 +62,8 @@ export function useLifecycleState(): LifecycleState {
     const onVisibility = () => applyWeb();
     const onFocus = () => applyWeb();
     const onBlur = () => applyWeb();
+    // Populate real device state after mount (initial render stays SSR-safe).
+    applyWeb();
     document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("focus", onFocus);
     window.addEventListener("blur", onBlur);

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as XcodeSetupRouteImport } from './routes/xcode-setup'
+import { Route as WhatsNewRouteImport } from './routes/whats-new'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TasbihRouteImport } from './routes/tasbih'
 import { Route as QiblaRouteImport } from './routes/qibla'
@@ -26,6 +27,11 @@ import { Route as ApiPublicCronFajrPushRouteImport } from './routes/api/public/c
 const XcodeSetupRoute = XcodeSetupRouteImport.update({
   id: '/xcode-setup',
   path: '/xcode-setup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhatsNewRoute = WhatsNewRouteImport.update({
+  id: '/whats-new',
+  path: '/whats-new',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TermsRoute = TermsRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/qibla': typeof QiblaRoute
   '/tasbih': typeof TasbihRoute
   '/terms': typeof TermsRoute
+  '/whats-new': typeof WhatsNewRoute
   '/xcode-setup': typeof XcodeSetupRoute
   '/quran/$surah': typeof QuranSurahRoute
   '/quran/': typeof QuranIndexRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/qibla': typeof QiblaRoute
   '/tasbih': typeof TasbihRoute
   '/terms': typeof TermsRoute
+  '/whats-new': typeof WhatsNewRoute
   '/xcode-setup': typeof XcodeSetupRoute
   '/quran/$surah': typeof QuranSurahRoute
   '/quran': typeof QuranIndexRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/qibla': typeof QiblaRoute
   '/tasbih': typeof TasbihRoute
   '/terms': typeof TermsRoute
+  '/whats-new': typeof WhatsNewRoute
   '/xcode-setup': typeof XcodeSetupRoute
   '/quran/$surah': typeof QuranSurahRoute
   '/quran/': typeof QuranIndexRoute
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/qibla'
     | '/tasbih'
     | '/terms'
+    | '/whats-new'
     | '/xcode-setup'
     | '/quran/$surah'
     | '/quran/'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/qibla'
     | '/tasbih'
     | '/terms'
+    | '/whats-new'
     | '/xcode-setup'
     | '/quran/$surah'
     | '/quran'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/qibla'
     | '/tasbih'
     | '/terms'
+    | '/whats-new'
     | '/xcode-setup'
     | '/quran/$surah'
     | '/quran/'
@@ -193,6 +205,7 @@ export interface RootRouteChildren {
   QiblaRoute: typeof QiblaRoute
   TasbihRoute: typeof TasbihRoute
   TermsRoute: typeof TermsRoute
+  WhatsNewRoute: typeof WhatsNewRoute
   XcodeSetupRoute: typeof XcodeSetupRoute
   QuranSurahRoute: typeof QuranSurahRoute
   QuranIndexRoute: typeof QuranIndexRoute
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/xcode-setup'
       fullPath: '/xcode-setup'
       preLoaderRoute: typeof XcodeSetupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/whats-new': {
+      id: '/whats-new'
+      path: '/whats-new'
+      fullPath: '/whats-new'
+      preLoaderRoute: typeof WhatsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -305,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   QiblaRoute: QiblaRoute,
   TasbihRoute: TasbihRoute,
   TermsRoute: TermsRoute,
+  WhatsNewRoute: WhatsNewRoute,
   XcodeSetupRoute: XcodeSetupRoute,
   QuranSurahRoute: QuranSurahRoute,
   QuranIndexRoute: QuranIndexRoute,
