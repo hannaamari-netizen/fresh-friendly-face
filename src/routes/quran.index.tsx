@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { BookOpen, ChevronLeft, Search } from "lucide-react";
+import { BookmarkCheck, BookOpen, ChevronLeft, Search, X } from "lucide-react";
 import { surahListQuery } from "@/lib/quran";
+import { percentRead, useBookmarks, useReadingProgress } from "@/lib/quranProgress";
 
 export const Route = createFileRoute("/quran/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(surahListQuery),
@@ -29,6 +30,8 @@ export const Route = createFileRoute("/quran/")({
 function QuranIndex() {
   const { data: surahs } = useSuspenseQuery(surahListQuery);
   const [q, setQ] = useState("");
+  const { bookmarks, remove } = useBookmarks();
+  const { last, forSurah, recent, ready: progressReady } = useReadingProgress();
 
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -79,6 +82,66 @@ function QuranIndex() {
           />
         </div>
 
+        {/* Continue reading */}
+        {last && (
+          <Link
+            to="/quran/$surah"
+            params={{ surah: String(last.surah) }}
+            className="mt-4 block rounded-3xl border border-amber-200/25 bg-amber-200/5 px-4 py-4 transition hover:bg-amber-200/10"
+          >
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground">Continue reading</p>
+            <p className="mt-1 text-sm font-medium text-amber-100">
+              {last.surah}. {last.surahName} · verse {last.ayah}
+            </p>
+            <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10">
+              <div
+                className="h-full rounded-full"
+                style={{ width: `${percentRead(last)}%`, background: "var(--gold-soft)" }}
+              />
+            </div>
+            <p className="mt-1.5 text-[11px] text-muted-foreground">{percentRead(last)}% read</p>
+          </Link>
+        )}
+
+        {/* Bookmarks */}
+        {bookmarks.length > 0 && (
+          <section className="mt-4 rounded-3xl border border-white/10 bg-black/20 px-4 py-4">
+            <h2 className="flex items-center gap-1.5 text-xs font-medium">
+              <BookmarkCheck className="h-3.5 w-3.5" style={{ color: "var(--gold-soft)" }} />
+              Bookmarks
+              <span className="text-muted-foreground">({bookmarks.length})</span>
+            </h2>
+            <ul className="mt-3 space-y-1.5">
+              {bookmarks.slice(0, 12).map((b) => (
+                <li key={`${b.surah}:${b.ayah}`} className="flex items-center gap-2">
+                  <Link
+                    to="/quran/$surah"
+                    params={{ surah: String(b.surah) }}
+                    hash={`ayah-${b.ayah}`}
+                    className="min-w-0 flex-1 truncate rounded-xl border border-white/5 bg-white/5 px-3 py-2 text-[12px] transition hover:bg-white/10"
+                  >
+                    {b.surahName} · {b.surah}:{b.ayah}
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => remove(b.surah, b.ayah)}
+                    aria-label={`Remove bookmark ${b.surah}:${b.ayah}`}
+                    className="rounded-full border border-white/10 p-1.5 text-muted-foreground transition hover:bg-white/10"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {progressReady && recent.length > 1 && (
+          <p className="mt-3 text-center text-[11px] text-muted-foreground">
+            Reading progress saved for {recent.length} surahs on this device.
+          </p>
+        )}
+
         <ul className="mt-4 space-y-1.5">
           {filtered.map((s) => (
             <li key={s.number}>
@@ -99,6 +162,14 @@ function QuranIndex() {
                     {s.englishNameTranslation} · {s.numberOfAyahs} verses · {s.revelationType}
                   </span>
                 </span>
+                {(() => {
+                  const p = forSurah(s.number);
+                  return p ? (
+                    <span className="shrink-0 rounded-full border border-amber-200/30 px-2 py-0.5 text-[10px] text-amber-100">
+                      {percentRead(p)}%
+                    </span>
+                  ) : null;
+                })()}
                 <span className="font-arabic text-lg" style={{ color: "var(--gold-soft)" }} dir="rtl">
                   {s.name}
                 </span>
