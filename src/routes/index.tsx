@@ -1353,9 +1353,25 @@ function HayaAlSalat() {
             </span>
             <span className="mt-1 block text-sm font-medium">Dua Sessions</span>
             <span className="mt-0.5 block text-[11px] text-muted-foreground">
-              Before &amp; after prayer
+              Prayer &amp; morning/evening athkar
             </span>
           </Link>
+          <Link
+            to="/qibla"
+            className="col-span-2 flex items-center justify-between rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
+          >
+            <span>
+              <span className="font-arabic block text-lg" style={{ color: "var(--gold-soft)" }} dir="rtl">
+                ٱلْقِبْلَة
+              </span>
+              <span className="mt-1 block text-sm font-medium">Qibla Finder</span>
+              <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                Search any city or use your location
+              </span>
+            </span>
+            <Compass className="h-5 w-5" style={{ color: "var(--gold-soft)" }} />
+          </Link>
+
         </section>
 
         {/* Prayer times list */}
