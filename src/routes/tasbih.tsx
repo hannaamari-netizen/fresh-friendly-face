@@ -40,6 +40,7 @@ type TasbihState = { phrase: number; count: number; total: number; target: numbe
 const KEY = "haya-tasbih";
 const PHRASES_KEY = "haya-tasbih-phrases";
 const REMINDER_KEY = "haya-tasbih-reminder";
+const UNDO_PHRASES_KEY = "haya-tasbih-undo-phrases";
 
 const DEFAULT_PHRASES: Phrase[] = [
   { arabic: "سُبْحَانَ الله", latin: "SubhanAllah", meaning: "Glory be to Allah" },
