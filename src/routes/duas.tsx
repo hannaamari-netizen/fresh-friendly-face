@@ -121,6 +121,7 @@ function DuaCard({
   onToggleBookmark: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const speechSupported = useSpeechSupported();
   const speech = useSpeechState();
   const isActive = speech.id === dua.id;
   const isPlaying = isActive && speech.playing;
