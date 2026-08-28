@@ -136,12 +136,19 @@ function AboutPage() {
   }, [ua, standalone, APP_NAME, APP_VERSION, APP_BUILD, BUNDLE_ID, BUILD_DATE, device, lifecycle]);
 
   // Live preview refreshes every second so the shown timestamp stays current.
+  // The report contains client-only values (viewport, timezone, timestamps),
+  // so it is rendered only after mount to keep SSR and first client render equal.
+  const [reportMounted, setReportMounted] = useState(false);
   const [previewTick, setPreviewTick] = useState(0);
   useEffect(() => {
+    setReportMounted(true);
     const id = window.setInterval(() => setPreviewTick((n) => n + 1), 1000);
     return () => window.clearInterval(id);
   }, []);
-  const report = useMemo(() => buildReport(), [buildReport, previewTick]);
+  const report = useMemo(
+    () => (reportMounted ? buildReport() : ""),
+    [buildReport, previewTick, reportMounted],
+  );
 
   const [copiedReport, setCopiedReport] = useState(false);
   const [shareState, setShareState] = useState<"idle" | "sharing" | "done">("idle");
