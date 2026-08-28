@@ -123,7 +123,7 @@ function WhatsNewPage() {
         ))}
       </div>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap items-center gap-3">
         <Link
           to="/"
           onClick={markWhatsNewSeen}
@@ -131,6 +131,21 @@ function WhatsNewPage() {
         >
           Continue to Haya Al-Salat
         </Link>
+        {ready && !ack && (
+          <button
+            type="button"
+            onClick={markRead}
+            className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-foreground hover:bg-foreground/5"
+          >
+            Mark version {CURRENT_VERSION} as read
+          </button>
+        )}
+        {ready && ack && (
+          <span className="inline-flex items-center gap-1.5 self-center rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+            <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+            Read{seenAtLabel ? ` · ${seenAtLabel}` : ""}
+          </span>
+        )}
         {ready && (
           <span className="self-center text-xs text-muted-foreground">
             Version {CURRENT_VERSION} · Build 8
