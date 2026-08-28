@@ -15,6 +15,8 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LicensesRouteImport } from './routes/licenses'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as QuranIndexRouteImport } from './routes/quran.index'
+import { Route as QuranSurahRouteImport } from './routes/quran.$surah'
 import { Route as ApiPublicCronFajrPushRouteImport } from './routes/api/public/cron/fajr-push'
 
 const XcodeSetupRoute = XcodeSetupRouteImport.update({
@@ -47,6 +49,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuranIndexRoute = QuranIndexRouteImport.update({
+  id: '/quran/',
+  path: '/quran/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuranSurahRoute = QuranSurahRouteImport.update({
+  id: '/quran/$surah',
+  path: '/quran/$surah',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCronFajrPushRoute = ApiPublicCronFajrPushRouteImport.update({
   id: '/api/public/cron/fajr-push',
   path: '/api/public/cron/fajr-push',
@@ -60,6 +72,8 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
+  '/quran/$surah': typeof QuranSurahRoute
+  '/quran/': typeof QuranIndexRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +83,8 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
+  '/quran/$surah': typeof QuranSurahRoute
+  '/quran': typeof QuranIndexRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesById {
@@ -79,6 +95,8 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
+  '/quran/$surah': typeof QuranSurahRoute
+  '/quran/': typeof QuranIndexRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +108,8 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/xcode-setup'
+    | '/quran/$surah'
+    | '/quran/'
     | '/api/public/cron/fajr-push'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +119,8 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/xcode-setup'
+    | '/quran/$surah'
+    | '/quran'
     | '/api/public/cron/fajr-push'
   id:
     | '__root__'
@@ -108,6 +130,8 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/terms'
     | '/xcode-setup'
+    | '/quran/$surah'
+    | '/quran/'
     | '/api/public/cron/fajr-push'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +142,8 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   XcodeSetupRoute: typeof XcodeSetupRoute
+  QuranSurahRoute: typeof QuranSurahRoute
+  QuranIndexRoute: typeof QuranIndexRoute
   ApiPublicCronFajrPushRoute: typeof ApiPublicCronFajrPushRoute
 }
 
@@ -165,6 +191,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quran/': {
+      id: '/quran/'
+      path: '/quran'
+      fullPath: '/quran/'
+      preLoaderRoute: typeof QuranIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quran/$surah': {
+      id: '/quran/$surah'
+      path: '/quran/$surah'
+      fullPath: '/quran/$surah'
+      preLoaderRoute: typeof QuranSurahRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/fajr-push': {
       id: '/api/public/cron/fajr-push'
       path: '/api/public/cron/fajr-push'
@@ -182,6 +222,8 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   XcodeSetupRoute: XcodeSetupRoute,
+  QuranSurahRoute: QuranSurahRoute,
+  QuranIndexRoute: QuranIndexRoute,
   ApiPublicCronFajrPushRoute: ApiPublicCronFajrPushRoute,
 }
 export const routeTree = rootRouteImport
