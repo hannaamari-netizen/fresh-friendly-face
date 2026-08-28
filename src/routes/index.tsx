@@ -7,10 +7,19 @@ import { MotionToggle } from "@/components/MotionToggle";
 import { InstallSteps } from "@/components/InstallSteps";
 import { ShareApp } from "@/components/ShareApp";
 import { AppStoreBadge } from "@/components/AppStoreBadge";
+import { AdhanTest } from "@/components/AdhanTest";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
 import { reverseGeocode, ipLocate } from "@/lib/geo";
+import {
+  CALC_METHODS,
+  loadMethodPref,
+  saveMethodPref,
+  methodForCountry,
+  methodLabel,
+  type MethodPref,
+} from "@/lib/calcMethod";
 import {
   FAJR_SURAHS,
   DEFAULT_FAJR_SURAH,
@@ -46,7 +55,7 @@ type Timings = {
   Fajr: string; Sunrise: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string;
 };
 
-type LocInfo = { city: string; country: string; lat: number; lon: number; tz: string } | null;
+type LocInfo = { city: string; country: string; countryCode?: string; lat: number; lon: number; tz: string; method: number } | null;
 
 function pad(n: number) { return n.toString().padStart(2, "0"); }
 
@@ -330,20 +339,42 @@ function HayaAlSalat() {
     return () => clearTimeout(t);
   }, []);
 
+  // Calculation-method preference ("auto" follows the detected country).
+  const [methodPref, setMethodPref] = useState<MethodPref>("auto");
+  const methodPrefRef = useRef<MethodPref>("auto");
+  useEffect(() => {
+    const saved = loadMethodPref();
+    methodPrefRef.current = saved;
+    setMethodPref(saved);
+    if (saved !== "auto") setFetchTick((t) => t + 1);
+  }, []);
+  function changeMethodPref(pref: MethodPref) {
+    methodPrefRef.current = pref;
+    setMethodPref(pref);
+    saveMethodPref(pref);
+    setFetchTick((t) => t + 1);
+  }
+
   // Fetch location + prayer times (timezone-aware, refetches on day rollover / focus)
   const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
   const [fetchTick, setFetchTick] = useState(0);
 
-  const load = useCallback(async (lat: number, lon: number, hintedCity?: string) => {
+  const load = useCallback(async (lat: number, lon: number, hintedCity?: string, hintedCountryCode?: string) => {
     // Use the *device* current date as a starting query; the API returns the
     // correct set for the coordinates' timezone even if the date differs by a day.
     const d = new Date();
     const date = `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
     try {
-      const [res, place] = await Promise.all([
-        fetch(`https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=2`),
-        reverseGeocode(lat, lon),
-      ]);
+      // Resolve the place first so we know which country the user is in: prayer
+      // times must be computed with that country's recognised authority
+      // (e.g. Riyadh → Umm al-Qura, where Isha is 90 min after Maghrib).
+      const place = await reverseGeocode(lat, lon);
+      const code = place?.countryCode || hintedCountryCode;
+      const pref = methodPrefRef.current;
+      const method = pref === "auto" ? methodForCountry(code) : pref;
+      const url = (day: string) =>
+        `https://api.aladhan.com/v1/timings/${day}?latitude=${lat}&longitude=${lon}&method=${method}`;
+      const res = await fetch(url(date));
       const j = await res.json();
       const m = j.data.meta;
       const tz: string = m.timezone;
@@ -353,9 +384,7 @@ function HayaAlSalat() {
       const zoneDateStr = `${pad(zoneToday.d)}-${pad(zoneToday.m)}-${zoneToday.y}`;
       let timings = j.data.timings;
       if (zoneDateStr !== date) {
-        const res2 = await fetch(
-          `https://api.aladhan.com/v1/timings/${zoneDateStr}?latitude=${lat}&longitude=${lon}&method=2`
-        );
+        const res2 = await fetch(url(zoneDateStr));
         const j2 = await res2.json();
         timings = j2.data.timings;
       }
@@ -368,9 +397,11 @@ function HayaAlSalat() {
           tz.split("/").pop()?.replace(/_/g, " ") ||
           "Your city",
         country: place?.country ?? "",
+        countryCode: code,
         lat: m.latitude,
         lon: m.longitude,
         tz,
+        method,
       });
       setError(null);
       setLoading(false);
@@ -382,10 +413,10 @@ function HayaAlSalat() {
 
   useEffect(() => {
     let cancelled = false;
-    const use = (lat: number, lon: number, city?: string) => {
+    const use = (lat: number, lon: number, city?: string, countryCode?: string) => {
       if (cancelled) return;
       coordsRef.current = { lat, lon };
-      load(lat, lon, city);
+      load(lat, lon, city, countryCode);
     };
     // Fallback chain: precise GPS → approximate IP location → Stockholm.
     const fallback = async () => {
@@ -393,10 +424,10 @@ function HayaAlSalat() {
       if (cancelled) return;
       if (ip) {
         setLocSource("ip");
-        use(ip.lat, ip.lon, ip.city);
+        use(ip.lat, ip.lon, ip.city, ip.countryCode);
       } else {
         setLocSource("default");
-        use(59.3293, 18.0686);
+        use(59.3293, 18.0686, "Stockholm", "SE");
       }
     };
     if (!navigator.geolocation) {
@@ -1567,6 +1598,37 @@ function HayaAlSalat() {
               if (adhanRef.current && adhanRef.current.ended) return;
             }}
           />
+          {/* Calculation method — prayer times differ by country authority */}
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+            <p className="mb-2 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              Calculation method
+            </p>
+            <select
+              value={methodPref === "auto" ? "auto" : String(methodPref)}
+              onChange={(e) =>
+                changeMethodPref(e.target.value === "auto" ? "auto" : Number(e.target.value))
+              }
+              aria-label="Prayer time calculation method"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-[12px] text-foreground focus:border-[var(--gold)] focus:outline-none"
+            >
+              <option value="auto">
+                Automatic (follow my country)
+              </option>
+              {CALC_METHODS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+            <p className="mt-2 text-[10px] text-muted-foreground/80">
+              {loc?.method
+                ? `Using ${methodLabel(loc.method)}${
+                    methodPref === "auto" && loc.country ? ` — detected ${loc.country}` : ""
+                  }.`
+                : "Times follow the recognised authority for your country."}
+            </p>
+          </div>
+
           <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
@@ -1643,6 +1705,8 @@ function HayaAlSalat() {
               Hear exactly what will play at each prayer time before it triggers.
             </p>
           </div>
+          <AdhanTest volume={adhanVolume} />
+
           <p className="mt-3 text-center text-[10px] text-muted-foreground/70">
             Tap the Adhan icon to hear the call to prayer for each time.
           </p>

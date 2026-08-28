@@ -2,7 +2,7 @@
 // IP-based fallback so users who deny/skip GPS still see their own region
 // (instead of a hardcoded city).
 
-export type PlaceName = { city: string; country: string };
+export type PlaceName = { city: string; country: string; countryCode?: string };
 
 /** Reverse geocode coordinates to a city/country name (free, keyless). */
 export async function reverseGeocode(lat: number, lon: number): Promise<PlaceName | null> {
@@ -18,9 +18,10 @@ export async function reverseGeocode(lat: number, lon: number): Promise<PlaceNam
         locality?: string;
         principalSubdivision?: string;
         countryName?: string;
+        countryCode?: string;
       };
       const city = j.city || j.locality || j.principalSubdivision || "";
-      if (city) return { city, country: j.countryName ?? "" };
+      if (city) return { city, country: j.countryName ?? "", countryCode: j.countryCode };
     }
   } catch {
     /* fall through to secondary provider */
@@ -37,17 +38,18 @@ export async function reverseGeocode(lat: number, lon: number): Promise<PlaceNam
       locality?: string;
       principalSubdivision?: string;
       countryName?: string;
+      countryCode?: string;
     };
     const city = j.city || j.locality || j.principalSubdivision || "";
     if (!city) return null;
-    return { city, country: j.countryName ?? "" };
+    return { city, country: j.countryName ?? "", countryCode: j.countryCode };
   } catch {
     return null;
   }
 }
 
 
-export type IpLocation = { lat: number; lon: number; city: string; country: string };
+export type IpLocation = { lat: number; lon: number; city: string; country: string; countryCode?: string };
 
 /** Approximate location from the visitor's IP address (free, keyless). */
 export async function ipLocate(): Promise<IpLocation | null> {
@@ -59,11 +61,12 @@ export async function ipLocate(): Promise<IpLocation | null> {
       longitude?: string;
       city?: string;
       country?: string;
+      country_code?: string;
     };
     const lat = Number(j.latitude);
     const lon = Number(j.longitude);
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
-    return { lat, lon, city: j.city ?? "", country: j.country ?? "" };
+    return { lat, lon, city: j.city ?? "", country: j.country ?? "", countryCode: j.country_code };
   } catch {
     return null;
   }
