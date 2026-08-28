@@ -11,6 +11,14 @@ import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
 import { reverseGeocode, ipLocate } from "@/lib/geo";
+import {
+  FAJR_SURAHS,
+  DEFAULT_FAJR_SURAH,
+  getFajrSurah,
+  loadFajrSurah,
+  saveFajrSurah,
+  surahAudioUrl,
+} from "@/lib/fajrSurahs";
 
 
 export const Route = createFileRoute("/")({
@@ -27,8 +35,6 @@ export const Route = createFileRoute("/")({
   component: HayaAlSalat,
 });
 
-const SURAH_URL =
-  "https://server16.mp3quran.net/mukhtar_haj/Rewayat-Hafs-A-n-Assem/023.mp3";
 
 // Adhan (call to prayer) audio. Fajr uses the special Fajr adhan which includes
 // "As-salatu khayrun min an-nawm" (prayer is better than sleep).
@@ -117,6 +123,19 @@ function HayaAlSalat() {
     if (adhanRef.current) adhanRef.current.volume = adhanVolume;
   }, [adhanVolume]);
 
+  // Selected surah for the pre-Fajr recitation. Starts from the default so SSR
+  // and first client render match, then loads the saved choice after mount.
+  const [fajrSurah, setFajrSurahState] = useState<number>(DEFAULT_FAJR_SURAH);
+  useEffect(() => {
+    setFajrSurahState(loadFajrSurah());
+  }, []);
+  const surahInfo = getFajrSurah(fajrSurah);
+  const surahUrl = surahAudioUrl(fajrSurah);
+  const setFajrSurah = useCallback((n: number) => {
+    setFajrSurahState(n);
+    saveFajrSurah(n);
+  }, []);
+
   // Recitation volume + mute
   const [recitationVolume, setRecitationVolume] = useState<number>(() => {
     if (typeof window === "undefined") return 0.8;
@@ -177,7 +196,7 @@ function HayaAlSalat() {
     if (!notifyOnStart || !notifSupported) return;
     if (Notification.permission !== "granted") return;
     const title = "Haya Al-Salat";
-    const body = "Surat Al-Mu'minun is now playing before Fajr.";
+    const body = `${surahInfo.name} is now playing before Fajr.`;
     const options: NotificationOptions = {
       body,
       icon: "/icon-192.png",
@@ -191,7 +210,7 @@ function HayaAlSalat() {
       }
       new Notification(title, options);
     } catch {}
-  }, [notifyOnStart, notifSupported]);
+  }, [notifyOnStart, notifSupported, surahInfo.name]);
   async function enableStartNotifications() {
     if (!notifSupported) return;
     let perm = Notification.permission;
@@ -266,7 +285,7 @@ function HayaAlSalat() {
       const prevSrc = el.src;
       try {
         el.muted = true;
-        if (!el.src) el.src = SURAH_URL; // needs a src to play
+        if (!el.src) el.src = surahUrl; // needs a src to play
         await el.play();
         el.pause();
         el.currentTime = 0;
@@ -279,8 +298,8 @@ function HayaAlSalat() {
     }
     try { sessionStorage.setItem("haya-audio-unlocked", "1"); } catch {}
     setAudioUnlocked(true);
-  }, []);
-  const offline = useOfflineAudio(SURAH_URL);
+  }, [surahUrl]);
+  const offline = useOfflineAudio(surahUrl);
   const auto = useAutoDownload({
     isCached: offline.status === "cached",
     isDownloading: offline.status === "downloading",
@@ -288,7 +307,17 @@ function HayaAlSalat() {
   });
   // Streaming-first: start with the network URL, swap to the offline blob only
   // when playback is idle so an in-flight stream is never interrupted.
-  const [activeSrc, setActiveSrc] = useState<string>(SURAH_URL);
+  const [activeSrc, setActiveSrc] = useState<string>(surahUrl);
+
+  // When the chosen surah changes, stop any playback and switch to the new source.
+  useEffect(() => {
+    const el = audioRef.current;
+    if (el && !el.paused) {
+      try { el.pause(); } catch {}
+    }
+    setPlaying(false);
+    setActiveSrc(surahUrl);
+  }, [surahUrl]);
 
   // Fetch location + prayer times (timezone-aware, refetches on day rollover / focus)
   const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
@@ -595,17 +624,17 @@ function HayaAlSalat() {
 
   // If the cache is cleared while paused, revert to the network URL.
   useEffect(() => {
-    if (!offline.localUrl && activeSrc !== SURAH_URL && !playing) {
-      setActiveSrc(SURAH_URL);
+    if (!offline.localUrl && activeSrc !== surahUrl && !playing) {
+      setActiveSrc(surahUrl);
     }
-  }, [offline.localUrl, activeSrc, playing]);
+  }, [offline.localUrl, activeSrc, playing, surahUrl]);
 
   // Media Session — lock screen / notification shade controls & metadata
   useEffect(() => {
     if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
     const ms = navigator.mediaSession;
     ms.metadata = new MediaMetadata({
-      title: "Surat Al-Mu'minun — سورة المؤمنون",
+      title: `${surahInfo.name} — ${surahInfo.arabic}`,
       artist: "Mukhtar Al-Hajj — مختار الحاج",
       album: "Haya Al-Salat · Peaceful Fajr Companion",
       artwork: [
@@ -655,7 +684,7 @@ function HayaAlSalat() {
         try { ms.setActionHandler(k as MediaSessionAction, null); } catch {}
       });
     };
-  }, []);
+  }, [surahInfo]);
 
   // Keep OS playback state & position in sync so the lock screen scrubber is accurate.
   useEffect(() => {
@@ -802,7 +831,7 @@ function HayaAlSalat() {
                   return (
                     <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-3 py-2 text-[11px] text-muted-foreground">
                       <Play className="h-3 w-3" style={{ color: "var(--gold)" }} />
-                      <span>Surat Al-Mu'minun begins in</span>
+                      <span>{surahInfo.name} begins in</span>
                       <span className="tabular-nums font-medium" style={{ color: "var(--gold)" }}>{label}</span>
                     </div>
                   );
@@ -811,7 +840,7 @@ function HayaAlSalat() {
                   return (
                     <div className="mt-4 flex items-center justify-center gap-2 rounded-2xl border border-[var(--gold)]/40 bg-[oklch(0.82_0.13_85/0.12)] px-3 py-2 text-[11px]" style={{ color: "var(--gold)" }}>
                       <Play className="h-3 w-3" />
-                      <span>Surat Al-Mu'minun is reciting now — {Math.max(1, Math.ceil(fajrInfo.diff / 60000))} min to Fajr</span>
+                      <span>{surahInfo.name} is reciting now — {Math.max(1, Math.ceil(fajrInfo.diff / 60000))} min to Fajr</span>
                     </div>
                   );
                 }
@@ -851,9 +880,9 @@ function HayaAlSalat() {
               </button>
               <div className="min-w-0 flex-1">
                 <p className="font-arabic text-lg leading-tight" style={{ color: "var(--gold-soft)" }}>
-                  سورة المؤمنون
+                  {surahInfo.arabic}
                 </p>
-                <p className="mt-0.5 font-display text-lg leading-tight">Surat Al-Mu'minun</p>
+                <p className="mt-0.5 font-display text-lg leading-tight">{surahInfo.name}</p>
                 <p className="mt-0.5 truncate text-xs text-muted-foreground">
                   Recited by Mukhtar Al-Hajj
                 </p>
@@ -911,7 +940,7 @@ function HayaAlSalat() {
                 {stopConfirmOpen ? (
                   <div className="mt-2 rounded-2xl border border-rose-200/20 bg-rose-200/5 px-3 py-2.5">
                     <p className="text-xs font-medium text-rose-50">Stop recitation?</p>
-                    <p className="text-[10px] text-rose-100/70">This will reset Surat Al-Mu'minun to the beginning.</p>
+                    <p className="text-[10px] text-rose-100/70">This will reset {surahInfo.name} to the beginning.</p>
                     <div className="mt-2 grid grid-cols-2 gap-2">
                       <button
                         onClick={() => setStopConfirmOpen(false)}
@@ -1070,6 +1099,36 @@ function HayaAlSalat() {
               </div>
             </div>
 
+            {/* Choose the surah recited before Fajr */}
+            <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 px-3 py-3">
+              <p className="mb-2 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+                Recitation before Fajr
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {FAJR_SURAHS.map((s) => {
+                  const sel = fajrSurah === s.number;
+                  return (
+                    <button
+                      key={s.number}
+                      onClick={() => setFajrSurah(s.number)}
+                      aria-pressed={sel}
+                      className="rounded-full border px-2.5 py-1.5 text-[11px] font-medium transition"
+                      style={{
+                        borderColor: sel ? "var(--gold)" : "oklch(1 0 0 / 0.12)",
+                        background: sel ? "oklch(0.82 0.13 85 / 0.15)" : "transparent",
+                        color: sel ? "var(--gold)" : "var(--foreground)",
+                      }}
+                    >
+                      {s.number} · {s.name.replace(/^Surat /, "")}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mt-2 text-[10px] text-muted-foreground/80">
+                All surahs are recited by Mukhtar Al-Hajj. Your choice is saved on this device.
+              </p>
+            </div>
+
             {/* Auto-start lead time before Fajr */}
             <div className="mt-4 rounded-2xl border border-white/5 bg-black/20 px-3 py-3">
               <div className="mb-2 flex items-center justify-between">
@@ -1100,7 +1159,7 @@ function HayaAlSalat() {
                 })}
               </div>
               <p className="mt-2 text-[10px] text-muted-foreground/80">
-                Surat Al-Mu'minun begins {recitationLead} minutes before the Fajr adhan.
+                {surahInfo.name} begins {recitationLead} minutes before the Fajr adhan.
               </p>
             </div>
 
@@ -1157,8 +1216,8 @@ function HayaAlSalat() {
                     : Notification.permission === "denied"
                     ? "Notifications blocked in browser settings."
                     : notifyOnStart
-                    ? "You'll get a desktop alert when Surat Al-Mu'minun starts."
-                    : "Get a desktop alert the moment Surat Al-Mu'minun begins."}
+                    ? `You'll get a desktop alert when ${surahInfo.name} starts.`
+                    : `Get a desktop alert the moment ${surahInfo.name} begins.`}
                 </p>
               </div>
               {notifyOnStart ? (
