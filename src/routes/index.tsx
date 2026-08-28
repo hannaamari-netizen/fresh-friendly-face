@@ -9,6 +9,7 @@ import { ShareApp } from "@/components/ShareApp";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
+import { reverseGeocode, ipLocate } from "@/lib/geo";
 
 
 export const Route = createFileRoute("/")({
@@ -90,6 +91,7 @@ function HayaAlSalat() {
   const now = useNow(1000);
   const [timings, setTimings] = useState<Timings | null>(null);
   const [loc, setLoc] = useState<LocInfo>(null);
+  const [locSource, setLocSource] = useState<"gps" | "ip" | "default">("gps");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -289,15 +291,16 @@ function HayaAlSalat() {
   const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
   const [fetchTick, setFetchTick] = useState(0);
 
-  const load = useCallback(async (lat: number, lon: number) => {
+  const load = useCallback(async (lat: number, lon: number, hintedCity?: string) => {
     // Use the *device* current date as a starting query; the API returns the
     // correct set for the coordinates' timezone even if the date differs by a day.
     const d = new Date();
     const date = `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
     try {
-      const res = await fetch(
-        `https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=2`
-      );
+      const [res, place] = await Promise.all([
+        fetch(`https://api.aladhan.com/v1/timings/${date}?latitude=${lat}&longitude=${lon}&method=2`),
+        reverseGeocode(lat, lon),
+      ]);
       const j = await res.json();
       const m = j.data.meta;
       const tz: string = m.timezone;
@@ -315,8 +318,13 @@ function HayaAlSalat() {
       }
       setTimings(timings);
       setLoc({
-        city: tz.split("/").pop()?.replace(/_/g, " ") ?? "Your city",
-        country: "",
+        // Prefer the real place name (Ottawa), not the timezone label (Toronto).
+        city:
+          place?.city ||
+          hintedCity ||
+          tz.split("/").pop()?.replace(/_/g, " ") ||
+          "Your city",
+        country: place?.country ?? "",
         lat: m.latitude,
         lon: m.longitude,
         tz,
@@ -331,19 +339,34 @@ function HayaAlSalat() {
 
   useEffect(() => {
     let cancelled = false;
-    const use = (lat: number, lon: number) => {
+    const use = (lat: number, lon: number, city?: string) => {
       if (cancelled) return;
       coordsRef.current = { lat, lon };
-      load(lat, lon);
+      load(lat, lon, city);
+    };
+    // Fallback chain: precise GPS → approximate IP location → Stockholm.
+    const fallback = async () => {
+      const ip = await ipLocate();
+      if (cancelled) return;
+      if (ip) {
+        setLocSource("ip");
+        use(ip.lat, ip.lon, ip.city);
+      } else {
+        setLocSource("default");
+        use(59.3293, 18.0686);
+      }
     };
     if (!navigator.geolocation) {
-      use(59.3293, 18.0686); // Stockholm fallback
+      void fallback();
       return () => { cancelled = true; };
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => use(pos.coords.latitude, pos.coords.longitude),
-      () => use(59.3293, 18.0686),
-      { timeout: 5000 }
+      (pos) => {
+        setLocSource("gps");
+        use(pos.coords.latitude, pos.coords.longitude);
+      },
+      () => { void fallback(); },
+      { timeout: 8000, maximumAge: 5 * 60 * 1000, enableHighAccuracy: false }
     );
     return () => { cancelled = true; };
   }, [load, fetchTick]);
@@ -704,7 +727,20 @@ function HayaAlSalat() {
           {loc && (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin className="h-3 w-3" />
-              <span className="capitalize">{loc.city}</span>
+              <span className="capitalize">
+                {loc.city}
+                {loc.country ? `, ${loc.country}` : ""}
+              </span>
+              {locSource !== "gps" && (
+                <button
+                  type="button"
+                  onClick={() => setFetchTick((t) => t + 1)}
+                  className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-amber-100 transition hover:bg-white/10"
+                  title="Approximate location — tap to use your precise location"
+                >
+                  {locSource === "ip" ? "Approx · Fix" : "Set location"}
+                </button>
+              )}
             </div>
           )}
         </header>
