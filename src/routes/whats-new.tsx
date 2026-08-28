@@ -80,10 +80,22 @@ export function markWhatsNewSeen(): void {
 
 function WhatsNewPage() {
   const [ready, setReady] = useState(false);
+  const [ack, setAck] = useState<WhatsNewAck | null>(null);
 
   useEffect(() => {
+    setAck(getWhatsNewAck(CURRENT_VERSION));
     setReady(true);
   }, []);
+
+  const markRead = () => setAck(acknowledgeWhatsNewVersion(CURRENT_VERSION));
+
+  const seenAtLabel = ack
+    ? new Date(ack.seenAt).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
