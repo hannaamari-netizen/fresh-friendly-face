@@ -462,11 +462,65 @@ function TasbihPage() {
 
               <button
                 type="button"
-                onClick={resetPhrases}
+                onClick={requestResetPhrases}
                 className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/10 px-3 py-2 text-[11px] text-muted-foreground transition hover:text-foreground"
               >
                 <RotateCcw className="h-3.5 w-3.5" /> Restore defaults
               </button>
+
+              {showResetConfirm && (
+                <div className="rounded-xl border border-white/10 bg-black/60 p-4">
+                  <p className="text-sm font-medium text-foreground">
+                    Restore default phrases?
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    This will replace your current custom phrase list. You can undo this for a short time afterwards.
+                  </p>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={confirmResetPhrases}
+                      className="flex-1 rounded-lg px-3 py-2 text-xs font-medium transition"
+                      style={{ backgroundColor: "var(--gold)", color: "#0F172A" }}
+                    >
+                      Yes, restore
+                    </button>
+                    <button
+                      type="button"
+                      onClick={cancelResetPhrases}
+                      className="flex-1 rounded-lg border border-white/10 px-3 py-2 text-xs font-medium text-muted-foreground transition hover:text-foreground"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {undoPhrases && !showResetConfirm && (
+                <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/40 p-3">
+                  <p className="text-xs text-muted-foreground">
+                    Phrases restored to defaults.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={undoResetPhrases}
+                      className="rounded-lg px-2.5 py-1.5 text-xs font-medium transition"
+                      style={{ backgroundColor: "var(--gold)", color: "#0F172A" }}
+                    >
+                      Undo
+                    </button>
+                    <button
+                      type="button"
+                      onClick={dismissUndo}
+                      aria-label="Dismiss undo"
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition hover:text-foreground"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
