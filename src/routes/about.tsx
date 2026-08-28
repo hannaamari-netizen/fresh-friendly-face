@@ -4,6 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppInfo } from "@/lib/app-info";
 import { useDeviceInfo } from "@/lib/device-info";
 import { useLifecycleState } from "@/lib/lifecycle-state";
+import {
+  WHATS_NEW_CURRENT_VERSION,
+  acknowledgeWhatsNewVersion,
+  getWhatsNewAck,
+  type WhatsNewAck,
+} from "@/lib/whatsNewAck";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -227,6 +233,42 @@ function AboutPage() {
         <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           {info.source === "native" ? "App Store" : "Web"}
         </span>
+      </section>
+
+      <section className="mb-6 flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
+        <div className="min-w-0">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            What's New · Version {WHATS_NEW_CURRENT_VERSION}
+          </p>
+          <p className="mt-0.5 text-sm text-foreground">
+            {whatsNewAck
+              ? `Read · ${new Date(whatsNewAck.seenAt).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}`
+              : "Not read yet"}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {!whatsNewAck && (
+            <button
+              type="button"
+              onClick={() =>
+                setWhatsNewAck(acknowledgeWhatsNewVersion(WHATS_NEW_CURRENT_VERSION))
+              }
+              className="rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-semibold text-foreground hover:bg-foreground/5"
+            >
+              Mark as read
+            </button>
+          )}
+          <Link
+            to="/whats-new"
+            className="rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-semibold text-muted-foreground transition hover:text-foreground"
+          >
+            Open
+          </Link>
+        </div>
       </section>
 
       <section className="space-y-3">
