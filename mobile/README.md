@@ -60,16 +60,16 @@ Capacitor does not centralize versioning — each store reads its own file. Keep
 
 | Key                          | Meaning                     | Example |
 | ---------------------------- | --------------------------- | ------- |
-| `MARKETING_VERSION`          | User-visible version        | `1.0.0` |
-| `CURRENT_PROJECT_VERSION`    | Build number (must ↑ each upload) | `1`     |
+| `MARKETING_VERSION`          | User-visible version        | `1.2`   |
+| `CURRENT_PROJECT_VERSION`    | Build number (must ↑ each upload) | `8`     |
 
 ### Android — `android/app/build.gradle`
 
 ```gradle
 defaultConfig {
     applicationId "app.hayaalsalat.companion"   // mirror appId
-    versionCode 1                                // integer, must ↑ each upload
-    versionName "1.0.0"                          // user-visible
+    versionCode 8                                // integer, must ↑ each upload
+    versionName "1.2"                            // user-visible
     minSdkVersion 23
     targetSdkVersion 34
 }
@@ -135,7 +135,7 @@ Bundle (.aab)**. Create/reuse a keystore and store it outside the repo. Bump
 ## 6. Store submission checklist
 
 - [ ] Final `appId` set in `capacitor.config.ts` and mirrored in `applicationId`
-- [ ] `MARKETING_VERSION` = `versionName` (e.g. `1.0.0`)
+- [ ] `MARKETING_VERSION` = `versionName` (e.g. `1.2`)
 - [ ] `CURRENT_PROJECT_VERSION` and `versionCode` incremented since last upload
 - [ ] Icons regenerated via `@capacitor/assets`
 - [ ] Privacy policy URL live (both stores require it)

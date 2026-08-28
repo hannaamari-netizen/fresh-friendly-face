@@ -132,6 +132,17 @@ else
   else
     warn "CURRENT_PROJECT_VERSION not set"
   fi
+
+  if grep -q "IPHONEOS_DEPLOYMENT_TARGET = " "$PBXPROJ"; then
+    dt=$(grep -m1 "IPHONEOS_DEPLOYMENT_TARGET = " "$PBXPROJ" | sed 's/.*IPHONEOS_DEPLOYMENT_TARGET = \([^;]*\);.*/\1/' | tr -d ' ')
+    if awk "BEGIN {exit !($dt >= 15.0)}" >/dev/null 2>&1; then
+      pass "IPHONEOS_DEPLOYMENT_TARGET = $dt (>= 15.0)"
+    else
+      fail "IPHONEOS_DEPLOYMENT_TARGET = $dt; must be 15.0 or higher (ITMS-90068)"
+    fi
+  else
+    warn "IPHONEOS_DEPLOYMENT_TARGET not set"
+  fi
 fi
 
 head "Info.plist ($INFO_PLIST)"

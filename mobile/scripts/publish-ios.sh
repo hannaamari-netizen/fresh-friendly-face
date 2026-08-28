@@ -46,21 +46,21 @@ NEXT STEPS (App Store Connect → App ID ${ASC_APP_ID})
       "Does your app use encryption?"        → Yes
       "Does it qualify for an exemption?"    → Yes (standard HTTPS/TLS)
 
- 3. App Store tab → 1.0.0 Prepare for Submission. Paste from
-    mobile/APP_STORE_CONNECT_COPY.md:
-      • What's New / Description (English, Arabic, Swedish)
-      • Promotional text, Subtitle, Keywords
-      • Support / Marketing / Privacy Policy URLs
+  3. App Store tab → 1.2 Prepare for Submission. Paste from
+     mobile/APP_STORE_CONNECT_COPY.md:
+       • What's New / Description (English, Arabic, Swedish)
+       • Promotional text, Subtitle, Keywords
+       • Support / Marketing / Privacy Policy URLs
 
- 4. Upload screenshots from /mnt/documents/app-store/
-    (privacy-entry screenshots: /mnt/documents/app-store/privacy/)
+  4. Upload screenshots from /mnt/documents/app-store/
+     (privacy-entry screenshots: /mnt/documents/app-store/privacy/)
 
- 5. App Privacy → select exactly these five data types and answer
-    "No" to tracking (details in mobile/APP_PRIVACY_MAPPING.md):
-      Coarse Location · User ID · Device ID ·
-      Product Interaction · Other User Content
+  5. App Privacy → select exactly these five data types and answer
+     "No" to tracking (details in mobile/APP_PRIVACY_MAPPING.md):
+       Coarse Location · User ID · Device ID ·
+       Product Interaction · Other User Content
 
- 6. Age rating 4+, then attach the processed build to version 1.0.0.
+  6. Age rating 4+, then attach the processed build to version 1.2.
 
  7. Submit for Review.
 

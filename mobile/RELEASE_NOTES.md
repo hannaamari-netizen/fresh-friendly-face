@@ -8,6 +8,49 @@ product page before "more", so lead with the most important line.
 
 ---
 
+## Version 1.2 (Build 8) — iOS 15 minimum + compliance fix
+
+### What's New (App Store Connect — English, primary)
+
+```text
+This update raises the minimum supported iOS version to 15.0 to comply with App Store Connect requirements and ensure continued distribution.
+
+• Minimum iOS version updated to 15.0 (resolves ITMS-90068)
+• Stability and compatibility improvements
+
+May your Fajr be blessed. — Inoxin HA
+```
+
+### Short version
+
+```text
+Updated minimum iOS version to 15.0 for continued App Store distribution.
+```
+
+### Arabic
+
+```text
+تم رفع الحد الأدنى لإصدار iOS المدعوم إلى 15.0 لضمان الامتثال لمتطلبات App Store Connect واستمرار توزيع التطبيق.
+
+• تحديث الحد الأدنى لإصدار iOS إلى 15.0 (لحل ITMS-90068)
+• تحسينات الاستقرار والتوافق
+
+نسأل الله أن يتقبل منكم. — Inoxin HA
+```
+
+### Swedish
+
+```text
+Denna uppdatering höjer den lägsta stödda iOS-versionen till 15.0 för att uppfylla App Store Connect-kraven och säkerställa fortsatt distribution.
+
+• Minimi-iOS-version uppdaterad till 15.0 (löser ITMS-90068)
+• Stabilitets- och kompatibilitetsförbättringar
+
+Må din Fajr vara välsignad. — Inoxin HA
+```
+
+---
+
 ## Version 1.0.0 (Build 1) — Initial release
 
 ### What's New (App Store Connect — English, primary)
