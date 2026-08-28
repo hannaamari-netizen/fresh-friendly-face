@@ -1165,7 +1165,7 @@ function HayaAlSalat() {
               ) : (
                 <button
                   onClick={enableStartNotifications}
-                  disabled={!notifSupported || (notifSupported && Notification.permission === "denied")}
+                  disabled={notifMounted ? !notifSupported || Notification.permission === "denied" : false}
                   className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Enable
@@ -1335,7 +1335,7 @@ function HayaAlSalat() {
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-display text-xl">Today's Prayers</h2>
             <span className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-              {new Date().toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+              {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
             </span>
           </div>
           <ul className="space-y-1.5">
