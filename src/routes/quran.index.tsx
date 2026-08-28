@@ -1,9 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { BookmarkCheck, BookOpen, ChevronLeft, Search, X } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import {
+  BookmarkCheck,
+  BookOpen,
+  ChevronLeft,
+  Clock,
+  Download,
+  Flame,
+  Search,
+  Upload,
+  X,
+} from "lucide-react";
 import { surahListQuery } from "@/lib/quran";
-import { percentRead, useBookmarks, useReadingProgress } from "@/lib/quranProgress";
+import {
+  downloadBackup,
+  formatDuration,
+  importBackup,
+  percentRead,
+  useBookmarks,
+  useQuranStats,
+  useReadingProgress,
+  versesRead,
+} from "@/lib/quranProgress";
 
 export const Route = createFileRoute("/quran/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(surahListQuery),
@@ -31,7 +50,32 @@ function QuranIndex() {
   const { data: surahs } = useSuspenseQuery(surahListQuery);
   const [q, setQ] = useState("");
   const { bookmarks, remove } = useBookmarks();
-  const { last, forSurah, recent, ready: progressReady } = useReadingProgress();
+  const { last, forSurah, recent, progress, ready: progressReady } = useReadingProgress();
+  const { streak, totalSeconds, todaySeconds, daysRead, stats } = useQuranStats();
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [transfer, setTransfer] = useState<string | null>(null);
+
+  const verses = versesRead(progress);
+  const lastSession = stats.lastSession
+    ? new Date(stats.lastSession).toLocaleDateString("en-US", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      })
+    : null;
+
+  const onImport = async (file: File) => {
+    try {
+      const result = importBackup(await file.text());
+      setTransfer(
+        `Imported ${result.bookmarks} bookmark${result.bookmarks === 1 ? "" : "s"}, ${result.surahs} surah${
+          result.surahs === 1 ? "" : "s"
+        } of progress and ${result.days} day${result.days === 1 ? "" : "s"} of reading time.`
+      );
+    } catch (e) {
+      setTransfer(e instanceof Error ? e.message : "Import failed.");
+    }
+  };
 
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -81,6 +125,50 @@ function QuranIndex() {
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </div>
+
+        {/* Stats & streak */}
+        {progressReady && (verses > 0 || totalSeconds > 0) && (
+          <section className="mt-4 rounded-3xl border border-white/10 bg-black/20 px-4 py-4">
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <p className="flex items-center justify-center gap-1 font-display text-xl" style={{ color: "var(--gold-soft)" }}>
+                  <Flame className="h-4 w-4" /> {streak}
+                </p>
+                <p className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                  day streak
+                </p>
+              </div>
+              <div>
+                <p className="font-display text-xl" style={{ color: "var(--gold-soft)" }}>
+                  {verses.toLocaleString("en-US")}
+                </p>
+                <p className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                  verses read
+                </p>
+              </div>
+              <div>
+                <p className="font-display text-xl" style={{ color: "var(--gold-soft)" }}>
+                  {formatDuration(totalSeconds)}
+                </p>
+                <p className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                  time spent
+                </p>
+              </div>
+            </div>
+            <p className="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span>Today: {formatDuration(todaySeconds)}</span>
+              <span>·</span>
+              <span>{daysRead} day{daysRead === 1 ? "" : "s"} read</span>
+              {lastSession && (
+                <>
+                  <span>·</span>
+                  <span>Last session: {lastSession}</span>
+                </>
+              )}
+            </p>
+          </section>
+        )}
 
         {/* Continue reading */}
         {last && (
@@ -182,6 +270,47 @@ function QuranIndex() {
             </li>
           )}
         </ul>
+
+        {/* Export / import */}
+        <section className="mt-8 rounded-3xl border border-white/10 bg-black/20 px-4 py-4 text-center">
+          <h2 className="text-xs font-medium">Move your data between devices</h2>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Bookmarks, reading progress and stats are saved on this device only. Export a backup file and
+            import it on your other phone or tablet.
+          </p>
+          <div className="mt-3 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                downloadBackup();
+                setTransfer("Backup file downloaded.");
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-amber-200/30 px-3 py-1.5 text-[11px] text-amber-100 transition hover:bg-amber-200/10"
+            >
+              <Download className="h-3.5 w-3.5" /> Export
+            </button>
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[11px] transition hover:bg-white/10"
+            >
+              <Upload className="h-3.5 w-3.5" /> Import
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              aria-label="Import backup file"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void onImport(f);
+                e.target.value = "";
+              }}
+            />
+          </div>
+          {transfer && <p className="mt-3 text-[11px] text-amber-100/80">{transfer}</p>}
+        </section>
 
         <p className="mt-8 flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
           <BookOpen className="h-3.5 w-3.5" /> Translations: Saheeh International (EN) · Knut Bernström (SV)
