@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { surahQuery, surahAudioUrl } from "@/lib/quran";
-import { percentRead, useBookmarks, useReadingProgress } from "@/lib/quranProgress";
+import { percentRead, useBookmarks, useQuranStats, useReadingProgress } from "@/lib/quranProgress";
 
 export const Route = createFileRoute("/quran/$surah")({
   params: {
@@ -49,6 +49,16 @@ function SurahReader() {
   const { record, forSurah, ready: progressReady } = useReadingProgress();
   const saved = progressReady ? forSurah(number) : undefined;
   const [resumed, setResumed] = useState(false);
+  const { addSeconds } = useQuranStats();
+
+  // Count reading time in 15s chunks while this surah is open and visible.
+  useEffect(() => {
+    const CHUNK = 15;
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") addSeconds(CHUNK);
+    }, CHUNK * 1000);
+    return () => clearInterval(id);
+  }, [addSeconds]);
 
   // Track the top-most visible verse and store it as reading progress.
   useEffect(() => {
