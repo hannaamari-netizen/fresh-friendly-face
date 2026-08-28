@@ -102,8 +102,14 @@ function useSpeechState(): SpeechState {
   return state;
 }
 
-const speechSupported =
-  typeof window !== "undefined" && "speechSynthesis" in window;
+// Resolved after mount so SSR and the first client render agree.
+function useSpeechSupported(): boolean {
+  const [supported, setSupported] = useState(false);
+  useEffect(() => {
+    setSupported("speechSynthesis" in window);
+  }, []);
+  return supported;
+}
 
 function DuaCard({
   dua,
