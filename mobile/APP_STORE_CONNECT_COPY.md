@@ -1,6 +1,6 @@
 # Haya Al-Salat — App Store Connect Copy/Paste Sheet
 
-Exact text to paste into App Store Connect for **version 1.0.0 (Build 1)**.
+Exact text to paste into App Store Connect for **version 1.2 (Build 8)**.
 
 - Bundle ID: `app.hayaalsalat.companion`
 - App Store Connect App ID: `3b2ab217-8afd-4c24-b752-4dbd82d31ba7`
@@ -12,7 +12,7 @@ Sources: `mobile/RELEASE_NOTES.md`, `mobile/APP_PRIVACY_MAPPING.md`.
 
 ## 1. What's New in This Version
 
-**Where:** App Store tab → 1.0.0 Prepare for Submission → *What's New in This Version*
+**Where:** App Store tab → 1.2 Prepare for Submission → *What's New in This Version*
 (For a first release this field may be labeled *Description* only — if so, skip to §2 and use the Description text there.)
 
 ### English (primary)
