@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as XcodeSetupRouteImport } from './routes/xcode-setup'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TasbihRouteImport } from './routes/tasbih'
 import { Route as QiblaRouteImport } from './routes/qibla'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as NamesRouteImport } from './routes/names'
 import { Route as LicensesRouteImport } from './routes/licenses'
 import { Route as DuasRouteImport } from './routes/duas'
 import { Route as AboutRouteImport } from './routes/about'
@@ -31,6 +33,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TasbihRoute = TasbihRouteImport.update({
+  id: '/tasbih',
+  path: '/tasbih',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QiblaRoute = QiblaRouteImport.update({
   id: '/qibla',
   path: '/qibla',
@@ -39,6 +46,11 @@ const QiblaRoute = QiblaRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NamesRoute = NamesRouteImport.update({
+  id: '/names',
+  path: '/names',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LicensesRoute = LicensesRouteImport.update({
@@ -82,8 +94,10 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
+  '/names': typeof NamesRoute
   '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
+  '/tasbih': typeof TasbihRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
   '/quran/$surah': typeof QuranSurahRoute
@@ -95,8 +109,10 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
+  '/names': typeof NamesRoute
   '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
+  '/tasbih': typeof TasbihRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
   '/quran/$surah': typeof QuranSurahRoute
@@ -109,8 +125,10 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
+  '/names': typeof NamesRoute
   '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
+  '/tasbih': typeof TasbihRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
   '/quran/$surah': typeof QuranSurahRoute
@@ -124,8 +142,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/duas'
     | '/licenses'
+    | '/names'
     | '/privacy'
     | '/qibla'
+    | '/tasbih'
     | '/terms'
     | '/xcode-setup'
     | '/quran/$surah'
@@ -137,8 +157,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/duas'
     | '/licenses'
+    | '/names'
     | '/privacy'
     | '/qibla'
+    | '/tasbih'
     | '/terms'
     | '/xcode-setup'
     | '/quran/$surah'
@@ -150,8 +172,10 @@ export interface FileRouteTypes {
     | '/about'
     | '/duas'
     | '/licenses'
+    | '/names'
     | '/privacy'
     | '/qibla'
+    | '/tasbih'
     | '/terms'
     | '/xcode-setup'
     | '/quran/$surah'
@@ -164,8 +188,10 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   DuasRoute: typeof DuasRoute
   LicensesRoute: typeof LicensesRoute
+  NamesRoute: typeof NamesRoute
   PrivacyRoute: typeof PrivacyRoute
   QiblaRoute: typeof QiblaRoute
+  TasbihRoute: typeof TasbihRoute
   TermsRoute: typeof TermsRoute
   XcodeSetupRoute: typeof XcodeSetupRoute
   QuranSurahRoute: typeof QuranSurahRoute
@@ -189,6 +215,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tasbih': {
+      id: '/tasbih'
+      path: '/tasbih'
+      fullPath: '/tasbih'
+      preLoaderRoute: typeof TasbihRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/qibla': {
       id: '/qibla'
       path: '/qibla'
@@ -201,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/names': {
+      id: '/names'
+      path: '/names'
+      fullPath: '/names'
+      preLoaderRoute: typeof NamesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/licenses': {
@@ -260,8 +300,10 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   DuasRoute: DuasRoute,
   LicensesRoute: LicensesRoute,
+  NamesRoute: NamesRoute,
   PrivacyRoute: PrivacyRoute,
   QiblaRoute: QiblaRoute,
+  TasbihRoute: TasbihRoute,
   TermsRoute: TermsRoute,
   XcodeSetupRoute: XcodeSetupRoute,
   QuranSurahRoute: QuranSurahRoute,

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Preflight for `bun run mobile:ios`.
-#
+
+
 # Verifies:
 #   - Running on macOS with Xcode command-line tools
 #   - Capacitor bundle id matches expected value
@@ -175,6 +176,13 @@ if command -v security >/dev/null 2>&1; then
   fi
 else
   warn "security(1) not available — cannot check Keychain"
+fi
+
+head "Audio safeguards"
+if node scripts/check-fajr-adhan.mjs >/dev/null 2>&1; then
+  pass "Fajr Adhan URL pinned and unchanged"
+else
+  fail "Fajr Adhan URL changed or missing — run: bun run check:fajr-adhan"
 fi
 
 head "Reference IDs"

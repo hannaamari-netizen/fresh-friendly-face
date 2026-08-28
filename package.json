@@ -11,6 +11,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
+    "check:fajr-adhan": "node scripts/check-fajr-adhan.mjs",
     "format": "prettier --write .",
     "mobile:prerender": "node mobile/scripts/prerender.js",
     "mobile:assets": "bash mobile/scripts/generate-assets.sh",
