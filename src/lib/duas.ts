@@ -110,3 +110,121 @@ export const DUAS_AFTER: Dua[] = [
     swedish: "O Allah, jag ber Dig om Din nåd och gåva.",
   },
 ];
+
+export const ATHKAR_MORNING: Dua[] = [
+  {
+    id: "sabah-opening",
+    title: "On waking into the morning",
+    arabic:
+      "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+    transliteration:
+      "Aṣbaḥnā wa aṣbaḥa-l-mulku lillāh, wa-l-ḥamdu lillāh, lā ilāha illā-llāhu waḥdahu lā sharīka lah.",
+    english:
+      "We have entered the morning and with it the dominion belongs to Allah. All praise is for Allah. There is no god but Allah alone, without partner.",
+    swedish:
+      "Vi har gått in i morgonen och med den tillhör herradömet Allah. Allt lov tillhör Allah. Det finns ingen gud utom Allah, den Ende, utan medhjälpare.",
+  },
+  {
+    id: "sayyid-istighfar",
+    title: "Sayyid al-Istighfar",
+    arabic:
+      "اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي",
+    transliteration:
+      "Allāhumma anta rabbī lā ilāha illā anta, khalaqtanī wa anā ʿabduk, wa anā ʿalā ʿahdika wa waʿdika mā istaṭaʿt, aʿūdhu bika min sharri mā ṣanaʿt, abūʾu laka bi-niʿmatika ʿalayya wa abūʾu bi-dhanbī faghfir lī.",
+    english:
+      "O Allah, You are my Lord; there is no god but You. You created me and I am Your servant. I keep Your covenant as much as I can. I seek refuge in You from the evil I have done. I acknowledge Your favour upon me and I admit my sin, so forgive me.",
+    swedish:
+      "O Allah, Du är min Herre; det finns ingen gud utom Du. Du skapade mig och jag är Din tjänare. Jag håller Ditt förbund så långt jag förmår. Jag söker skydd hos Dig från det onda jag gjort. Jag erkänner Din välsignelse över mig och jag bekänner min synd, så förlåt mig.",
+    note: "Said once in the morning and once in the evening.",
+  },
+  {
+    id: "sabah-afiyah",
+    title: "Asking for wellbeing",
+    arabic:
+      "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ",
+    transliteration:
+      "Allāhumma ʿāfinī fī badanī, Allāhumma ʿāfinī fī samʿī, Allāhumma ʿāfinī fī baṣarī, lā ilāha illā anta.",
+    english:
+      "O Allah, grant my body health, grant my hearing health, grant my sight health. There is no god but You.",
+    swedish:
+      "O Allah, ge min kropp hälsa, ge min hörsel hälsa, ge min syn hälsa. Det finns ingen gud utom Du.",
+    note: "Repeated three times.",
+  },
+  {
+    id: "sabah-bismillah",
+    title: "Protection for the day",
+    arabic:
+      "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+    transliteration:
+      "Bismillāhi-lladhī lā yaḍurru maʿa ismihi shayʾun fī-l-arḍi wa lā fī-s-samāʾ, wa huwa-s-samīʿu-l-ʿalīm.",
+    english:
+      "In the name of Allah, with whose name nothing on earth or in heaven can cause harm. He is the All-Hearing, the All-Knowing.",
+    swedish:
+      "I Allahs namn, med vars namn ingenting på jorden eller i himlen kan skada. Han är den Allhörande, den Allvetande.",
+    note: "Repeated three times.",
+  },
+  {
+    id: "sabah-tasbih",
+    title: "Morning tasbih",
+    arabic: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+    transliteration: "Subḥānallāhi wa biḥamdih.",
+    english: "Glory be to Allah and praise be to Him.",
+    swedish: "Ära vare Allah och lov och pris till Honom.",
+    note: "Repeated one hundred times.",
+  },
+];
+
+export const ATHKAR_EVENING: Dua[] = [
+  {
+    id: "masa-opening",
+    title: "As the evening comes",
+    arabic:
+      "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
+    transliteration:
+      "Amsaynā wa amsa-l-mulku lillāh, wa-l-ḥamdu lillāh, lā ilāha illā-llāhu waḥdahu lā sharīka lah.",
+    english:
+      "We have entered the evening and with it the dominion belongs to Allah. All praise is for Allah. There is no god but Allah alone, without partner.",
+    swedish:
+      "Vi har gått in i kvällen och med den tillhör herradömet Allah. Allt lov tillhör Allah. Det finns ingen gud utom Allah, den Ende, utan medhjälpare.",
+  },
+  {
+    id: "masa-shelter",
+    title: "Seeking refuge in the evening",
+    arabic: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ",
+    transliteration: "Aʿūdhu bi-kalimātillāhi-t-tāmmāti min sharri mā khalaq.",
+    english: "I seek refuge in the perfect words of Allah from the evil of what He has created.",
+    swedish: "Jag söker skydd i Allahs fullkomliga ord från det onda i det Han har skapat.",
+    note: "Repeated three times.",
+  },
+  {
+    id: "masa-tawakkul",
+    title: "Placing trust before night",
+    arabic:
+      "حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ، عَلَيْهِ تَوَكَّلْتُ، وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+    transliteration: "Ḥasbiya-llāhu lā ilāha illā huwa, ʿalayhi tawakkalt, wa huwa rabbu-l-ʿarshi-l-ʿaẓīm.",
+    english:
+      "Allah is sufficient for me; there is no god but Him. In Him I place my trust, and He is the Lord of the Mighty Throne.",
+    swedish:
+      "Allah är nog för mig; det finns ingen gud utom Han. På Honom förlitar jag mig, och Han är den Mäktiga Tronens Herre.",
+    note: "Repeated seven times.",
+  },
+  {
+    id: "masa-mualliqat",
+    title: "Before sleeping",
+    arabic: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+    transliteration: "Bismika-llāhumma amūtu wa aḥyā.",
+    english: "In Your name, O Allah, I die and I live.",
+    swedish: "I Ditt namn, o Allah, dör jag och lever jag.",
+  },
+  {
+    id: "masa-ikhlas",
+    title: "The three protecting surahs",
+    arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ · قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ · قُلْ أَعُوذُ بِرَبِّ النَّاسِ",
+    transliteration: "Al-Ikhlāṣ, Al-Falaq, An-Nās.",
+    english:
+      "Recite Surah Al-Ikhlas, Al-Falaq and An-Nas three times each, morning and evening, for protection.",
+    swedish:
+      "Läs surorna Al-Ikhlas, Al-Falaq och An-Nas tre gånger var, morgon och kväll, som skydd.",
+    note: "Open them in the Quran section: surahs 112, 113 and 114.",
+  },
+];
