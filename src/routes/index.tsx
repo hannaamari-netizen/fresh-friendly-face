@@ -91,6 +91,7 @@ function HayaAlSalat() {
   const now = useNow(1000);
   const [timings, setTimings] = useState<Timings | null>(null);
   const [loc, setLoc] = useState<LocInfo>(null);
+  const [locSource, setLocSource] = useState<"gps" | "ip" | "default">("gps");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
