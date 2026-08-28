@@ -1,8 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { CheckCircle2 } from "lucide-react";
+import {
+  WHATS_NEW_CURRENT_VERSION,
+  acknowledgeWhatsNewVersion,
+  getWhatsNewAck,
+  isWhatsNewVersionRead,
+  type WhatsNewAck,
+} from "@/lib/whatsNewAck";
 
-const CURRENT_VERSION = "1.2.0";
-const SEEN_KEY = "haya-whats-new-seen";
+const CURRENT_VERSION = WHATS_NEW_CURRENT_VERSION;
 
 const SECTIONS = [
   {
