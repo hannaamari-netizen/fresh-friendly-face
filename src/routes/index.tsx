@@ -757,6 +757,9 @@ function HayaAlSalat() {
           <p className="mt-3 text-sm text-muted-foreground">
             A peaceful companion to begin the day with remembrance of Allah.
           </p>
+          <div className="mt-5 flex justify-center">
+            <AppStoreBadge />
+          </div>
         </div>
 
         {/* Countdown */}
