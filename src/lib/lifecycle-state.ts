@@ -62,6 +62,8 @@ export function useLifecycleState(): LifecycleState {
     const onVisibility = () => applyWeb();
     const onFocus = () => applyWeb();
     const onBlur = () => applyWeb();
+    // Populate real device state after mount (initial render stays SSR-safe).
+    applyWeb();
     document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("focus", onFocus);
     window.addEventListener("blur", onBlur);
