@@ -1,7 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ChevronLeft, HandHeart, Sparkles } from "lucide-react";
-import { DUAS_AFTER, DUAS_BEFORE, type Dua } from "@/lib/duas";
+import { useEffect, useState } from "react";
+import { ChevronLeft, HandHeart, MoonStar, Sparkles, Sun } from "lucide-react";
+import {
+  ATHKAR_EVENING,
+  ATHKAR_MORNING,
+  DUAS_AFTER,
+  DUAS_BEFORE,
+  type Dua,
+} from "@/lib/duas";
 
 export const Route = createFileRoute("/duas")({
   head: () => ({
