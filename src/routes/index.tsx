@@ -9,6 +9,7 @@ import { ShareApp } from "@/components/ShareApp";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
+import { reverseGeocode, ipLocate } from "@/lib/geo";
 
 
 export const Route = createFileRoute("/")({
