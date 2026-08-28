@@ -1,8 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { surahQuery, surahAudioUrl } from "@/lib/quran";
+import { percentRead, useBookmarks, useReadingProgress } from "@/lib/quranProgress";
 
 export const Route = createFileRoute("/quran/$surah")({
   params: {
@@ -44,9 +45,54 @@ function SurahReader() {
   const [playing, setPlaying] = useState(false);
   const [showEn, setShowEn] = useState(true);
   const [showSv, setShowSv] = useState(true);
+  const { isBookmarked, toggle: toggleBookmark } = useBookmarks();
+  const { record, forSurah, ready: progressReady } = useReadingProgress();
+  const saved = progressReady ? forSurah(number) : undefined;
+  const [resumed, setResumed] = useState(false);
+
+  // Track the top-most visible verse and store it as reading progress.
+  useEffect(() => {
+    const nodes = Array.from(document.querySelectorAll<HTMLElement>("[data-ayah]"));
+    if (!nodes.length) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .map((e) => Number((e.target as HTMLElement).dataset.ayah))
+          .sort((a, b) => a - b);
+        const ayah = visible[0];
+        if (!ayah) return;
+        clearTimeout(timer);
+        timer = setTimeout(
+          () =>
+            record({
+              surah: number,
+              ayah,
+              totalAyahs: data.numberOfAyahs,
+              surahName: data.englishName,
+            }),
+          600
+        );
+      },
+      { rootMargin: "-20% 0px -60% 0px" }
+    );
+    nodes.forEach((n) => io.observe(n));
+    return () => {
+      clearTimeout(timer);
+      io.disconnect();
+    };
+  }, [number, data.numberOfAyahs, data.englishName, record]);
+
+  const jumpTo = (ayah: number) => {
+    document
+      .querySelector(`[data-ayah="${ayah}"]`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
 
   // Reset playback when navigating between surahs.
   useEffect(() => {
+    setResumed(false);
     setPlaying(false);
     if (audioRef.current) {
       audioRef.current.pause();
@@ -145,10 +191,43 @@ function SurahReader() {
           </button>
         </div>
 
+        {/* Resume where you left off */}
+        {saved && saved.ayah > 1 && !resumed && (
+          <div className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-200/25 bg-amber-200/5 px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-amber-100">
+                You stopped at verse {saved.ayah}
+              </p>
+              <p className="mt-1 text-[11px] text-muted-foreground">{percentRead(saved)}% read</p>
+              <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: `${percentRead(saved)}%`, background: "var(--gold-soft)" }}
+                />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                jumpTo(saved.ayah);
+                setResumed(true);
+              }}
+              className="shrink-0 rounded-full border border-amber-200/40 px-3 py-1.5 text-[11px] text-amber-100 transition hover:bg-amber-200/10"
+            >
+              Resume
+            </button>
+          </div>
+        )}
+
         {/* Verses */}
         <ol className="mt-6 space-y-4">
           {data.ayahs.map((a) => (
-            <li key={a.numberInSurah} className="rounded-3xl border border-white/5 bg-black/20 px-4 py-4">
+            <li
+              key={a.numberInSurah}
+              id={`ayah-${a.numberInSurah}`}
+              data-ayah={a.numberInSurah}
+              className="scroll-mt-24 rounded-3xl border border-white/5 bg-black/20 px-4 py-4"
+            >
               <div className="flex items-center justify-between">
                 <span
                   className="flex h-6 min-w-6 items-center justify-center rounded-full border border-white/10 px-1.5 text-[10px]"
@@ -156,6 +235,24 @@ function SurahReader() {
                 >
                   {a.numberInSurah}
                 </span>
+                <button
+                  type="button"
+                  onClick={() => toggleBookmark(number, a.numberInSurah, data.englishName)}
+                  aria-label={
+                    isBookmarked(number, a.numberInSurah)
+                      ? `Remove bookmark on verse ${a.numberInSurah}`
+                      : `Bookmark verse ${a.numberInSurah}`
+                  }
+                  aria-pressed={isBookmarked(number, a.numberInSurah)}
+                  className="rounded-full border border-white/10 p-1.5 transition hover:bg-white/10"
+                  style={{ color: isBookmarked(number, a.numberInSurah) ? "var(--gold-soft)" : undefined }}
+                >
+                  {isBookmarked(number, a.numberInSurah) ? (
+                    <BookmarkCheck className="h-3.5 w-3.5" />
+                  ) : (
+                    <Bookmark className="h-3.5 w-3.5 text-muted-foreground" />
+                  )}
+                </button>
               </div>
               <p
                 dir="rtl"
