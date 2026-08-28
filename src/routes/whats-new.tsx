@@ -1,8 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { CheckCircle2 } from "lucide-react";
+import {
+  WHATS_NEW_CURRENT_VERSION,
+  acknowledgeWhatsNewVersion,
+  getWhatsNewAck,
+  isWhatsNewVersionRead,
+  type WhatsNewAck,
+} from "@/lib/whatsNewAck";
 
-const CURRENT_VERSION = "1.2.0";
-const SEEN_KEY = "haya-whats-new-seen";
+const CURRENT_VERSION = WHATS_NEW_CURRENT_VERSION;
 
 const SECTIONS = [
   {
@@ -64,27 +71,31 @@ export const Route = createFileRoute("/whats-new")({
 
 export function shouldShowWhatsNew(): boolean {
   if (typeof window === "undefined") return false;
-  try {
-    return window.localStorage.getItem(SEEN_KEY) !== CURRENT_VERSION;
-  } catch {
-    return false;
-  }
+  return !isWhatsNewVersionRead(CURRENT_VERSION);
 }
 
 export function markWhatsNewSeen(): void {
-  try {
-    window.localStorage.setItem(SEEN_KEY, CURRENT_VERSION);
-  } catch {
-    /* ignore */
-  }
+  acknowledgeWhatsNewVersion(CURRENT_VERSION);
 }
 
 function WhatsNewPage() {
   const [ready, setReady] = useState(false);
+  const [ack, setAck] = useState<WhatsNewAck | null>(null);
 
   useEffect(() => {
+    setAck(getWhatsNewAck(CURRENT_VERSION));
     setReady(true);
   }, []);
+
+  const markRead = () => setAck(acknowledgeWhatsNewVersion(CURRENT_VERSION));
+
+  const seenAtLabel = ack
+    ? new Date(ack.seenAt).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-10">
@@ -112,7 +123,7 @@ function WhatsNewPage() {
         ))}
       </div>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap items-center gap-3">
         <Link
           to="/"
           onClick={markWhatsNewSeen}
@@ -120,6 +131,21 @@ function WhatsNewPage() {
         >
           Continue to Haya Al-Salat
         </Link>
+        {ready && !ack && (
+          <button
+            type="button"
+            onClick={markRead}
+            className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-foreground hover:bg-foreground/5"
+          >
+            Mark version {CURRENT_VERSION} as read
+          </button>
+        )}
+        {ready && ack && (
+          <span className="inline-flex items-center gap-1.5 self-center rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+            <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+            Read{seenAtLabel ? ` · ${seenAtLabel}` : ""}
+          </span>
+        )}
         {ready && (
           <span className="self-center text-xs text-muted-foreground">
             Version {CURRENT_VERSION} · Build 8
