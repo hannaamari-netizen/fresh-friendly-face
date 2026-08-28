@@ -1330,6 +1330,34 @@ function HayaAlSalat() {
           </div>
         </section>
 
+        {/* Quran + Dua */}
+        <section className="mt-8 grid grid-cols-2 gap-2">
+          <Link
+            to="/quran"
+            className="rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
+          >
+            <span className="font-arabic block text-lg" style={{ color: "var(--gold-soft)" }} dir="rtl">
+              ٱلْقُرْآن
+            </span>
+            <span className="mt-1 block text-sm font-medium">The Holy Quran</span>
+            <span className="mt-0.5 block text-[11px] text-muted-foreground">
+              Arabic · English · Svenska
+            </span>
+          </Link>
+          <Link
+            to="/duas"
+            className="rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
+          >
+            <span className="font-arabic block text-lg" style={{ color: "var(--gold-soft)" }} dir="rtl">
+              الدُّعَاء
+            </span>
+            <span className="mt-1 block text-sm font-medium">Dua Sessions</span>
+            <span className="mt-0.5 block text-[11px] text-muted-foreground">
+              Before &amp; after prayer
+            </span>
+          </Link>
+        </section>
+
         {/* Prayer times list */}
         <section className="mt-8">
           <div className="mb-3 flex items-center justify-between">
