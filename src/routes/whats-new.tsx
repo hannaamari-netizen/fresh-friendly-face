@@ -71,19 +71,11 @@ export const Route = createFileRoute("/whats-new")({
 
 export function shouldShowWhatsNew(): boolean {
   if (typeof window === "undefined") return false;
-  try {
-    return window.localStorage.getItem(SEEN_KEY) !== CURRENT_VERSION;
-  } catch {
-    return false;
-  }
+  return !isWhatsNewVersionRead(CURRENT_VERSION);
 }
 
 export function markWhatsNewSeen(): void {
-  try {
-    window.localStorage.setItem(SEEN_KEY, CURRENT_VERSION);
-  } catch {
-    /* ignore */
-  }
+  acknowledgeWhatsNewVersion(CURRENT_VERSION);
 }
 
 function WhatsNewPage() {
