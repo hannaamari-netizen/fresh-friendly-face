@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as XcodeSetupRouteImport } from './routes/xcode-setup'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as QiblaRouteImport } from './routes/qibla'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LicensesRouteImport } from './routes/licenses'
 import { Route as DuasRouteImport } from './routes/duas'
@@ -28,6 +29,11 @@ const XcodeSetupRoute = XcodeSetupRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QiblaRoute = QiblaRouteImport.update({
+  id: '/qibla',
+  path: '/qibla',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
+  '/qibla': typeof QiblaRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
   '/quran/$surah': typeof QuranSurahRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
+  '/qibla': typeof QiblaRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
   '/quran/$surah': typeof QuranSurahRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
+  '/qibla': typeof QiblaRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
   '/quran/$surah': typeof QuranSurahRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/duas'
     | '/licenses'
     | '/privacy'
+    | '/qibla'
     | '/terms'
     | '/xcode-setup'
     | '/quran/$surah'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/duas'
     | '/licenses'
     | '/privacy'
+    | '/qibla'
     | '/terms'
     | '/xcode-setup'
     | '/quran/$surah'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/duas'
     | '/licenses'
     | '/privacy'
+    | '/qibla'
     | '/terms'
     | '/xcode-setup'
     | '/quran/$surah'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   DuasRoute: typeof DuasRoute
   LicensesRoute: typeof LicensesRoute
   PrivacyRoute: typeof PrivacyRoute
+  QiblaRoute: typeof QiblaRoute
   TermsRoute: typeof TermsRoute
   XcodeSetupRoute: typeof XcodeSetupRoute
   QuranSurahRoute: typeof QuranSurahRoute
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qibla': {
+      id: '/qibla'
+      path: '/qibla'
+      fullPath: '/qibla'
+      preLoaderRoute: typeof QiblaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -241,6 +261,7 @@ const rootRouteChildren: RootRouteChildren = {
   DuasRoute: DuasRoute,
   LicensesRoute: LicensesRoute,
   PrivacyRoute: PrivacyRoute,
+  QiblaRoute: QiblaRoute,
   TermsRoute: TermsRoute,
   XcodeSetupRoute: XcodeSetupRoute,
   QuranSurahRoute: QuranSurahRoute,
