@@ -105,6 +105,13 @@ function TasbihPage() {
     setPhrases(loaded);
     setState(loadState(loaded));
     setNotifUnsupported(typeof Notification === "undefined");
+    try {
+      const raw = localStorage.getItem(UNDO_PHRASES_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) setUndoPhrases(parsed);
+      }
+    } catch {}
     setHydrated(true);
   }, []);
 
