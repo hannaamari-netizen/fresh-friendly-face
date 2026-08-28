@@ -1712,6 +1712,18 @@ function HayaAlSalat() {
             <p className="mt-2 text-[10px] text-muted-foreground/80">
               Hear exactly what will play at each prayer time before it triggers.
             </p>
+            <div
+              className="mt-3 rounded-xl border px-3 py-2 text-center"
+              style={{ borderColor: "oklch(0.82 0.13 85 / 0.25)", background: "oklch(0.82 0.13 85 / 0.08)" }}
+            >
+              <p className="font-arabic text-base" style={{ color: "var(--gold-soft)" }} dir="rtl">
+                {FAJR_PHRASE_ARABIC}
+              </p>
+              <p className="mt-0.5 text-[10px] font-medium" style={{ color: "var(--gold)" }}>
+                {FAJR_PHRASE_LATIN}
+              </p>
+              <p className="text-[9px] text-muted-foreground/80">{FAJR_PHRASE_MEANING} · included before the Fajr adhan</p>
+            </div>
           </div>
           <AdhanTest volume={adhanVolume} />
 
