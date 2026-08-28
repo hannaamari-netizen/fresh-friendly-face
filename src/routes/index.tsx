@@ -28,7 +28,15 @@ import {
   saveFajrSurah,
   surahAudioUrl,
 } from "@/lib/fajrSurahs";
-import { ADHAN_FAJR_URL, ADHAN_URL, cachedAdhanSrc, preloadAdhanAudio } from "@/lib/adhan";
+import {
+  ADHAN_FAJR_URL,
+  ADHAN_URL,
+  cachedAdhanSrc,
+  preloadAdhanAudio,
+  FAJR_PHRASE_ARABIC,
+  FAJR_PHRASE_LATIN,
+  FAJR_PHRASE_MEANING,
+} from "@/lib/adhan";
 
 
 export const Route = createFileRoute("/")({
