@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, Compass, LocateFixed, Search } from "lucide-react";
+import { ChevronLeft, Compass, History, LocateFixed, Search, Star, Trash2, X } from "lucide-react";
 import { ipLocate, reverseGeocode } from "@/lib/geo";
+import { useQiblaPlaces, type QiblaPlace } from "@/lib/qiblaPlaces";
 
 export const Route = createFileRoute("/qibla")({
   head: () => ({
@@ -78,6 +79,27 @@ function QiblaPage() {
 
   const bearing = useMemo(() => (place ? qiblaBearing(place.lat, place.lon) : null), [place]);
   const distance = useMemo(() => (place ? distanceKm(place.lat, place.lon) : null), [place]);
+  const { history, favorites, pushHistory, isFavorite, toggleFavorite, removeFavorite, clearHistory } =
+    useQiblaPlaces();
+
+  // Remember every place that gets looked up, with its bearing and distance.
+  useEffect(() => {
+    if (!place || bearing == null || distance == null) return;
+    pushHistory({
+      city: place.city,
+      country: place.country,
+      lat: place.lat,
+      lon: place.lon,
+      bearing: Math.round(bearing),
+      distanceKm: distance,
+    });
+  }, [place, bearing, distance, pushHistory]);
+
+  const openSaved = (p: QiblaPlace) => {
+    setPlace({ city: p.city, country: p.country, lat: p.lat, lon: p.lon });
+    setQ("");
+    setResults([]);
+  };
 
   // Initial location: precise GPS, else approximate IP location.
   useEffect(() => {
@@ -268,6 +290,30 @@ function QiblaPage() {
                 {bearing != null ? `${Math.round(bearing)}° from true north` : ""}
                 {distance != null ? ` · ${distance.toLocaleString("en-US")} km to Mecca` : ""}
               </p>
+              {bearing != null && distance != null && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    toggleFavorite({
+                      city: place.city,
+                      country: place.country,
+                      lat: place.lat,
+                      lon: place.lon,
+                      bearing: Math.round(bearing),
+                      distanceKm: distance,
+                    })
+                  }
+                  aria-pressed={isFavorite(place)}
+                  className={`mt-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] transition ${
+                    isFavorite(place)
+                      ? "border-amber-200/40 bg-amber-200/10 text-amber-100"
+                      : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
+                  }`}
+                >
+                  <Star className="h-3.5 w-3.5" fill={isFavorite(place) ? "currentColor" : "none"} />
+                  {isFavorite(place) ? "Saved location" : "Save this location"}
+                </button>
+              )}
 
               <div className="relative mx-auto mt-6 h-52 w-52">
                 <div className="absolute inset-0 rounded-full border border-white/10" />
@@ -329,6 +375,88 @@ function QiblaPage() {
           )}
           {status && <p className="mt-3 text-[11px] text-amber-100/80">{status}</p>}
         </section>
+
+        {/* Favourites */}
+        {favorites.length > 0 && (
+          <section className="mt-6 rounded-3xl border border-white/10 bg-black/20 px-4 py-4">
+            <h2 className="flex items-center gap-1.5 text-xs font-medium">
+              <Star className="h-3.5 w-3.5" style={{ color: "var(--gold-soft)" }} /> Favourite locations
+            </h2>
+            <ul className="mt-3 space-y-1.5">
+              {favorites.map((f) => (
+                <li key={`fav-${f.lat}-${f.lon}`} className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openSaved(f)}
+                    className="min-w-0 flex-1 rounded-xl border border-white/5 bg-white/5 px-3 py-2 text-left transition hover:bg-white/10"
+                  >
+                    <span className="block truncate text-[12px] font-medium capitalize">
+                      {f.city}
+                      {f.country ? `, ${f.country}` : ""}
+                    </span>
+                    <span className="block text-[10px] text-muted-foreground">
+                      {f.bearing}° · {f.distanceKm.toLocaleString("en-US")} km to Mecca
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeFavorite(f)}
+                    aria-label={`Remove ${f.city} from favourites`}
+                    className="rounded-full border border-white/10 p-1.5 text-muted-foreground transition hover:bg-white/10"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* History */}
+        {history.length > 0 && (
+          <section className="mt-4 rounded-3xl border border-white/10 bg-black/20 px-4 py-4">
+            <div className="flex items-center justify-between">
+              <h2 className="flex items-center gap-1.5 text-xs font-medium">
+                <History className="h-3.5 w-3.5" style={{ color: "var(--gold-soft)" }} /> Recent lookups
+              </h2>
+              <button
+                type="button"
+                onClick={clearHistory}
+                className="inline-flex items-center gap-1 text-[10px] text-muted-foreground transition hover:text-foreground"
+              >
+                <Trash2 className="h-3 w-3" /> Clear
+              </button>
+            </div>
+            <ul className="mt-3 space-y-1.5">
+              {history.map((h) => (
+                <li key={`hist-${h.lat}-${h.lon}`} className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openSaved(h)}
+                    className="min-w-0 flex-1 rounded-xl border border-white/5 bg-white/5 px-3 py-2 text-left transition hover:bg-white/10"
+                  >
+                    <span className="block truncate text-[12px] capitalize">
+                      {h.city}
+                      {h.country ? `, ${h.country}` : ""}
+                    </span>
+                    <span className="block text-[10px] text-muted-foreground">
+                      {h.bearing}° · {h.distanceKm.toLocaleString("en-US")} km
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleFavorite(h)}
+                    aria-label={`Save ${h.city} to favourites`}
+                    className="rounded-full border border-white/10 p-1.5 transition hover:bg-white/10"
+                    style={{ color: isFavorite(h) ? "var(--gold-soft)" : undefined }}
+                  >
+                    <Star className="h-3 w-3" fill={isFavorite(h) ? "currentColor" : "none"} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </main>
   );
