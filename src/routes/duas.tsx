@@ -61,9 +61,33 @@ function DuaCard({ dua }: { dua: Dua }) {
   );
 }
 
+const TABS = [
+  { id: "before", label: "Before prayer", icon: HandHeart },
+  { id: "after", label: "After prayer", icon: Sparkles },
+  { id: "morning", label: "Athkar as-Sabah", icon: Sun },
+  { id: "evening", label: "Athkar al-Masa", icon: MoonStar },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
+const LISTS: Record<TabId, Dua[]> = {
+  before: DUAS_BEFORE,
+  after: DUAS_AFTER,
+  morning: ATHKAR_MORNING,
+  evening: ATHKAR_EVENING,
+};
+
 function DuasPage() {
-  const [tab, setTab] = useState<"before" | "after">("before");
-  const list = tab === "before" ? DUAS_BEFORE : DUAS_AFTER;
+  // Default to the session that fits the time of day (set after mount so SSR
+  // and the first client render agree).
+  const [tab, setTab] = useState<TabId>("before");
+  useEffect(() => {
+    const h = new Date().getHours();
+    if (h < 11) setTab("morning");
+    else if (h >= 17) setTab("evening");
+  }, []);
+  const list = LISTS[tab];
+
 
   return (
     <main className="relative min-h-dvh">
