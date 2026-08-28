@@ -151,6 +151,12 @@ function AboutPage() {
     const id = window.setInterval(() => setPreviewTick((n) => n + 1), 1000);
     return () => window.clearInterval(id);
   }, []);
+
+  // What's New per-version acknowledgment state (read after mount; SSR-safe).
+  const [whatsNewAck, setWhatsNewAck] = useState<WhatsNewAck | null>(null);
+  useEffect(() => {
+    setWhatsNewAck(getWhatsNewAck(WHATS_NEW_CURRENT_VERSION));
+  }, []);
   const report = useMemo(
     () => (reportMounted ? buildReport() : ""),
     [buildReport, previewTick, reportMounted],
