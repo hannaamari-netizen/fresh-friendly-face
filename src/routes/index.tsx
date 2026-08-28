@@ -1461,6 +1461,7 @@ function HayaAlSalat() {
             </span>
           </Link>
           <Link
+            to="/qibla"
             className="col-span-2 flex items-center justify-between rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
           >
             <span>
