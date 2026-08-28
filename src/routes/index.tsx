@@ -1437,7 +1437,30 @@ function HayaAlSalat() {
             </span>
           </Link>
           <Link
-            to="/qibla"
+            to="/names"
+            className="rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
+          >
+            <span className="font-arabic block text-lg" style={{ color: "var(--gold-soft)" }} dir="rtl">
+              أسماء الله الحسنى
+            </span>
+            <span className="mt-1 block text-sm font-medium">99 Names of Allah</span>
+            <span className="mt-0.5 block text-[11px] text-muted-foreground">
+              Asma Allah Al-Husna
+            </span>
+          </Link>
+          <Link
+            to="/tasbih"
+            className="rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
+          >
+            <span className="font-arabic block text-lg" style={{ color: "var(--gold-soft)" }} dir="rtl">
+              التَّسْبِيح
+            </span>
+            <span className="mt-1 block text-sm font-medium">Tasbih Counter</span>
+            <span className="mt-0.5 block text-[11px] text-muted-foreground">
+              Dhikr counter &amp; daily reminder
+            </span>
+          </Link>
+          <Link
             className="col-span-2 flex items-center justify-between rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
           >
             <span>
