@@ -9,7 +9,7 @@ export const Route = createFileRoute("/tasbih")({
       {
         name: "description",
         content:
-          "A gentle tasbih counter for SubhanAllah, Alhamdulillah and Allahu Akbar with daily reminder notifications.",
+          "A gentle tasbih counter for SubhanAllah, Alhamdulillah, Allahu Akbar, La ilaha illa Allah and Astaghfir Allah with daily reminder notifications.",
       },
       { property: "og:title", content: "Tasbih Counter — Haya Al-Salat" },
       {
@@ -32,6 +32,7 @@ const PHRASES = [
   { arabic: "الْحَمْدُ لِلَّه", latin: "Alhamdulillah", meaning: "All praise is due to Allah" },
   { arabic: "اللهُ أَكْبَر", latin: "Allahu Akbar", meaning: "Allah is the Greatest" },
   { arabic: "لَا إِلَهَ إِلَّا الله", latin: "La ilaha illa Allah", meaning: "There is no god but Allah" },
+  { arabic: "أَسْتَغْفِرُ الله", latin: "Astaghfir Allah", meaning: "I seek forgiveness from Allah" },
 ] as const;
 
 const TARGETS = [33, 100, 1000];
