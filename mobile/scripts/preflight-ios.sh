@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Preflight for `bun run mobile:ios`.
 
+
 # Verifies:
 #   - Running on macOS with Xcode command-line tools
 #   - Capacitor bundle id matches expected value
