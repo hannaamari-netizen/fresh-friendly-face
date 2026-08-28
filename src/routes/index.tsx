@@ -7,6 +7,7 @@ import { MotionToggle } from "@/components/MotionToggle";
 import { InstallSteps } from "@/components/InstallSteps";
 import { ShareApp } from "@/components/ShareApp";
 import { AppStoreBadge } from "@/components/AppStoreBadge";
+import { AdhanTest } from "@/components/AdhanTest";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
@@ -1643,6 +1644,8 @@ function HayaAlSalat() {
               Hear exactly what will play at each prayer time before it triggers.
             </p>
           </div>
+          <AdhanTest volume={adhanVolume} />
+
           <p className="mt-3 text-center text-[10px] text-muted-foreground/70">
             Tap the Adhan icon to hear the call to prayer for each time.
           </p>
