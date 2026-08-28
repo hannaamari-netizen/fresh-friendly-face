@@ -318,6 +318,18 @@ function HayaAlSalat() {
     setActiveSrc(surahUrl);
   }, [surahUrl]);
 
+  // Background-preload and cache both adhan recordings so prayer alerts start
+  // instantly, even on a weak connection.
+  useEffect(() => {
+    const run = () => { void preloadAdhanAudio(); };
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(run);
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = setTimeout(run, 3000);
+    return () => clearTimeout(t);
+  }, []);
+
   // Fetch location + prayer times (timezone-aware, refetches on day rollover / focus)
   const coordsRef = useRef<{ lat: number; lon: number } | null>(null);
   const [fetchTick, setFetchTick] = useState(0);
@@ -1565,6 +1577,47 @@ function HayaAlSalat() {
                 style={{ ["--val" as any]: `${adhanVolume * 100}%` }}
               />
             </div>
+          </div>
+
+          {/* Adhan alert preview */}
+          <div className="mt-3 rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+            <p className="mb-2 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              Preview adhan alerts
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { key: "Fajr", label: "Fajr adhan", hint: "special" },
+                { key: "Dhuhr", label: "Regular adhan", hint: "Dhuhr–Isha" },
+              ].map((opt) => {
+                const active = adhanPlaying === opt.key;
+                return (
+                  <button
+                    key={opt.key}
+                    onClick={() => toggleAdhan(opt.key)}
+                    aria-pressed={active}
+                    className="rounded-xl border px-3 py-2 text-left transition"
+                    style={{
+                      borderColor: active ? "var(--gold)" : "oklch(1 0 0 / 0.12)",
+                      background: active ? "oklch(0.82 0.13 85 / 0.15)" : "transparent",
+                    }}
+                  >
+                    <span
+                      className="flex items-center gap-1.5 text-[11px] font-medium"
+                      style={{ color: active ? "var(--gold)" : "var(--foreground)" }}
+                    >
+                      {active ? <Square className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                      {opt.label}
+                    </span>
+                    <span className="mt-0.5 block text-[9px] text-muted-foreground/80">
+                      {active ? "Tap to stop" : opt.hint}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[10px] text-muted-foreground/80">
+              Hear exactly what will play at each prayer time before it triggers.
+            </p>
           </div>
           <p className="mt-3 text-center text-[10px] text-muted-foreground/70">
             Tap the Adhan icon to hear the call to prayer for each time.
