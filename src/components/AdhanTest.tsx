@@ -9,8 +9,15 @@ import {
   Copy,
   Mail,
   ListChecks,
+  Moon,
 } from "lucide-react";
-import { ADHAN_FAJR_URL, ADHAN_URL, cachedAdhanSrc } from "@/lib/adhan";
+import {
+  ADHAN_FAJR_URL,
+  ADHAN_URL,
+  cachedAdhanSrc,
+  FAJR_PHRASE_ARABIC,
+  FAJR_PHRASE_LATIN,
+} from "@/lib/adhan";
 
 const PRAYERS = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"] as const;
 type Prayer = (typeof PRAYERS)[number];
