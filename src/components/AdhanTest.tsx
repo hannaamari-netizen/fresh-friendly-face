@@ -9,8 +9,15 @@ import {
   Copy,
   Mail,
   ListChecks,
+  Moon,
 } from "lucide-react";
-import { ADHAN_FAJR_URL, ADHAN_URL, cachedAdhanSrc } from "@/lib/adhan";
+import {
+  ADHAN_FAJR_URL,
+  ADHAN_URL,
+  cachedAdhanSrc,
+  FAJR_PHRASE_ARABIC,
+  FAJR_PHRASE_LATIN,
+} from "@/lib/adhan";
 
 const PRAYERS = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"] as const;
 type Prayer = (typeof PRAYERS)[number];
@@ -177,6 +184,12 @@ export function AdhanTest({ volume = 0.8 }: { volume?: number }) {
                 {active === "Fajr" ? "Special Fajr adhan" : "Regular adhan"} ·{" "}
                 {index! + 1} of {PRAYERS.length} · next in {remaining}s
               </p>
+              {active === "Fajr" && (
+                <p className="mt-1 text-[10px]" style={{ color: "var(--gold-soft)" }}>
+                  <Moon className="mr-1 inline h-3 w-3" />
+                  Includes “{FAJR_PHRASE_LATIN}”
+                </p>
+              )}
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <button

@@ -1,16 +1,20 @@
 // Adhan (call to prayer) audio sources.
 //
-// IMPORTANT: ADHAN_FAJR_URL is PINNED. The Fajr adhan recording (which
-// includes "As-salatu khayrun min an-nawm") is a deliberate product choice
-// and must never change. The safeguard script `scripts/check-fajr-adhan.mjs`
-// (run via `bun run check:fajr-adhan` and in the iOS preflight) verifies this
-// value before every release.
+// IMPORTANT: ADHAN_FAJR_URL is PINNED. The Fajr adhan recording is a
+// deliberate product choice and must never change. The safeguard script
+// `scripts/check-fajr-adhan.mjs` (run via `bun run check:fajr-adhan` and in
+// the iOS preflight) verifies this value before every release.
 export const ADHAN_FAJR_URL = "https://www.islamcan.com/audio/adhan/azan2.mp3";
 
 // Regular adhan for Dhuhr, Asr, Maghrib and Isha (high-quality Aladhan CDN).
 export const ADHAN_URL = "https://cdn.aladhan.com/audio/adhans/a2.mp3";
 
 export const ADHAN_SOURCES = [ADHAN_FAJR_URL, ADHAN_URL] as const;
+
+/** The phrase traditionally added before the Fajr adhan. */
+export const FAJR_PHRASE_ARABIC = "الصَّلَاةُ خَيْرٌ مِنَ النَّوْمِ";
+export const FAJR_PHRASE_LATIN = "As-salatu khayrun min an-nawm";
+export const FAJR_PHRASE_MEANING = "Prayer is better than sleep";
 
 const ADHAN_CACHE = "haya-adhan-v1";
 
