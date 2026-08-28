@@ -53,18 +53,27 @@ function loadState(): TasbihState {
 }
 
 function TasbihPage() {
-  const [state, setState] = useState<TasbihState>(() =>
-    typeof window === "undefined" ? { phrase: 0, count: 0, total: 0, target: 33 } : loadState()
-  );
+  const DEFAULT: TasbihState = { phrase: 0, count: 0, total: 0, target: 33 };
+  const [state, setState] = useState<TasbihState>(DEFAULT);
+  const [hydrated, setHydrated] = useState(false);
+  const [notifUnsupported, setNotifUnsupported] = useState(false);
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState("20:00");
   const [justHitTarget, setJustHitTarget] = useState(false);
 
+  // Load persisted state after mount to avoid SSR/client hydration mismatch.
   useEffect(() => {
+    setState(loadState());
+    setNotifUnsupported(typeof Notification === "undefined");
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem(KEY, JSON.stringify(state));
     } catch {}
-  }, [state]);
+  }, [hydrated, state]);
 
   // Load reminder prefs + run the reminder check every minute.
   useEffect(() => {
