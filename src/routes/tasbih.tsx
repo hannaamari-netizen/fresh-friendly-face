@@ -127,6 +127,17 @@ function TasbihPage() {
     savePhrases(phrases);
   }, [hydrated, phrases]);
 
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      if (undoPhrases) {
+        localStorage.setItem(UNDO_PHRASES_KEY, JSON.stringify(undoPhrases));
+      } else {
+        localStorage.removeItem(UNDO_PHRASES_KEY);
+      }
+    } catch {}
+  }, [hydrated, undoPhrases]);
+
   // Load reminder prefs + run the reminder check every minute.
   useEffect(() => {
     try {
