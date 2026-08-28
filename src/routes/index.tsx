@@ -727,7 +727,20 @@ function HayaAlSalat() {
           {loc && (
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <MapPin className="h-3 w-3" />
-              <span className="capitalize">{loc.city}</span>
+              <span className="capitalize">
+                {loc.city}
+                {loc.country ? `, ${loc.country}` : ""}
+              </span>
+              {locSource !== "gps" && (
+                <button
+                  type="button"
+                  onClick={() => setFetchTick((t) => t + 1)}
+                  className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-medium text-amber-100 transition hover:bg-white/10"
+                  title="Approximate location — tap to use your precise location"
+                >
+                  {locSource === "ip" ? "Approx · Fix" : "Set location"}
+                </button>
+              )}
             </div>
           )}
         </header>
