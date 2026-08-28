@@ -33,7 +33,7 @@ export const Route = createFileRoute("/quran/$surah")({
       ],
     };
   },
-  component: SurahReader;
+  component: SurahReader,
 });
 
 function SurahReader() {
