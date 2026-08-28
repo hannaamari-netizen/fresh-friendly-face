@@ -1598,6 +1598,37 @@ function HayaAlSalat() {
               if (adhanRef.current && adhanRef.current.ended) return;
             }}
           />
+          {/* Calculation method — prayer times differ by country authority */}
+          <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
+            <p className="mb-2 text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              Calculation method
+            </p>
+            <select
+              value={methodPref === "auto" ? "auto" : String(methodPref)}
+              onChange={(e) =>
+                changeMethodPref(e.target.value === "auto" ? "auto" : Number(e.target.value))
+              }
+              aria-label="Prayer time calculation method"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-[12px] text-foreground focus:border-[var(--gold)] focus:outline-none"
+            >
+              <option value="auto">
+                Automatic (follow my country)
+              </option>
+              {CALC_METHODS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+            <p className="mt-2 text-[10px] text-muted-foreground/80">
+              {loc?.method
+                ? `Using ${methodLabel(loc.method)}${
+                    methodPref === "auto" && loc.country ? ` — detected ${loc.country}` : ""
+                  }.`
+                : "Times follow the recognised authority for your country."}
+            </p>
+          </div>
+
           <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 px-3 py-3">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
