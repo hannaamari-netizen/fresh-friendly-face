@@ -11,10 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as XcodeSetupRouteImport } from './routes/xcode-setup'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as QiblaRouteImport } from './routes/qibla'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LicensesRouteImport } from './routes/licenses'
+import { Route as DuasRouteImport } from './routes/duas'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as QuranIndexRouteImport } from './routes/quran.index'
+import { Route as QuranSurahRouteImport } from './routes/quran.$surah'
 import { Route as ApiPublicCronFajrPushRouteImport } from './routes/api/public/cron/fajr-push'
 
 const XcodeSetupRoute = XcodeSetupRouteImport.update({
@@ -27,6 +31,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QiblaRoute = QiblaRouteImport.update({
+  id: '/qibla',
+  path: '/qibla',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -35,6 +44,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const LicensesRoute = LicensesRouteImport.update({
   id: '/licenses',
   path: '/licenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DuasRoute = DuasRouteImport.update({
+  id: '/duas',
+  path: '/duas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -47,6 +61,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuranIndexRoute = QuranIndexRouteImport.update({
+  id: '/quran/',
+  path: '/quran/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuranSurahRoute = QuranSurahRouteImport.update({
+  id: '/quran/$surah',
+  path: '/quran/$surah',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCronFajrPushRoute = ApiPublicCronFajrPushRouteImport.update({
   id: '/api/public/cron/fajr-push',
   path: '/api/public/cron/fajr-push',
@@ -56,29 +80,41 @@ const ApiPublicCronFajrPushRoute = ApiPublicCronFajrPushRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
+  '/qibla': typeof QiblaRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
+  '/quran/$surah': typeof QuranSurahRoute
+  '/quran/': typeof QuranIndexRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
+  '/qibla': typeof QiblaRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
+  '/quran/$surah': typeof QuranSurahRoute
+  '/quran': typeof QuranIndexRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
   '/privacy': typeof PrivacyRoute
+  '/qibla': typeof QiblaRoute
   '/terms': typeof TermsRoute
   '/xcode-setup': typeof XcodeSetupRoute
+  '/quran/$surah': typeof QuranSurahRoute
+  '/quran/': typeof QuranIndexRoute
   '/api/public/cron/fajr-push': typeof ApiPublicCronFajrPushRoute
 }
 export interface FileRouteTypes {
@@ -86,38 +122,54 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/duas'
     | '/licenses'
     | '/privacy'
+    | '/qibla'
     | '/terms'
     | '/xcode-setup'
+    | '/quran/$surah'
+    | '/quran/'
     | '/api/public/cron/fajr-push'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/duas'
     | '/licenses'
     | '/privacy'
+    | '/qibla'
     | '/terms'
     | '/xcode-setup'
+    | '/quran/$surah'
+    | '/quran'
     | '/api/public/cron/fajr-push'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/duas'
     | '/licenses'
     | '/privacy'
+    | '/qibla'
     | '/terms'
     | '/xcode-setup'
+    | '/quran/$surah'
+    | '/quran/'
     | '/api/public/cron/fajr-push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  DuasRoute: typeof DuasRoute
   LicensesRoute: typeof LicensesRoute
   PrivacyRoute: typeof PrivacyRoute
+  QiblaRoute: typeof QiblaRoute
   TermsRoute: typeof TermsRoute
   XcodeSetupRoute: typeof XcodeSetupRoute
+  QuranSurahRoute: typeof QuranSurahRoute
+  QuranIndexRoute: typeof QuranIndexRoute
   ApiPublicCronFajrPushRoute: typeof ApiPublicCronFajrPushRoute
 }
 
@@ -137,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/qibla': {
+      id: '/qibla'
+      path: '/qibla'
+      fullPath: '/qibla'
+      preLoaderRoute: typeof QiblaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -149,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/licenses'
       fullPath: '/licenses'
       preLoaderRoute: typeof LicensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/duas': {
+      id: '/duas'
+      path: '/duas'
+      fullPath: '/duas'
+      preLoaderRoute: typeof DuasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -165,6 +231,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quran/': {
+      id: '/quran/'
+      path: '/quran'
+      fullPath: '/quran/'
+      preLoaderRoute: typeof QuranIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quran/$surah': {
+      id: '/quran/$surah'
+      path: '/quran/$surah'
+      fullPath: '/quran/$surah'
+      preLoaderRoute: typeof QuranSurahRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/fajr-push': {
       id: '/api/public/cron/fajr-push'
       path: '/api/public/cron/fajr-push'
@@ -178,10 +258,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  DuasRoute: DuasRoute,
   LicensesRoute: LicensesRoute,
   PrivacyRoute: PrivacyRoute,
+  QiblaRoute: QiblaRoute,
   TermsRoute: TermsRoute,
   XcodeSetupRoute: XcodeSetupRoute,
+  QuranSurahRoute: QuranSurahRoute,
+  QuranIndexRoute: QuranIndexRoute,
   ApiPublicCronFajrPushRoute: ApiPublicCronFajrPushRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2, Wifi, BatteryCharging, Radio, Square, Shield, FileText, Info, ExternalLink } from "lucide-react";
+import { Play, Pause, MapPin, Moon, Sunrise, Volume2, VolumeX, Download, CheckCircle2, Loader2, Wifi, BatteryCharging, Radio, Square, Shield, FileText, Info, ExternalLink, Compass } from "lucide-react";
 import { FajrReminder } from "@/components/FajrReminder";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MotionToggle } from "@/components/MotionToggle";
@@ -1165,7 +1165,7 @@ function HayaAlSalat() {
               ) : (
                 <button
                   onClick={enableStartNotifications}
-                  disabled={!notifSupported || (notifSupported && Notification.permission === "denied")}
+                  disabled={notifMounted ? !notifSupported || Notification.permission === "denied" : false}
                   className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-amber-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Enable
@@ -1330,12 +1330,56 @@ function HayaAlSalat() {
           </div>
         </section>
 
+        {/* Quran + Dua */}
+        <section className="mt-8 grid grid-cols-2 gap-2">
+          <Link
+            to="/quran"
+            className="rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
+          >
+            <span className="font-arabic block text-lg" style={{ color: "var(--gold-soft)" }} dir="rtl">
+              ٱلْقُرْآن
+            </span>
+            <span className="mt-1 block text-sm font-medium">The Holy Quran</span>
+            <span className="mt-0.5 block text-[11px] text-muted-foreground">
+              Arabic · English · Svenska
+            </span>
+          </Link>
+          <Link
+            to="/duas"
+            className="rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
+          >
+            <span className="font-arabic block text-lg" style={{ color: "var(--gold-soft)" }} dir="rtl">
+              الدُّعَاء
+            </span>
+            <span className="mt-1 block text-sm font-medium">Dua Sessions</span>
+            <span className="mt-0.5 block text-[11px] text-muted-foreground">
+              Prayer &amp; morning/evening athkar
+            </span>
+          </Link>
+          <Link
+            to="/qibla"
+            className="col-span-2 flex items-center justify-between rounded-3xl border border-white/10 bg-black/20 px-4 py-4 transition hover:bg-white/5"
+          >
+            <span>
+              <span className="font-arabic block text-lg" style={{ color: "var(--gold-soft)" }} dir="rtl">
+                ٱلْقِبْلَة
+              </span>
+              <span className="mt-1 block text-sm font-medium">Qibla Finder</span>
+              <span className="mt-0.5 block text-[11px] text-muted-foreground">
+                Search any city or use your location
+              </span>
+            </span>
+            <Compass className="h-5 w-5" style={{ color: "var(--gold-soft)" }} />
+          </Link>
+
+        </section>
+
         {/* Prayer times list */}
         <section className="mt-8">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-display text-xl">Today's Prayers</h2>
             <span className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
-              {new Date().toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+              {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
             </span>
           </div>
           <ul className="space-y-1.5">
