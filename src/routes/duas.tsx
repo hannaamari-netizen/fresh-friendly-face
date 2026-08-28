@@ -117,30 +117,25 @@ function DuasPage() {
           </p>
           <h1 className="mt-3 font-display text-4xl font-medium leading-tight gold-shimmer">Dua Sessions</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            A quiet moment before the prayer, and remembrance after it.
+            Before and after the prayer, and the morning and evening athkar.
           </p>
         </header>
 
-        <div className="mt-6 grid grid-cols-2 gap-2 rounded-full border border-white/10 bg-white/5 p-1 text-xs">
-          <button
-            type="button"
-            onClick={() => setTab("before")}
-            className={`flex items-center justify-center gap-1.5 rounded-full px-3 py-2 transition ${
-              tab === "before" ? "bg-amber-200/15 text-amber-100" : "text-muted-foreground"
-            }`}
-          >
-            <HandHeart className="h-3.5 w-3.5" /> Before prayer
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("after")}
-            className={`flex items-center justify-center gap-1.5 rounded-full px-3 py-2 transition ${
-              tab === "after" ? "bg-amber-200/15 text-amber-100" : "text-muted-foreground"
-            }`}
-          >
-            <Sparkles className="h-3.5 w-3.5" /> After prayer
-          </button>
+        <div className="mt-6 grid grid-cols-2 gap-2 rounded-3xl border border-white/10 bg-white/5 p-1 text-xs">
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => setTab(id)}
+              className={`flex items-center justify-center gap-1.5 rounded-2xl px-3 py-2 transition ${
+                tab === id ? "bg-amber-200/15 text-amber-100" : "text-muted-foreground"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5 shrink-0" /> {label}
+            </button>
+          ))}
         </div>
+
 
         <ul className="mt-5 space-y-3">
           {list.map((d) => (
