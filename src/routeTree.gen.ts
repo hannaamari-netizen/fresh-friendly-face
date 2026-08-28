@@ -13,6 +13,7 @@ import { Route as XcodeSetupRouteImport } from './routes/xcode-setup'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as QiblaRouteImport } from './routes/qibla'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as NamesRouteImport } from './routes/names'
 import { Route as LicensesRouteImport } from './routes/licenses'
 import { Route as DuasRouteImport } from './routes/duas'
 import { Route as AboutRouteImport } from './routes/about'
@@ -39,6 +40,11 @@ const QiblaRoute = QiblaRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NamesRoute = NamesRouteImport.update({
+  id: '/names',
+  path: '/names',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LicensesRoute = LicensesRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
+  '/names': typeof NamesRoute
   '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
   '/terms': typeof TermsRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
+  '/names': typeof NamesRoute
   '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
   '/terms': typeof TermsRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/duas': typeof DuasRoute
   '/licenses': typeof LicensesRoute
+  '/names': typeof NamesRoute
   '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
   '/terms': typeof TermsRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/duas'
     | '/licenses'
+    | '/names'
     | '/privacy'
     | '/qibla'
     | '/terms'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/duas'
     | '/licenses'
+    | '/names'
     | '/privacy'
     | '/qibla'
     | '/terms'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/duas'
     | '/licenses'
+    | '/names'
     | '/privacy'
     | '/qibla'
     | '/terms'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   DuasRoute: typeof DuasRoute
   LicensesRoute: typeof LicensesRoute
+  NamesRoute: typeof NamesRoute
   PrivacyRoute: typeof PrivacyRoute
   QiblaRoute: typeof QiblaRoute
   TermsRoute: typeof TermsRoute
@@ -201,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/names': {
+      id: '/names'
+      path: '/names'
+      fullPath: '/names'
+      preLoaderRoute: typeof NamesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/licenses': {
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   DuasRoute: DuasRoute,
   LicensesRoute: LicensesRoute,
+  NamesRoute: NamesRoute,
   PrivacyRoute: PrivacyRoute,
   QiblaRoute: QiblaRoute,
   TermsRoute: TermsRoute,
