@@ -8,6 +8,7 @@ import { InstallSteps } from "@/components/InstallSteps";
 import { ShareApp } from "@/components/ShareApp";
 import { AppStoreBadge } from "@/components/AppStoreBadge";
 import { AdhanTest } from "@/components/AdhanTest";
+import { WhatsNewBanner } from "@/components/WhatsNewBanner";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
@@ -833,6 +834,7 @@ function HayaAlSalat() {
 
         {/* Title */}
         <div className="mt-10 text-center">
+          <WhatsNewBanner />
           <p className="font-arabic text-2xl leading-none" style={{ color: "var(--gold-soft)" }}>
             حَيَّ عَلَى الصَّلَاة
           </p>
