@@ -19,6 +19,7 @@ import {
   saveFajrSurah,
   surahAudioUrl,
 } from "@/lib/fajrSurahs";
+import { ADHAN_FAJR_URL, ADHAN_URL, cachedAdhanSrc, preloadAdhanAudio } from "@/lib/adhan";
 
 
 export const Route = createFileRoute("/")({
@@ -36,12 +37,10 @@ export const Route = createFileRoute("/")({
 });
 
 
-// Adhan (call to prayer) audio. Fajr uses the special Fajr adhan which includes
-// "As-salatu khayrun min an-nawm" (prayer is better than sleep).
-// The regular adhan uses the high-quality Aladhan CDN recording (beautiful,
-// clear voice) while Fajr keeps its dedicated recitation.
-const ADHAN_FAJR_URL = "https://www.islamcan.com/audio/adhan/azan2.mp3";
-const ADHAN_URL = "https://cdn.aladhan.com/audio/adhans/a2.mp3";
+// Adhan (call to prayer) audio. Fajr uses the special pinned Fajr adhan which
+// includes "As-salatu khayrun min an-nawm" (prayer is better than sleep).
+// URLs live in src/lib/adhan.ts — ADHAN_FAJR_URL is pinned and guarded by
+// `bun run check:fajr-adhan` so it can never change accidentally.
 
 type Timings = {
   Fajr: string; Sunrise: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string;
@@ -539,10 +538,14 @@ function HayaAlSalat() {
       return;
     }
     const src = prayerKey === "Fajr" ? ADHAN_FAJR_URL : ADHAN_URL;
-    el.src = src;
-    el.currentTime = 0;
     el.volume = adhanVolume;
-    el.play().then(() => setAdhanPlaying(prayerKey)).catch(() => setAdhanPlaying(null));
+    // Use the background-cached offline copy when available so the alert
+    // starts instantly; otherwise stream the network URL.
+    void cachedAdhanSrc(src).then((resolved) => {
+      el.src = resolved;
+      el.currentTime = 0;
+      el.play().then(() => setAdhanPlaying(prayerKey)).catch(() => setAdhanPlaying(null));
+    });
   }
 
   // Auto-start Surat Al-Mu'minun `recitationLead` minutes before Fajr, once per Fajr instant.
