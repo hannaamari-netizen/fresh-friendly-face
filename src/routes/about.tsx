@@ -205,6 +205,23 @@ function AboutPage() {
         </p>
       </header>
 
+      <section
+        className="mb-6 flex items-center justify-between rounded-lg border px-4 py-3"
+        style={{ borderColor: "var(--gold-soft)", background: "color-mix(in srgb, var(--gold-soft) 8%, transparent)" }}
+      >
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            You're running
+          </p>
+          <p className="mt-0.5 font-display text-xl text-foreground">
+            Version {APP_VERSION} <span className="text-muted-foreground">(Build {APP_BUILD})</span>
+          </p>
+        </div>
+        <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          {info.source === "native" ? "App Store" : "Web"}
+        </span>
+      </section>
+
       <section className="space-y-3">
         <CopyRow label="App name" value={APP_NAME} />
         <CopyRow label="Version" value={APP_VERSION} />
