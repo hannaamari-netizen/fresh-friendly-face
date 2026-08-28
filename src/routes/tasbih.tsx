@@ -96,6 +96,8 @@ function TasbihPage() {
   const [justHitTarget, setJustHitTarget] = useState(false);
   const [editing, setEditing] = useState(false);
   const [newPhrase, setNewPhrase] = useState<Phrase>({ arabic: "", latin: "", meaning: "" });
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [undoPhrases, setUndoPhrases] = useState<Phrase[] | null>(null);
 
   // Load persisted state after mount to avoid SSR/client hydration mismatch.
   useEffect(() => {
