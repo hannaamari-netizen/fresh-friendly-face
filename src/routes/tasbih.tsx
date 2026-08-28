@@ -236,9 +236,30 @@ function TasbihPage() {
     setNewPhrase({ arabic: "", latin: "", meaning: "" });
   }
 
-  function resetPhrases() {
+  function requestResetPhrases() {
+    setShowResetConfirm(true);
+  }
+
+  function confirmResetPhrases() {
+    setUndoPhrases(phrases);
     setPhrases(DEFAULT_PHRASES);
     setState((s) => ({ ...s, phrase: 0, count: 0 }));
+    setShowResetConfirm(false);
+  }
+
+  function cancelResetPhrases() {
+    setShowResetConfirm(false);
+  }
+
+  function undoResetPhrases() {
+    if (!undoPhrases) return;
+    setPhrases(undoPhrases);
+    setState((s) => ({ ...s, phrase: 0, count: 0 }));
+    setUndoPhrases(null);
+  }
+
+  function dismissUndo() {
+    setUndoPhrases(null);
   }
 
   const phrase = phrases[state.phrase];
