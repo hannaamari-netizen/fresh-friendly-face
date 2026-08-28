@@ -32,8 +32,10 @@ const SURAH_URL =
 
 // Adhan (call to prayer) audio. Fajr uses the special Fajr adhan which includes
 // "As-salatu khayrun min an-nawm" (prayer is better than sleep).
+// The regular adhan uses the high-quality Aladhan CDN recording (beautiful,
+// clear voice) while Fajr keeps its dedicated recitation.
 const ADHAN_FAJR_URL = "https://www.islamcan.com/audio/adhan/azan2.mp3";
-const ADHAN_URL = "https://www.islamcan.com/audio/adhan/azan1.mp3";
+const ADHAN_URL = "https://cdn.aladhan.com/audio/adhans/a2.mp3";
 
 type Timings = {
   Fajr: string; Sunrise: string; Dhuhr: string; Asr: string; Maghrib: string; Isha: string;
