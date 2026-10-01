@@ -9,64 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as XcodeSetupRouteImport } from './routes/xcode-setup'
-import { Route as WhatsNewRouteImport } from './routes/whats-new'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as TasbihRouteImport } from './routes/tasbih'
-import { Route as QiblaRouteImport } from './routes/qibla'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as NamesRouteImport } from './routes/names'
-import { Route as LicensesRouteImport } from './routes/licenses'
-import { Route as DuasRouteImport } from './routes/duas'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as DuasRouteImport } from './routes/duas'
+import { Route as LicensesRouteImport } from './routes/licenses'
+import { Route as NamesRouteImport } from './routes/names'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as QiblaRouteImport } from './routes/qibla'
+import { Route as TasbihRouteImport } from './routes/tasbih'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as WhatsNewRouteImport } from './routes/whats-new'
+import { Route as XcodeSetupRouteImport } from './routes/xcode-setup'
 import { Route as QuranIndexRouteImport } from './routes/quran.index'
 import { Route as QuranSurahRouteImport } from './routes/quran.$surah'
 import { Route as ApiPublicCronFajrPushRouteImport } from './routes/api/public/cron/fajr-push'
 
-const XcodeSetupRoute = XcodeSetupRouteImport.update({
-  id: '/xcode-setup',
-  path: '/xcode-setup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WhatsNewRoute = WhatsNewRouteImport.update({
-  id: '/whats-new',
-  path: '/whats-new',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TasbihRoute = TasbihRouteImport.update({
-  id: '/tasbih',
-  path: '/tasbih',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QiblaRoute = QiblaRouteImport.update({
-  id: '/qibla',
-  path: '/qibla',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NamesRoute = NamesRouteImport.update({
-  id: '/names',
-  path: '/names',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LicensesRoute = LicensesRouteImport.update({
-  id: '/licenses',
-  path: '/licenses',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DuasRoute = DuasRouteImport.update({
-  id: '/duas',
-  path: '/duas',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -74,9 +34,49 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const DuasRoute = DuasRouteImport.update({
+  id: '/duas',
+  path: '/duas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LicensesRoute = LicensesRouteImport.update({
+  id: '/licenses',
+  path: '/licenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NamesRoute = NamesRouteImport.update({
+  id: '/names',
+  path: '/names',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QiblaRoute = QiblaRouteImport.update({
+  id: '/qibla',
+  path: '/qibla',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TasbihRoute = TasbihRouteImport.update({
+  id: '/tasbih',
+  path: '/tasbih',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WhatsNewRoute = WhatsNewRouteImport.update({
+  id: '/whats-new',
+  path: '/whats-new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const XcodeSetupRoute = XcodeSetupRouteImport.update({
+  id: '/xcode-setup',
+  path: '/xcode-setup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const QuranIndexRoute = QuranIndexRouteImport.update({
@@ -214,67 +214,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/xcode-setup': {
-      id: '/xcode-setup'
-      path: '/xcode-setup'
-      fullPath: '/xcode-setup'
-      preLoaderRoute: typeof XcodeSetupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/whats-new': {
-      id: '/whats-new'
-      path: '/whats-new'
-      fullPath: '/whats-new'
-      preLoaderRoute: typeof WhatsNewRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tasbih': {
-      id: '/tasbih'
-      path: '/tasbih'
-      fullPath: '/tasbih'
-      preLoaderRoute: typeof TasbihRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/qibla': {
-      id: '/qibla'
-      path: '/qibla'
-      fullPath: '/qibla'
-      preLoaderRoute: typeof QiblaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/names': {
-      id: '/names'
-      path: '/names'
-      fullPath: '/names'
-      preLoaderRoute: typeof NamesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/licenses': {
-      id: '/licenses'
-      path: '/licenses'
-      fullPath: '/licenses'
-      preLoaderRoute: typeof LicensesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/duas': {
-      id: '/duas'
-      path: '/duas'
-      fullPath: '/duas'
-      preLoaderRoute: typeof DuasRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -284,11 +228,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/duas': {
+      id: '/duas'
+      path: '/duas'
+      fullPath: '/duas'
+      preLoaderRoute: typeof DuasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/licenses': {
+      id: '/licenses'
+      path: '/licenses'
+      fullPath: '/licenses'
+      preLoaderRoute: typeof LicensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/names': {
+      id: '/names'
+      path: '/names'
+      fullPath: '/names'
+      preLoaderRoute: typeof NamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qibla': {
+      id: '/qibla'
+      path: '/qibla'
+      fullPath: '/qibla'
+      preLoaderRoute: typeof QiblaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tasbih': {
+      id: '/tasbih'
+      path: '/tasbih'
+      fullPath: '/tasbih'
+      preLoaderRoute: typeof TasbihRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/whats-new': {
+      id: '/whats-new'
+      path: '/whats-new'
+      fullPath: '/whats-new'
+      preLoaderRoute: typeof WhatsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/xcode-setup': {
+      id: '/xcode-setup'
+      path: '/xcode-setup'
+      fullPath: '/xcode-setup'
+      preLoaderRoute: typeof XcodeSetupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/quran/': {
