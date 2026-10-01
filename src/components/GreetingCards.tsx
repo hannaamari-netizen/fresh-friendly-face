@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Download, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import octoberCard from "@/assets/october-greeting-card.jpeg.asset.json";
-import coffeeCard from "@/assets/greeting-cards/coffee-moment.jpg.asset.json";
 
 type Card = { id: string; title: string; text: string; url: string; filename: string; alt: string };
 
@@ -14,14 +13,6 @@ const CARDS: Card[] = [
     url: octoberCard.url,
     filename: "haya-al-salat-october-greeting.jpeg",
     alt: "Warm autumn greeting card reading It’s October again, with coffee, leaves, and a journal",
-  },
-  {
-    id: "coffee",
-    title: "A calm coffee moment",
-    text: "Wishing you a calm and blessed day ☕",
-    url: coffeeCard.url,
-    filename: "haya-al-salat-coffee-moment.jpg",
-    alt: "Cappuccino with latte art on a wooden table next to a laptop",
   },
 ];
 
