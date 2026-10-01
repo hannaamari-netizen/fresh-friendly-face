@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Greeting-card images use Lovable Assets pointers so shareable seasonal media stays lightweight and CDN-hosted.

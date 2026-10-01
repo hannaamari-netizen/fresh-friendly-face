@@ -9,6 +9,7 @@ import { ShareApp } from "@/components/ShareApp";
 import { AppStoreBadge } from "@/components/AppStoreBadge";
 import { AdhanTest } from "@/components/AdhanTest";
 import { WhatsNewBanner } from "@/components/WhatsNewBanner";
+import { GreetingCards } from "@/components/GreetingCards";
 import { useOfflineAudio } from "@/hooks/useOfflineAudio";
 import { useAutoDownload } from "@/hooks/useAutoDownload";
 import { todayInZone, zonedDateTimeToUtc } from "@/lib/timezone";
@@ -1744,6 +1745,10 @@ function HayaAlSalat() {
 
         <section className="mt-6">
           <ShareApp />
+        </section>
+
+        <section className="mt-6">
+          <GreetingCards />
         </section>
 
         {/* Legal & App Info — surfaced in-app for reviewer access */}
